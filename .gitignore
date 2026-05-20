@@ -1,0 +1,46 @@
+# ==========================================
+# GITIGNORE UNIFICADO PARA TFM
+# ==========================================
+
+# 1. Archivos y carpetas muy pesados
+*.zip
+SAREnv/sarenv_dataset/
+SAREnv/resultados_casa_de_campo*/
+SAREnv/cache/
+SAREnv/data/
+SAREnv/results/
+*.geojson
+*.csv
+*.mp4
+
+# 2. Resultados de MTS
+framwork-MTS/*/resultados/
+framwork-MTS/*/pruebas/
+framwork-MTS/*/pruebas_test/
+framwork-MTS/*/imagenes/
+framwork-MTS/*/TFG_Alejandro/resultados/
+
+# 3. Entornos Virtuales
+tfm/
+venv/
+env/
+.env/
+.venv/
+SAREnv/tfm/
+
+# 4. Python
+__pycache__/
+*.py[cod]
+*.class
+*.egg-info/
+.pytest_cache/
+.coverage
+.cache
+cache/
+
+# 5. Editores y Jupyter
+.vscode/
+.idea/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db

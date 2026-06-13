@@ -1,0 +1,461 @@
+%----------
+%   IMPORTANTE
+%----------
+
+% Esta plantilla está basada en las recomendaciones de la guía "Trabajo fin de Máster: Escribir el TFM", que encontrarás en http://uc3m.libguides.com/TFM/escribir 
+% contiene recomendaciones de la Biblioteca basadas principalmente en estilos APA e IEEE, pero debes seguir siempre las orientaciones de tu Tutor de TFM y la normativa de TFM para tu titulación.
+
+% ESTA PLANTILLA ESTÁ BASADA EN EL ESTILO IEEE
+
+%----------
+%   CONFIGURACIÓN DEL DOCUMENTO
+%----------
+
+\documentclass[12pt]{report} % fuente a 12pt
+
+% MÁRGENES: 2,5 cm sup. e inf.; 3 cm izdo. y dcho.
+\usepackage[
+a4paper,
+vmargin=2.5cm,
+hmargin=3cm
+]{geometry}
+
+% INTERLINEADO: Estrecho (6 ptos./interlineado 1,15) o Moderado (6 ptos./interlineado 1,5)
+\renewcommand{\baselinestretch}{1.15}
+\parskip=6pt
+
+% DEFINICIÓN DE COLORES para portada y listados de código
+\usepackage[table]{xcolor}
+\definecolor{azulUC3M}{RGB}{0,0,102}
+\definecolor{gray97}{gray}{.97}
+\definecolor{gray75}{gray}{.75}
+\definecolor{gray45}{gray}{.45}
+
+% ENLACES
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,
+	linkcolor=black,
+	urlcolor=blue}
+
+% EXPRESIONES MATEMÁTICAS
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+
+% Codificación caracteres
+\usepackage{txfonts} 
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Definición idioma español
+\usepackage[spanish, es-tabla]{babel} 
+\usepackage[babel, spanish=spanish]{csquotes}
+\AtBeginEnvironment{quote}{\small}
+
+% diseño de PIE DE PÁGINA
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\rfoot{\thepage}
+\fancypagestyle{plain}{\pagestyle{fancy}}
+
+% DISEÑO DE LOS TÍTULOS de las partes del trabajo
+\usepackage{titlesec}
+\usepackage{titletoc}
+\titleformat{\chapter}[block]
+{\large\bfseries\filcenter}
+{\thechapter.}
+{5pt}
+{\MakeUppercase}
+{}
+\titlespacing{\chapter}{0pt}{0pt}{*3}
+\titlecontents{chapter}
+[0pt]                                               
+{}
+{\contentsmargin{0pt}\thecontentslabel.\enspace\uppercase}
+{\contentsmargin{0pt}\uppercase}                        
+{\titlerule*[.7pc]{.}\contentspage}                 
+
+\titleformat{\section}
+{\bfseries}
+{\thesection.}
+{5pt}
+{}
+\titlecontents{section}
+[5pt]                                               
+{}
+{\contentsmargin{0pt}\thecontentslabel.\enspace}
+{\contentsmargin{0pt}}
+{\titlerule*[.7pc]{.}\contentspage}
+
+\titleformat{\subsection}
+{\normalsize\bfseries}
+{\thesubsection.}
+{5pt}
+{}
+\titlecontents{subsection}
+[10pt]                                               
+{}
+{\contentsmargin{0pt}                          
+	\thecontentslabel.\enspace}
+{\contentsmargin{0pt}}                        
+{\titlerule*[.7pc]{.}\contentspage}  
+
+% DISEÑO DE TABLAS
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{floatrow}
+\usepackage{array}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\DeclareCaptionFormat{upper}{#1#2\uppercase{#3}\par}
+
+\captionsetup*[table]{
+	format=upper,
+	name=TABLA,
+	justification=centering,
+	labelsep=period,
+	width=.75\linewidth,
+	labelfont=small,
+	font=small
+}
+
+% DISEÑO DE FIGURAS
+\usepackage{graphicx}
+\graphicspath{{imagenes/}}
+
+\captionsetup[figure]{
+	format=hang,
+	name=Fig.,
+	singlelinecheck=off,
+	labelsep=period,
+	labelfont=small,
+	font=small		
+}
+
+% NOTAS A PIE DE PÁGINA
+\usepackage{chngcntr}
+\counterwithout{footnote}{chapter}
+
+% LISTADOS DE CÓDIGO
+\usepackage{listings}
+\lstdefinestyle{estilo}{ frame=Ltb,
+	framerule=0pt,
+	aboveskip=0.5cm,
+	framextopmargin=3pt,
+	framexbottommargin=3pt,
+	framexleftmargin=0.4cm,
+	framesep=0pt,
+	rulesep=.4pt,
+	backgroundcolor=\color{gray97},
+	rulesepcolor=\color{black},
+	%
+	basicstyle=\ttfamily\footnotesize,
+	keywordstyle=\bfseries,
+	stringstyle=\ttfamily,
+	showstringspaces = false,
+	commentstyle=\color{gray45},     
+	%
+	numbers=left,
+	numbersep=15pt,
+	numberstyle=\tiny,
+	numberfirstline = false,
+	breaklines=true,
+	xleftmargin=\parindent
+}
+
+\captionsetup*[lstlisting]{font=small, labelsep=period}
+\lstset{style=estilo}
+\renewcommand{\lstlistingname}{\uppercase{Código}}
+
+%BIBLIOGRAFÍA 
+\usepackage[backend=bibtex, style=ieee, isbn=false,sortcites, maxbibnames=6, minbibnames=1]{biblatex}
+
+\DefineBibliographyStrings{spanish}{%
+	andothers = {et\addabbrvspace al\adddot}
+}
+\DefineBibliographyStrings{spanish}{
+	url = {\adddot\space[En línea]\adddot\space Disponible en:}
+}
+\DefineBibliographyStrings{spanish}{
+	urlseen = {Acceso:}
+}
+\DefineBibliographyStrings{spanish}{
+	pages = {pp\adddot},
+	page = {p.\adddot}
+}
+
+\addbibresource{referencias.bib}
+
+%-------------
+%   DOCUMENTO
+%-------------
+
+\begin{document}
+\pagenumbering{roman}
+
+%----------
+%   PORTADA
+%----------	
+\begin{titlepage}
+	\begin{sffamily}
+	\color{azulUC3M}
+	\begin{center}
+		\begin{Large}
+			Máster Universitario en Inteligencia Artificial Aplicada\\			
+			 2025-2026\\
+			\vspace{2cm}		
+			\textsl{Trabajo Fin de Máster}
+			\bigskip
+			
+		\end{Large}
+		 	{\Huge Estado del Arte}\\
+		 	\vspace*{0.3cm}
+		 	{\Large Enrutamiento inteligente sobre mapas vectorizados para el despliegue de drones en búsqueda y rescate.}\\
+		 	\vspace*{0.5cm}
+	 		\rule{10.5cm}{0.1mm}\\
+			\vspace*{0.9cm}
+			{\LARGE Juan Carlos Estefanía Ovejero}\\ 
+			\vspace*{1cm}
+		\begin{Large}
+			Tutores:\\
+			Jesús García Herrero\\
+			Juan Pedro Llerena Caña\\
+		\end{Large}
+	\end{center}
+	\vfill
+	\end{sffamily}
+\end{titlepage}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+%----------
+%   ÍNDICES
+%----------
+
+\tableofcontents
+\thispagestyle{fancy}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+
+%----------
+%   MEMORIA
+%----------
+\clearpage
+\pagenumbering{arabic}
+
+\chapter{Introducción}
+
+Los vehículos aéreos no tripulados (UAVs o drones) han revolucionado las operaciones de búsqueda y rescate (SAR) en entornos salvajes, proporcionando reconocimiento aéreo que expande tanto el campo de visión como la velocidad operativa de los equipos humanos. Según Queralta et al.\cite{queralta2020}, los sistemas multi-robot colaborativos para SAR requieren planificación, coordinación, percepción y visión activa para maximizar la eficiencia de las misiones.
+
+La planificación de rutas para drones en SAR presenta desafíos únicos: entornos vastos y complejos, tiempo crítico donde la probabilidad de supervivencia disminuye rápidamente\cite{koester2008}, y la necesidad de coordinar múltiples agentes de forma eficiente. Este estado del arte revisa las técnicas de búsqueda, algoritmos de planificación de rutas y métricas de evaluación relevantes para el despliegue de drones en operaciones SAR.
+
+El trabajo se estructura en torno a cuatro pilares fundamentales: (1) técnicas de planificación de rutas para UAVs, (2) algoritmos de búsqueda informada y no informada, (3) métricas de evaluación de rendimiento, y (4) modelos de comportamiento de personas perdidas basados en datos empíricos.
+
+\chapter{Planificación de Rutas para UAVs en SAR}
+
+La planificación de rutas para drones en operaciones SAR se divide principalmente en dos enfoques: Coverage Path Planning (CPP), que busca cubrir sistemáticamente un área definida, e Informative Path Planning (IPP), que maximiza la adquisición de información relevante por unidad de tiempo.
+
+\section{Coverage Path Planning (CPP)}
+
+El Coverage Path Planning tiene como objetivo generar una ruta que asegure que la huella del sensor pase sobre la totalidad de un área definida al menos una vez\cite{galceran2013}. En el contexto SAR, los equipos de rescate han empleado históricamente patrones de cobertura como espirales expansivas o barridos paralelos\cite{foo2012, hart2023}.
+
+El método más elemental de CPP es el patrón boustrophedon o ``lawnmower'', que es simple de implementar manual o autónomamente\cite{bahnemann2019}. Sin embargo, una limitación principal de los métodos de cobertura exhaustiva es su ineficiencia inherente en términos de tiempo y consumo energético, particularmente cuando se aplican a áreas grandes y complejas\cite{choset2001}.
+
+Para mitigar estas ineficiencias, se han propuesto varias adaptaciones: descomposición del área de búsqueda en celdas más pequeñas para cobertura paralela por múltiples UAVs\cite{nielsen2019, dong2020}, y el empleo de equipos jerárquicos donde un UAV de alta altitud realiza vigilancia de amplia área mientras un UAV secundario de baja altitud realiza búsquedas detalladas en regiones de interés específicas\cite{hacho2018}.
+
+\section{Informative Path Planning (IPP)}
+
+En contraste con la cobertura exhaustiva, el Informative Path Planning busca maximizar la adquisición de información relevante por unidad de tiempo o distancia recorrida\cite{rossello2022, bai2021}. Esto se logra incorporando un marco probabilístico, como el mapa de Probabilidad de Contención (POC), que representa la probabilidad de que la persona perdida se encuentre en diferentes puntos del área de búsqueda.
+
+Lin y Goodrich\cite{lin2009, lin2010} demostraron un método donde la ruta del UAV se dirige hacia regiones con la mayor probabilidad de contener el objetivo, priorizando las áreas más prometedoras primero. Las metodologías híbridas combinan las fortalezas de CPP e IPP, particionando el área operacional en subregiones de alta probabilidad basadas en un mapa de probabilidad previa, tratando cada subregión como un nodo en un problema del viajante (TSP) para determinar la secuencia óptima de tareas de cobertura\cite{vasquez2018}.
+
+\section{Algoritmos Baseline en SAREnv}
+
+El framework SAREnv\cite{grontved2025} proporciona cuatro algoritmos baseline para la evaluación comparativa de estrategias de búsqueda con drones:
+
+\begin{itemize}
+	\item \textbf{Concentric Circles:} Crea una serie de trayectorias circulares concéntricas segmentadas equitativamente entre los drones disponibles. Es un planificador exhaustivo que garantiza cobertura completa dado suficiente tiempo.
+	\item \textbf{Pizza Zigzag:} Divide el área circular de búsqueda en sectores tipo ``pizza'', donde cada drone cubre un sector usando un patrón zigzag (boustrophedon). También es un planificador exhaustivo.
+	\item \textbf{Greedy:} Un planificador voraz que prioriza no revisitar celdas ya exploradas, dirigiéndose hacia las ubicaciones adyacentes con mayor densidad de probabilidad. Realiza exploración aleatoria si todos los espacios vecinos han sido visitados.
+	\item \textbf{Random Exploration:} Exploración aleatoria a través del entorno, sirviendo como línea base inferior para comparaciones de rendimiento.
+\end{itemize}
+
+Estos algoritmos se dividen en dos categorías: planificadores exhaustivos (Concentric Circles y Pizza Zigzag) diseñados para cubrir sistemáticamente todo el área de búsqueda, y planificadores no exhaustivos (Greedy y Random) que no garantizan cobertura completa pero pueden ser más eficientes en escenarios con restricciones de tiempo.
+
+\chapter{Técnicas de Búsqueda}
+
+Las técnicas de búsqueda para drones en SAR abarcan desde métodos clásicos heurísticos hasta enfoques avanzados de aprendizaje automático y teoría de juegos.
+
+\section{Métodos Heurísticos}
+
+Los algoritmos heurísticos son simples de ejecutar pero tienen gran sobrecarga computacional cuando se usan a gran escala. Se dividen en algoritmos de planificación de cobertura y algoritmos de planificación de rutas óptimas\cite{tan2021}.
+
+Ejemplos de algoritmos heurísticos utilizados en planificación multi-UAV incluyen A* (A-star), el algoritmo voraz (Greedy), y el algoritmo de planificación de rutas óptimas (OPP). Los algoritmos heurísticos híbridos como Elastic Band combinado con A* utilizan bandas elásticas para la planificación general de rutas y A* para suavizar la ruta inicial mediante planificación local.
+
+\section{Métodos Metaheurísticos}
+
+Los métodos metaheurísticos han demostrado ser efectivos para la planificación de rutas multi-UAV. Según la revisión de 2025 sobre planificación de rutas multi-UAV\cite{alqudsi2025, guo2025}, los algoritmos más utilizados incluyen:
+
+\begin{itemize}
+	\item \textbf{Algoritmos Genéticos (GA):} Utilizados para reducir rutas de vuelo y optimizar la asignación de tareas, aunque pueden no ser rentables en términos computacionales.
+	\item \textbf{Particle Swarm Optimization (PSO):} Variantes como PSO mejorado, FP-GPSO y MCMOPSO-RL se utilizan para optimizar rutas en entornos complejos con obstáculos.
+	\item \textbf{Grey Wolf Optimizer (GWO):} Algoritmo de optimización inspirado en el comportamiento de los lobos grises, utilizado para planificación de rutas 3D\cite{huang2024}.
+	\item \textbf{Dung Beetle Optimization (DBO):} Recientemente aplicado a la planificación de rutas multi-UAV en áreas de desastre, con mejoras como el algoritmo LODBO (Landmark Operator DBO) que mejora la capacidad de búsqueda global.
+	\item \textbf{Ant Colony Optimization (ACO):} Utilizado para planificación de rutas globales 3D, especialmente en entornos marítimos.
+\end{itemize}
+
+\section{Aprendizaje por Refuerzo}
+
+El aprendizaje por refuerzo (RL) y el aprendizaje profundo por refuerzo (DRL) han emergido como enfoques prominentes para la planificación de rutas multi-UAV\cite{hayat2020, yue2025}. El proceso de toma de decisiones en RL involucra factores como agente, entorno, estado, acción, recompensa, política y función de valor.
+
+Q-learning es una técnica destacada de RL, aunque presenta problemas de sobreestimación que pueden afectar la eficiencia del sistema. Para abordar esto, se han desarrollado variantes como Deep Q-Network (DQN), Double DQN, Dueling Deep Q-Learning y C51 Dueling Deep Q-Network.
+
+El algoritmo DDPG (Deep Deterministic Policy Gradient) muestra mejor rendimiento abordando problemas de consumo energético y convergencia comparado con el mecanismo de retrazado. MADDPG (Multi-Agent Deep Deterministic Policy Gradient) puede planificar rutas para enjambres de UAVs en entornos complejos\cite{jeon2024}.
+
+Investigaciones recientes (2024-2025) han propuesto enfoques híbridos como WDQN (Whale-inspired Deep Q-Network)\cite{wang2025} que combina el Algoritmo de la Ballena (WoA) con DQN para mejorar la eficiencia de aprendizaje y velocidad de convergencia, equilibrando explotación y exploración en el modelo DQN.
+
+\section{Exploración Ergódica}
+
+La exploración ergódica busca asignar el esfuerzo de búsqueda proporcionalmente a la distribución de probabilidad subyacente, asegurando que el tiempo dedicado a cada región sea proporcional a la densidad espacial de personas perdidas\cite{miller2016, ivic2019}.
+
+Miller et al.\cite{miller2016} presentaron el concepto de exploración ergódica de información distribuida, donde los agentes generan trayectorias que pasan tiempo en áreas proporcional a la información esperada en esas regiones. Este enfoque ha sido extendido a múltiples agentes y ha demostrado ser efectivo para la búsqueda y rescate.
+
+Investigaciones recientes\cite{rao2023, seewald2024} han desarrollado formulaciones de optimización ergódica dispersa que determinan cuándo y dónde tomar mediciones del sensor mientras optimizan la trayectoria del agente para cobertura, adhiriéndose a restricciones de recursos de sensado.
+
+El método HEDAC (Heat equation-driven area coverage)\cite{hedac2025} es una técnica de control ergódico basada en la ecuación de calor que ha sido validada experimentalmente en entornos reales de karst mediterráneo para búsqueda de humanos con UAVs.
+
+\section{POMDP y Procesos de Decisión}
+
+Los Procesos de Decisión de Markov Parcialmente Observables (POMDP) proporcionan un marco matemático para modelar problemas de toma de decisiones secuenciales en entornos inciertos donde el estado del sistema no es completamente observable\cite{ragi2018}.
+
+En SAR con UAVs, los POMDPs capturan incertidumbres en ubicaciones de objetivos, observaciones de sensores y condiciones ambientales mientras optimizan rutas. Modelan estados ambientales desconocidos, información imperfecta del sensor y la compleja interdependencia entre decisiones y observaciones futuras.
+
+Trabajos recientes han formulizado la planificación de rutas UAV-SAR como POMDPs, proponiendo soluciones como ``Shrinking POMCP'' para abordar restricciones de tiempo\cite{zhang2024}. El algoritmo ABT (Adaptive Belief Tree) ha sido utilizado para resolver POMDPs online en navegación autónoma de UAVs en entornos GPS-denied y con obstáculos\cite{sandino2020}.
+
+Los Dec-POMDPs (Decentralized POMDPs) permiten a los UAVs tomar decisiones bajo incertidumbre con observabilidad limitada, entrenados offline usando PPO (Proximal Policy Optimization) para maximizar la suma esperada de recompensas descontadas.
+
+\chapter{Métricas de Evaluación}
+
+La evaluación de estrategias de búsqueda con drones requiere métricas cuantitativas que capturen tanto la eficiencia como la efectividad de los algoritmos de planificación.
+
+\section{Probabilidad de Detección Acumulada}
+
+La métrica de Probabilidad de Detección Acumulada ($L(\pi)$) cuantifica la probabilidad de detectar una persona perdida dada una ruta planificada y una distribución de probabilidad previa sobre la región de búsqueda. Se calcula como la integral de la probabilidad previa sobre las porciones del entorno visibles desde la ruta:
+
+\begin{equation}
+L(\pi) = \int_{A_\pi} P_{prior}(x) \, dx
+\end{equation}
+
+donde $A_\pi$ denota el área visible desde $\pi$, y $P_{prior}(x)$ es la probabilidad previa de que una persona perdida esté en la ubicación $x$. Esta formulación ha sido utilizada en diversos trabajos de planificación SAR donde las funciones de costo se diseñan para minimizar la probabilidad acumulada de no detectar el objetivo\cite{li2020}.
+
+\section{Probabilidad de Detección con Descuento Temporal}
+
+Para incentivar el descubrimiento temprano de regiones de alta probabilidad, se introduce un factor de descuento temporal en la ganancia de probabilidad acumulada. Específicamente, para cada segmento de área $x$ observado en el tiempo $t$, la contribución al puntaje se descuenta por $\lambda^t$, donde $\lambda \in (0,1)$ controla la severidad del descuento:
+
+\begin{equation}
+I(\pi) = \int_{A_\pi} \lambda^{t(x)} P_{prior}(x) \, dx
+\end{equation}
+
+El factor de descuento $\lambda$ se calcula basado en un tiempo terminal $t_{end}$ por el cual se desea acumular el 95\% del valor total descontado. Este cálculo es especialmente importante en dominios como operaciones SAR donde la certeza de la ubicación de una persona perdida exhibe decaimiento temporal.
+
+\section{Puntaje de Descubrimiento de Personas Perdidas}
+
+El puntaje de descubrimiento de personas perdidas mide el número de personas perdidas sintéticas descubiertas durante una ruta $\pi$. En cada caso de prueba, se muestrea un número fijo de personas perdidas de una distribución predefinida, y $\pi$ se evalúa basándose en el número de personas localizadas exitosamente:
+
+\begin{equation}
+D(\pi) = \sum_{i} I(\pi, v_i)
+\end{equation}
+
+Los conteos brutos de personas encontradas han sido ampliamente utilizados en entornos de benchmarking como RoboCup Rescue\cite{kohlbrecher2015}. Formulaciones más recientes incluyen variantes ponderadas por tiempo donde las detecciones tempranas producen puntajes más altos, optimizando tanto el conteo de descubrimientos como el tiempo de descubrimiento usando planificación multi-objetivo\cite{trojanowski2024}.
+
+\section{Probabilidad de Éxito (POS)}
+
+Según el manual IAMSAR, la Probabilidad de Éxito (POS) es el producto de la Probabilidad de Contención (POC) y la Probabilidad de Detección (POD):
+
+\begin{equation}
+POS = POC \times POD
+\end{equation}
+
+La POC es la probabilidad de que el objetivo esté contenido en una cierta celda, mientras que el POD es la probabilidad de que el objetivo sea detectado asumiendo que está dentro de la celda cubierta por el UAV (en el campo de visión de su sensor). Cuando una celda es visitada múltiples veces, los valores de POC y POS pueden cambiar según la fórmula de actualización bayesiana\cite{koopman1980, stone2006}.
+
+\chapter{Modelos de Comportamiento de Personas Perdidas}
+
+Los modelos de comportamiento de personas perdidas son fundamentales para generar mapas de probabilidad informados que guíen la planificación de rutas de búsqueda.
+
+\section{ISRID y Lost Person Behavior}
+
+El International Search \& Rescue Incident Database (ISRID) fue desarrollado por el Dr. Robert Koester como parte de una subvención del USDA que permitió la recolección y análisis de estadísticas SAR de todo el mundo. Hasta la fecha, se han recolectado más de 150,000 incidentes SAR.
+
+El libro ``Lost Person Behavior''\cite{koester2008} utiliza clusters de patrones de comportamiento para predecir dónde podría encontrarse una persona perdida. Incluye categorías de sujetos, perfiles conductuales, estadísticas actualizadas, tareas iniciales sugeridas y preguntas de investigación especializadas.
+
+\section{Modelos de Desplazamiento}
+
+Los modelos principales de comportamiento de personas perdidas incluyen:
+
+\begin{itemize}
+	\item \textbf{Modelo de Desplazamiento (Ring Model):} El más común, utiliza anillos de rango. Por ejemplo, para niños de 1-3 años, el 25\% se encuentran dentro de 200m, el 50\% dentro de 300m, el 75\% dentro de 600m, y el 95\% a 4.5km.
+	\item \textbf{Modelo de Dispersión:} Predice qué tan cerca de una línea de dirección de viaje se encontrará una persona perdida. Los pacientes con demencia tienen un ángulo de dispersión bastante ajustado.
+	\item \textbf{Modelo de Elevación:} Predice la probabilidad de que una persona vaya cuesta arriba versus cuesta abajo. Históricamente la gente tendía a bajar, pero con el uso de teléfonos móviles la tendencia ha cambiado a subir por señal.
+	\item \textbf{Modelo de Offset de Pista:} Especialmente valioso para personas vulnerables como niños y pacientes con demencia. El 50\% de personas con demencia no encontradas en caminos están a solo 15m de una característica lineal.
+	\item \textbf{Modelo de Cuenca Hidrográfica:} Predice cómo se comportará una persona en relación con fuentes de agua. El 50\% de personas perdidas se encuentran en la misma cuenca.
+\end{itemize}
+
+\section{Generación de Mapas de Probabilidad}
+
+SAREnv\cite{grontved2025} utiliza un modelo probabilístico basado en estadísticas de comportamiento de personas perdidas. El proceso comienza extrayendo características geoespaciales de OpenStreetMap (estructuras, caminos, drenajes, agua, vegetación) y asigna probabilidades según tablas estadísticas derivadas de datos empíricos.
+
+La distribución log-normal proporciona el mejor ajuste a los datos de distancia (RMSE = 1.76 km), superando a las distribuciones normal (6.83 km) y gamma (2.02 km). Las probabilidades finales se normalizan para producir un mapa de Probabilidad de Área (POA) válido\cite{doherty2014}.
+
+\chapter{Mapas Vectorizados y Datos Geoespaciales}
+
+Los mapas vectorizados y los datos geoespaciales son la base sobre la cual se construyen los modelos de probabilidad y se planifican las rutas de búsqueda.
+
+\section{OpenStreetMap}
+
+OpenStreetMap (OSM) es la fuente principal de datos geoespaciales para aplicaciones de drones. Los datos de OSM se utilizan para extraer características relevantes para SAR como caminos, edificios, cuerpos de agua, vegetación y límites de cuencas hidrográficas.
+
+Las herramientas basadas en OSM incluyen motores de enrutamiento como GraphHopper (Java), OSRM (Open Source Routing Machine en C++), y Valhalla (por Mapbox, soporta transporte multimodal). Para geocodificación se utiliza Nominatim.
+
+\section{Procesamiento de Datos Vectoriales}
+
+Para aplicaciones robóticas, los datos vectoriales basados en características se convierten en mapas de cuadrícula espacialmente explícitos. Esta representación es ventajosa porque proporciona una estructura de datos uniforme y computacionalmente eficiente compatible con los espacios de estado discretizados comúnmente utilizados en algoritmos de planificación de rutas robóticos.
+
+El proceso de conversión comprende dos etapas principales: (1) rasterización independiente de cada característica en cuadrículas binarias separadas, y (2) ponderación y agregación de estas cuadrículas para generar un mapa de probabilidad compuesto final. En ubicaciones donde las características se superponen, el valor de probabilidad más alto toma precedencia.
+
+\section{Sistemas de Información Geográfica (GIS)}
+
+Los sistemas GIS expanden las capacidades de los drones proporcionando datos espaciales detallados, precisos y sensibles al tiempo. Las aplicaciones incluyen mapeo aéreo y levantamientos topográficos, agricultura de precisión, monitoreo ambiental, respuesta a emergencias y desastres, seguridad y defensa, e inspección industrial.
+
+Tecnologías geoespaciales clave incluyen receptores GNSS/RTK para posicionamiento centimétrico, unidades IMU para detección de orientación, SLAM para mapeo en entornos sin GPS, sensores LiDAR para nubes de puntos 3D, y sistemas de imágenes espectrales (multiespectral, hiperespectral, térmica).
+
+\chapter{Conclusiones del Estado del Arte}
+
+El estado del arte en enrutamiento inteligente para drones en operaciones SAR presenta un panorama diverso y en constante evolución. Las principales conclusiones que se pueden extraer son:
+
+\begin{enumerate}
+	\item \textbf{Diversidad de enfoques:} Existe una amplia variedad de técnicas de planificación de rutas, desde métodos clásicos de cobertura exhaustiva (CPP) hasta enfoques informados (IPP) y algoritmos basados en aprendizaje automático.
+	
+	\item \textbf{Importancia de los modelos probabilísticos:} Los modelos de comportamiento de personas perdidas, como los derivados de ISRID, son fundamentales para generar mapas de probabilidad que guíen eficazmente la búsqueda.
+	
+	\item \textbf{Métricas estandarizadas:} El framework SAREnv proporciona métricas estandarizadas (Probabilidad de Detección Acumulada, con descuento temporal, y Puntaje de Descubrimiento) que permiten comparar objetivamente diferentes algoritmos.
+	
+	\item \textbf{Tendencia hacia la inteligencia artificial:} Los métodos de aprendizaje por refuerzo y aprendizaje profundo están ganando protagonismo, especialmente para coordinación multi-agente y adaptación a entornos dinámicos.
+	
+	\item \textbf{Brecha simulación-realidad:} Aunque existen frameworks de simulación avanzados como SAREnv, la transferencia de algoritmos a escenarios reales sigue siendo un desafío activo de investigación.
+\end{enumerate}
+
+Este estado del arte proporciona la base teórica necesaria para el desarrollo del TFM, que se centrará en el enrutamiento inteligente sobre mapas vectorizados utilizando el framework SAREnv como plataforma de evaluación.
+
+%----------
+%   BIBLIOGRAFÍA
+%----------
+
+\clearpage
+\addcontentsline{toc}{chapter}{Bibliografía}
+\setquotestyle[english]{british}
+\printbibliography
+
+\end{document}

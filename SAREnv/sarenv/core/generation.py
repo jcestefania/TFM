@@ -447,7 +447,15 @@ class Environment:
             alpha = FEATURE_PROBABILITIES.get(key, 0)
             filtered_heatmap_part = individual_heatmap.astype(float) * alpha
 
-            combined_heatmap = np.maximum(combined_heatmap, filtered_heatmap_part)
+            # Modificación TFM: Suma de capas en lugar del operador máximo
+            # combined_heatmap = np.maximum(combined_heatmap, filtered_heatmap_part)
+            combined_heatmap = combined_heatmap + filtered_heatmap_part
+
+        # Normalización final del heatmap combinado (Fase 1 TFM)
+        total_sum = np.sum(combined_heatmap)
+        if total_sum > 0:
+            combined_heatmap = combined_heatmap / total_sum
+
         return combined_heatmap
 
     def generate_heightmap(self, output_dir=".") -> np.ndarray | None:

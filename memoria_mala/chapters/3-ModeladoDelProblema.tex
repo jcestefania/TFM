@@ -1,0 +1,48 @@
+\chapter{Modelado del Problema}
+
+En este capítulo se detalla cómo se ha construido el entorno virtual sobre el que operarán los algoritmos de búsqueda. El objetivo principal es transformar un espacio geográfico real (en este caso, el parque de la Casa de Campo en Madrid) en un modelo matemático y probabilístico que los drones puedan entender y procesar.
+
+\section{Generación del Espacio de Búsqueda}
+
+El problema de Búsqueda en Tiempo Mínimo (MTS) requiere definir primero el terreno de juego. Este espacio discreto bidimensional, que llamaremos $\Omega$, se modela como una cuadrícula de celdas.
+
+Para definir los límites exactos de este espacio en la Casa de Campo, hemos descartado la opción de usar un radio de búsqueda circular desde un punto central. Aunque es un método común, en un entorno semiurbano como este provoca que el simulador analice zonas que están fuera del parque (como barrios residenciales o autopistas colindantes).
+
+En su lugar, hemos optado por una \textbf{generación basada en un polígono vectorial personalizado}. Utilizando la librería de Python \texttt{shapely}, hemos definido las coordenadas exactas que bordean el perímetro del parque. Esto nos permite:
+
+\begin{itemize}
+    \item \textbf{Recortar el terreno con precisión:} Al conectarnos a la base de datos de OpenStreetMap, el sistema descarga únicamente la información geográfica que cae dentro de nuestro polígono, ignorando el resto.
+    \item \textbf{No desperdiciar recursos:} Garantizamos que la probabilidad de encontrar a la persona desaparecida se distribuya al 100\% dentro de las fronteras reales de búsqueda, evitando que los drones calculen rutas hacia zonas irrelevantes.
+\end{itemize}
+
+\section{Proceso de Sectorización}
+
+Los drones no pueden procesar un mapa continuo; necesitan un escenario dividido en parcelas. Este proceso de conversión se conoce como sectorización o rasterización.
+
+Para llevarlo a cabo, el framework proyecta los datos del mapa sobre una matriz (un \textit{grid} 2D). La resolución de esta matriz se define con el parámetro \texttt{meter\_per\_bin}, que establece cuántos metros reales mide cada lado de una celda.
+
+Para nuestras pruebas, hemos configurado \texttt{meter\_per\_bin = 20}. Esto significa que cada "cuadradito" del mapa representa un área de 20x20 metros (400 $m^2$). Hemos elegido este valor porque ofrece un buen equilibrio: es lo bastante pequeño como para detectar con precisión caminos y zonas de agua, pero no tan minúsculo como para generar matrices gigantescas que saturen la memoria y ralenticen a los algoritmos de planificación.
+
+\section{Fusión Probabilística Multicapa (SAREnv)}
+
+Una vez que tenemos la cuadrícula, necesitamos asignarle a cada celda la probabilidad de que la persona perdida esté allí. Para ello, utilizamos el framework SAREnv, que es capaz de extraer distintas capas de OpenStreetMap (edificios, caminos, ríos, vegetación).
+
+El proceso de asignación funciona así:
+\begin{enumerate}
+    \item \textbf{Rasterización de capas:} Cada elemento geográfico (por ejemplo, un camino) se dibuja en su propia matriz marcando con un 1 las celdas por las que pasa y con un 0 las demás.
+    \item \textbf{Ponderación:} Se multiplica esa matriz por un peso de probabilidad. Estos pesos no se han puesto al azar, sino que se extraen de las tablas de \textit{Lost Person Behavior} documentadas por Koester (2008) \cite{koester2008}. Por ejemplo, se le da más probabilidad a las zonas con agua o senderos que a los matorrales densos.
+\end{enumerate}
+
+\textbf{El problema del solapamiento:} Al juntar todas estas capas, es muy normal que un camino pase justo por el borde de un lago. Si simplemente sumáramos las probabilidades de la capa "camino" y la capa "agua", crearíamos "picos" de probabilidad falsamente altos. 
+
+Para resolverlo, en lugar de sumar, el sistema utiliza un operador de \textbf{probabilidad máxima} (mediante la función \texttt{np.maximum}). Esto significa que, si varias características coinciden en una celda, la celda se queda únicamente con el valor de la característica que tenga el porcentaje más alto. 
+
+El resultado de este proceso es el "Mapa de Calor" final. Esta matriz, exportada en un archivo \texttt{.npy}, servirá como la distribución inicial de probabilidad (el mapa de creencias) que alimentará a nuestros algoritmos de drones.
+
+\section{Observaciones y Modelo del Sensor}
+% Parámetros físicos de la huella del sensor de los UAVs (P_max, d_max, sigma).
+% TODO: Redactar cuando integremos las observaciones.
+
+\section{Filtro Recursivo Bayesiano (RBF)}
+% Algoritmo centralizado de actualización de la matriz de creencias ante observaciones negativas.
+% TODO: Redactar cuando integremos la lógica del RBF en MTS.

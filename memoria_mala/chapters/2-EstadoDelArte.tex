@@ -1,0 +1,40 @@
+\chapter{Estado del Arte}
+
+En este capítulo se presenta una revisión de los conceptos teóricos y tecnológicos que fundamentan este trabajo. La búsqueda y rescate (SAR, por sus siglas en inglés) mediante vehículos aéreos no tripulados (UAVs) ha evolucionado desde la simple ejecución de patrones de vuelo fijos hacia sistemas inteligentes guiados por la probabilidad y la inteligencia artificial.
+
+\section{Teoría de Búsqueda Bayesiana}
+
+La base matemática para la planificación de misiones de búsqueda tiene sus raíces teóricas en los trabajos desarrollados durante la Segunda Guerra Mundial, documentados posteriormente por autores como Koopman (1946) \cite{koopman}. El problema fundamental no consiste únicamente en mover un dron por el espacio, sino en decidir cómo moverlo para maximizar las posibilidades de encontrar el objetivo antes de que se agote el tiempo o la batería.
+
+Para formalizar este problema, la teoría de búsqueda clásica define varias métricas clave que los algoritmos intentan optimizar:
+\begin{itemize}
+    \item \textbf{Probabilidad de Área (POA):} Es la probabilidad inicial de que la persona perdida se encuentre en una zona concreta del mapa, basándose en el terreno y su perfil.
+    \item \textbf{Probabilidad de Detección (POD):} Es la probabilidad de que la cámara o el sensor del dron detecte a la persona, asumiendo que esta se encuentra justo en la zona que se está sobrevolando. Depende de factores como la altura de vuelo o la densidad de los árboles.
+    \item \textbf{Probabilidad de Éxito (POS):} Es la métrica definitiva a maximizar. Se calcula multiplicando la POA por la POD. Un algoritmo inteligente puede decidir buscar en una zona con menos probabilidad de presencia (baja POA) si el terreno está muy despejado y es fácil ver el suelo (alta POD), garantizando así un mayor éxito global.
+\end{itemize}
+
+Durante la búsqueda, a medida que los drones sobrevuelan zonas sin encontrar a la víctima, el sistema debe actualizar la creencia sobre dónde podría estar. Este proceso de descarte y actualización continua de las probabilidades se modela mediante técnicas bayesianas, como el Filtro Recursivo Bayesiano, ampliamente utilizado en la literatura moderna de robótica SAR \cite{MTS_c1, lanillos-bayesian}.
+
+\section{Modelado de la Distribución de Desaparecidos (LPB)}
+
+Para que un algoritmo de búsqueda sea efectivo, el mapa de probabilidades (POA) debe ser realista. Tradicionalmente, se asumía que una persona perdida deambulaba al azar de forma uniforme. Sin embargo, la investigación empírica ha demostrado que el comportamiento humano en situaciones de desorientación sigue patrones predecibles.
+
+La base estadística para la planificación de misiones SAR modernas se sustenta en el trabajo de Robert Koester (2008) \cite{koester2008} y su base de datos internacional (ISRID). Koester demostró que el comportamiento de las personas perdidas (\textit{Lost Person Behavior} o LPB) varía enormemente según su perfil. Por ejemplo, los excursionistas tienden a seguir caminos o zonas lineales, mientras que los niños pequeños suelen buscar refugio en estructuras o vegetación densa.
+
+Además, la distribución espacial de las personas desde el punto donde fueron vistas por última vez (LKP) no es una simple campana de Gauss. Los datos reales, apoyados por investigaciones matemáticas posteriores como las de Doherty et al. (2014) \cite{doherty2014}, indican que las distancias recorridas se ajustan mejor a distribuciones asimétricas (como la log-normal). Esto significa que, aunque la mayoría de las personas se encuentran cerca del origen, siempre hay un porcentaje que recorre distancias inusualmente largas. Incorporar estos modelos empíricos al framework de simulación (como hace SAREnv) es vital para evitar que los drones busquen en los lugares equivocados.
+
+\section{Metaheurísticas Bioinspiradas en Enjambres}
+
+Una vez que se dispone de un mapa de probabilidades realista, el siguiente reto es calcular la ruta óptima para que el enjambre de drones inspeccione el terreno. 
+
+Tradicionalmente, en robótica se han utilizado patrones de cobertura geométrica exhaustiva (\textit{Coverage Path Planning} o CPP), como el barrido en paralelo (forma de cortacésped o \textit{Lawnmower}) o la espiral expansiva. Aunque estos métodos son fáciles de programar y garantizan que se observe todo el terreno, resultan muy ineficientes cuando se aplican a mapas de probabilidad irregular, ya que el dron pierde mucho tiempo sobrevolando zonas donde estadísticamente es casi imposible que esté la víctima.
+
+Para superar las limitaciones de la fuerza bruta geométrica, la investigación reciente propone el uso de \textbf{algoritmos bioinspirados} o metaheurísticas. Estas técnicas, basadas en el comportamiento social de animales e insectos, son ideales para resolver problemas complejos de optimización (\textit{NP-hard}) como es el enrutamiento de múltiples drones \cite{Multiple_Fixed-Wing_Unmanned_Aerial_Vehicles}.
+
+Entre las estrategias más destacadas se encuentran:
+\begin{itemize}
+    \item \textbf{Optimización por Colonia de Hormigas (ACO):} Inspirada en cómo las hormigas encuentran los caminos más cortos hacia la comida dejando un rastro de feromonas. En el contexto SAR, los drones depositan "feromonas virtuales" en el mapa. Las zonas ya exploradas actúan como feromona repulsiva, mientras que las zonas con alta probabilidad actúan como atractivo. Esto permite que el enjambre se coordine de forma descentralizada para cubrir las zonas críticas rápidamente \cite{carabaza-ACOr}.
+    \item \textbf{Colonia de Abejas Artificiales (ABC):} Basado en el comportamiento de recolección de las abejas. El algoritmo divide a los agentes en exploradores (que buscan nuevas áreas prometedoras) y recolectores (que intensifican la búsqueda en las mejores zonas encontradas). Esta división de roles es excelente para evitar que todo el enjambre se quede atascado buscando en un solo punto caliente, forzando la exploración global del mapa.
+\end{itemize}
+
+El uso de estas metaheurísticas, que se evaluarán empíricamente en capítulos posteriores, permite transformar un mapa de calor estático en un plan de vuelo dinámico, adaptativo y altamente eficiente.

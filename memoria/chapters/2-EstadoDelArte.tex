@@ -39,7 +39,7 @@ Lin y Goodrich \cite{lin2009, lin2010} demostraron un método donde la ruta del 
 
 \subsection{Algoritmos Baseline en SAREnv}
 
-El framework SAREnv \cite{grontved2025} proporciona cuatro algoritmos baseline para la evaluación comparativa de estrategias de búsqueda con drones:
+El framework SAREnv \cite{drones9090628} proporciona cuatro algoritmos baseline para la evaluación comparativa de estrategias de búsqueda con drones:
 
 \begin{itemize}
 	\item \textbf{Concentric Circles:} Crea una serie de trayectorias circulares concéntricas segmentadas equitativamente entre los drones disponibles. Es un planificador exhaustivo que garantiza cobertura completa dado suficiente tiempo.
@@ -166,7 +166,7 @@ Los modelos de comportamiento de personas perdidas son fundamentales para genera
 
 El International Search \& Rescue Incident Database (ISRID) fue desarrollado por el Dr. Robert Koester como parte de una subvención del USDA que permitió la recolección y análisis de estadísticas SAR de todo el mundo. Hasta la fecha, se han recolectado más de 150,000 incidentes SAR.
 
-El libro ``Lost Person Behavior'' \cite{koester2008} utiliza clusters de patrones de comportamiento para predecir dónde podría encontrarse una persona perdida. Incluye categorías de sujetos, perfiles conductuales, estadísticas actualizadas, tareas iniciales sugeridas y preguntas de investigación especializadas.
+El libro ``Lost Person Behavior'' \cite{koester2008lost} utiliza clusters de patrones de comportamiento para predecir dónde podría encontrarse una persona perdida. Incluye categorías de sujetos, perfiles conductuales, estadísticas actualizadas, tareas iniciales sugeridas y preguntas de investigación especializadas.
 
 \subsection{Modelos de Desplazamiento}
 
@@ -182,7 +182,7 @@ Los modelos principales de comportamiento de personas perdidas incluyen:
 
 \subsection{Generación de Mapas de Probabilidad}
 
-SAREnv \cite{grontved2025} utiliza un modelo probabilístico basado en estadísticas de comportamiento de personas perdidas. El proceso comienza extrprestando características geoespaciales de OpenStreetMap (estructuras, caminos, drenajes, agua, vegetación) y asigna probabilidades según tablas estadísticas de manuales.
+SAREnv \cite{drones9090628} utiliza un modelo probabilístico basado en estadísticas de comportamiento de personas perdidas. El proceso comienza extrprestando características geoespaciales de OpenStreetMap (estructuras, caminos, drenajes, agua, vegetación) y asigna probabilidades según tablas estadísticas de manuales.
 
 La distribución log-normal proporciona el mejor ajuste a los datos de distancia (RMSE = 1.76 km), superando a las distribuciones normal (6.83 km) y gamma (2.02 km). Las probabilidades finales se normalizan para producir un mapa de Probabilidad de Área (POA) válido \cite{doherty2014}.
 

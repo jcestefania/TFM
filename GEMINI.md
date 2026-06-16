@@ -13,7 +13,7 @@ Este archivo centraliza la estrategia, el estado de los componentes y los próxi
 2. **Fase 2: Preparación del Entorno de Pruebas (MTS)** - *Búsqueda voraz con 1 dron y familiarización.* **[COMPLETA]**
 3. **Fase 3: El Middleware (Integración SAREnv y MTS)** - *Conversión a JSON y transformación de coordenadas.* **[COMPLETA]**
 4. **Fase 4: Hito Visual (Paso 1)** - *Carga del mapa real en la web app de MTS y validación.* **[COMPLETA]**
-5. **Fase 5: Escenarios Canónicos y Comparativa (LPB)** - *Modelar perfiles de víctimas (Demencia, Senderista) y enfrentar ACO vs ABC vs BHA.* **[PLANIFICADA]**
+5. **Fase 5: Escenarios Canónicos y Comparativa (LPB)** - *Modelar perfiles de víctimas (Demencia, Senderista) y enfrentar ACO vs ABC vs BHA.* **[EN PROCESO]**
 6. **Fase 6: Simulación de Objetivos Dinámicos** - *Implementar búsqueda de víctimas móviles en MTS.* **[PLANIFICADA]**
 
 ## 📑 Estado de la Memoria
@@ -21,7 +21,7 @@ Este archivo centraliza la estrategia, el estado de los componentes y los próxi
 2. **Capítulo 2 (Estado del Arte):** Detallado y fusionado con fundamentos bayesianos. **[COMPLETO]**
 3. **Capítulo 3 (Modelado):** Ampliado con las formulaciones de SAREnv, sensor, RBF y Montecarlo. **[COMPLETO]**
 4. **Capítulo 4 (Desarrollo e Integración):** Modificaciones de la fusión y el middleware UTM explicados. **[BORRADOR LISTO]**
-5. **Capítulo 5 (Experimentación):** Planificación de los perfiles LPB y objetivos dinámicos. **[ESQUELETO CREADO]**
+5. **Capítulo 5 (Experimentación):** Justificación LPB, variables y métricas formales redactadas. **[BORRADOR REDACTADO]**
 
 ## 📝 Tareas Pendientes ( Roadmap )
 
@@ -43,7 +43,7 @@ Este archivo centraliza la estrategia, el estado de los componentes y los próxi
 - [x] **Punto de Control:** Detener la ejecución para avisar a los tutores una vez logrado este hito.
 
 ### FASE 5: Escenarios Canónicos y Comparativa (LPB)
-- [ ] **Definir perfiles de víctimas (LPB):** Redactar en LaTeX la justificación de los perfiles de Demencia (Alzheimer) y Senderista basados en las estadísticas reales de SAREnv.
+- [x] **Definir perfiles de víctimas (LPB):** Redactar en LaTeX la justificación de los perfiles de Demencia (Alzheimer) y Senderista basados en las estadísticas reales de SAREnv.
 - [ ] **Generar mapas de calor específicos:** Crear los mapas con radio `"small"` ($0.6\text{ km}$) para Demencia y `"large"` ($3.2\text{ km}$) para Senderistas.
 - [ ] **Simulaciones de Benchmark:** Correr comparativas completas de Voraz, ACO, ABC y BHA en ambos escenarios y almacenar métricas de rendimiento.
 

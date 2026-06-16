@@ -1,12 +1,86 @@
 \chapter{Proceso de Experimentación}
 
-En este capítulo se expone el diseño experimental planteado para comparar el rendimiento de los planificadores metaheurísticos propuestos frente a las líneas de base tradicionales.
+En este capítulo se expone el diseño experimental planteado para comparar el rendimiento de los planificadores metaheurísticos propuestos frente a las líneas de base tradicionales. Para dotar a las pruebas de realismo y validez académica, la experimentación se fundamenta en las estadísticas reales de comportamiento de personas perdidas (\textit{Lost Person Behavior} o LPB) y en las métricas de evaluación formales del simulador SAREnv.
 
-\section{Diseño del Banco de Pruebas}
-% Escenarios de prueba configurados en la Casa de Campo.
+\section{Diseño del Banco de Pruebas: Escenarios Canónicos y LPB}
+
+La evaluación de los algoritmos de búsqueda bioinspirados (Colonia de Hormigas, Enjambre de Abejas y Agujeros Negros) se realiza sobre escenarios que replican situaciones operativas reales en el entorno de la Casa de Campo de Madrid. A partir de los datos recopilados en la literatura de búsqueda y rescate (SAR), se definen tres escenarios canónicos que modelan perfiles específicos de víctimas:
+
+\begin{enumerate}
+    \item \textbf{Escenario A: Perfil de Demencia (Alzheimer):}
+    \begin{itemize}
+        \item \textbf{Justificación LPB:} Las personas con demencia senil o enfermedad de Alzheimer suelen presentar una desorientación cognitiva severa acompañada de limitaciones físicas de movilidad. Estadísticamente, la distancia de dispersión desde el punto de planificación o LKP (\textit{Last Known Point}) es reducida, concentrándose la gran mayoría de los casos en un radio muy cercano. En SAREnv, esto se modela utilizando un radio de búsqueda \enquote{small} ($0.6$~km), equivalente al percentil 25 de dispersión.
+        \item \textbf{Comportamiento y Capas:} Estas víctimas tienden a seguir la ley del mínimo esfuerzo físico, desviándose con facilidad de los senderos pavimentados y quedando frecuentemente atrapadas en zonas de vegetación densa (bosques, matorrales) o cerca de estructuras aisladas. En la fusión bayesiana, se asignan pesos elevados a las capas de coberturas de bosques (\textit{woodland}) y matorrales (\textit{brush}), y nulos o muy bajos a la red vial activa, forzando un mapa de probabilidad concentrado en el arbolado y estructuras cercanas al LKP.
+    \end{itemize}
+
+    \item \textbf{Escenario B: Perfil de Senderista (Hiker):}
+    \begin{itemize}
+        \item \textbf{Justificación LPB:} Los senderistas o excursionistas perdidos disponen de plena capacidad física e intención de desplazarse a través del terreno. Por ende, la distancia de dispersión con respecto al LKP es sustancialmente mayor. Se utiliza el radio de búsqueda \enquote{large} ($3.2$~km), representativo del percentil 75 en las estadísticas de LPB.
+        \item \textbf{Comportamiento y Capas:} El movimiento del senderista está fuertemente condicionado por la infraestructura lineal disponible. Suelen seguir caminos, senderos y pistas forestales en su intento de orientarse o regresar. Para este perfil, la capa lineal de la red de caminos (\textit{road} y \textit{linear}) recibe la ponderación preponderante en la fusión bayesiana de SAREnv. Esto produce un mapa de probabilidad de distribución alargado a lo largo de las vías de comunicación de la Casa de Campo.
+    \end{itemize}
+
+    \item \textbf{Escenario C: Escenario Dinámico (Víctima Móvil):}
+    \begin{itemize}
+        \item \textbf{Justificación LPB y Dinámica:} En muchas situaciones reales de emergencia, la persona extraviada no permanece estática, sino que continúa caminando de forma errática o siguiendo una dirección preferente. Esto altera dinámicamente la distribución espacial de la probabilidad de encontrar a la víctima a lo largo de la misión.
+        \item \textbf{Modelado en MTS:} Aprovechando las capacidades de simulación del framework MTS (\textit{Multi-Agent Target Search}), se introduce una matriz de probabilidad de transición espacial $P_{\text{transicion}}$. La víctima inicia su posición en una celda central según el mapa bayesiano de SAREnv y, en cada paso temporal del dron, su posición evoluciona estocásticamente siguiendo una caminata aleatoria restringida por las coberturas transitables del terreno.
+    \end{itemize}
+\end{enumerate}
 
 \section{Variables y Parámetros Controlados}
-% Definición del presupuesto de movimientos (budget), número de drones, resolución del grid y número de simulaciones Montecarlo.
 
-\section{Metodología de Validación}
-% Flujo estadístico del experimento y condiciones para asegurar la consistencia.
+Para asegurar una comparativa justa (\textit{benchmark}) entre las estrategias heurísticas y de base, se fijan de forma rigurosa los siguientes parámetros experimentales en el middleware y en el entorno de simulación:
+
+\begin{itemize}
+    \item \textbf{Número de agentes búsqueda:} Se configura un único vehículo aéreo no tripulado (dron) de búsqueda para simplificar el análisis y evitar problemas ajenos al enrutamiento como la colisión de agentes en el simulador MTS.
+    \item \textbf{Presupuesto de movimiento (\textit{budget}):} Limitado a un número fijo de pasos o distancia de vuelo equivalente a la capacidad nominal de la batería de un dron comercial estándar (estimada en $30$ minutos de vuelo).
+    \item \textbf{Altitud de vuelo ($H$):} Fijada de forma constante en $50$ metros sobre el nivel del suelo, equilibrando el campo de visión de la cámara con la resolución necesaria para la detección de personas.
+    \item \textbf{Parámetros del sensor a bordo:} Se asume una cámara con un campo de visión angular (FOV) de $90^{\circ}$, lo que determina un radio de detección física de la víctima $R_{\text{det}}$ a partir de la proyección cónica del sensor:
+    \begin{equation}
+        R_{\text{det}} = H \cdot \tan\left(\frac{\theta_{\text{FOV}}}{2}\right) = 50 \cdot \tan(45^{\circ}) = 50 \text{ metros}
+    \end{equation}
+    \item \textbf{Resolución del mapa:} Un tamaño de celda en el grid de probabilidad de $10 \times 10$ metros para garantizar tanto el detalle geográfico de la Casa de Campo como la eficiencia en el cálculo computacional.
+\end{itemize}
+
+\section{Metodología de Validación y Métricas de Rendimiento}
+
+Dada la naturaleza estocástica de los algoritmos metaheurísticos de planificación (por ejemplo, la selección probabilística en ACO y las perturbaciones en ABC y BHA), cada experimento en los escenarios canónicos se repite a través de $50$ ejecuciones independientes (Simulaciones de Montecarlo). Esto permite obtener la media y la desviación típica de cada métrica y realizar contrastes estadísticos significativos.
+
+Para la evaluación formal de las trayectorias de búsqueda generadas por los algoritmos, se adoptan las cinco métricas académicas implementadas en el módulo \texttt{PathEvaluator} de SAREnv, garantizando una comparación matemáticamente consistente con la literatura científica:
+
+\begin{enumerate}
+    \item \textbf{Probabilidad de Detección Acumulada (\textit{Likelihood Score} - $S_{\text{like}}$):}
+    Representa la suma de los valores de probabilidad de todas las celdas del mapa de calor que han sido observadas al menos una vez por el sensor del dron a lo largo del recorrido. Si definimos el conjunto de todas las celdas únicas cubiertas por la proyección del sensor a lo largo de la trayectoria como $\mathcal{C}_{\text{obs}}$, la métrica se define como:
+    \begin{equation}
+        S_{\text{like}} = \sum_{(r,c) \in \mathcal{C}_{\text{obs}}} \mathcal{M}_{r,c}
+    \end{equation}
+    donde $\mathcal{M}_{r,c}$ es el valor de la probabilidad en la celda situada en la fila $r$ y columna $c$ de la matriz del mapa de calor, normalizada tal que $\sum_{r,c} \mathcal{M}_{r,c} = 1.0$.
+
+    \item \textbf{Puntuación Descontada por Tiempo (\textit{Time-Discounted Score} - $S_{\text{td}}$):}
+    En misiones SAR, localizar a la víctima de forma temprana es crítico para su supervivencia. Esta métrica introduce un factor de descuento geométrico $\gamma \in (0, 1]$ que penaliza la demora en visitar las zonas de alta probabilidad. Para cada instante temporal de la trayectoria a una distancia acumulada $d(t)$, se evalúan las celdas visibles $\mathcal{V}(x(t))$:
+    \begin{equation}
+        S_{\text{td}} = \sum_{t} \left( \sum_{(r,c) \in \mathcal{V}(x(t))} \mathcal{M}_{r,c} \right) \cdot \gamma^{d(t)}
+    \end{equation}
+    donde $d(t)$ actúa como proxy del tiempo transcurrido y $\gamma$ se fija por defecto en $0.999$ por metro de avance.
+
+    \item \textbf{Porcentaje de Víctimas Localizadas ($P_{\text{found}}$):}
+    Mide el porcentaje de acierto de localización sobre un conjunto de víctimas estocásticas situadas en el entorno según la distribución de probabilidad subyacente. Si la trayectoria del dron se denota como el conjunto de puntos $P$ y definimos el área de cobertura efectiva mediante la unión de buffers de detección de radio $R_{\text{det}}$:
+    \begin{equation}
+        \mathcal{A}_{\text{eff}} = \bigcup_{p \in P} \mathcal{B}(p, R_{\text{det}})
+    \end{equation}
+    El conjunto de víctimas encontradas $\mathcal{V}_{\text{encontradas}}$ son aquellas cuyas coordenadas geográficas $v_i$ se encuentran dentro de $\mathcal{A}_{\text{eff}}$:
+    \begin{equation}
+        P_{\text{found}} = \frac{|\{ v_i \in \mathcal{V}_{\text{total}} \mid v_i \in \mathcal{A}_{\text{eff}} \}|}{|\mathcal{V}_{\text{total}}|} \times 100
+    \end{equation}
+
+    \item \textbf{Área de Cobertura Efectiva ($A_{\text{cov}}$):}
+    Indica la superficie total barrida por el sensor del dron en kilómetros cuadrados. Al calcularse mediante la unión de los buffers de la trayectoria, se evita contabilizar doblemente las zonas de solape o cruce de rutas:
+    \begin{equation}
+        A_{\text{cov}} = \frac{\text{Área}(\mathcal{A}_{\text{eff}})}{10^6} \text{ km}^2
+    \end{equation}
+
+    \item \textbf{Longitud Total de la Trayectoria ($L_{\text{tray}}$):}
+    Suma de las distancias euclídeas de los segmentos de vuelo realizados por el dron. Sirve como métrica de eficiencia energética y operativa de la ruta planificada:
+    \begin{equation}
+        L_{\text{tray}} = \frac{1}{1000} \sum_{i=1}^{N-1} d(p_i, p_{i+1}) \text{ km}
+    \end{equation}
+\end{enumerate}

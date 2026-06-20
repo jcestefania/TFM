@@ -14,8 +14,11 @@ SAREnv/results/
 *.mp4
 
 # 2. Resultados de MTS
-framwork-MTS/*/resultados/
-framwork-MTS/*/pruebas/
+**/resultados/
+**/resultados_ext/
+**/resultados_high_budget/
+**/resultados_opt/
+**/pruebas/TFM_JC/
 framwork-MTS/*/pruebas_test/
 framwork-MTS/*/imagenes/
 framwork-MTS/*/TFG_Alejandro/resultados/

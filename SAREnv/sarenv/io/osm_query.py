@@ -2,6 +2,12 @@
 from pathlib import Path
 import osmnx as ox
 import shapely
+
+# Configurar timeout de OSMnx para evitar largos bloqueos si el servidor Overpass falla
+try:
+    ox.settings.requests_timeout = 10
+except AttributeError:
+    ox.config(timeout=10)
 from geojson import Feature, FeatureCollection, dump # Ensure geojson is in requirements
 
 # Relative imports

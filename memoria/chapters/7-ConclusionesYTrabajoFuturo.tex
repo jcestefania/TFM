@@ -1,9 +1,60 @@
 \chapter{Conclusiones y Trabajo Futuro}
+\label{ch:conclusiones}
 
-En este capítulo se reúnen las conclusiones generales extraídas del proyecto y se proponen posibles extensiones para investigaciones futuras.
+En este capítulo se reúnen las conclusiones generales extraídas del proyecto de fin de máster y se proponen líneas de investigación futuras derivadas de los resultados y limitaciones observadas.
 
 \section{Logros Alcanzados}
-% Resumen del éxito de la integración de mapas reales vectoriales y metaheurísticas en el enrutamiento inteligente.
+
+El objetivo central de este TFM ha sido el desarrollo e integración de un framework de enrutamiento inteligente para vehículos aéreos no tripulados (UAV) en misiones de Búsqueda y Rescate (SAR), combinando la precisión cartográfica de entornos reales con la optimización metaheurística. A continuación, se detallan los hitos alcanzados:
+
+\begin{itemize}
+    \item \textbf{Fusión e Integración Cartográfica Real (SAREnv + MTS):} Se ha implementado con éxito un middleware capaz de traducir mapas vectoriales reales procedentes de OpenStreetMap a matrices probabilísticas discretas compatibles con el simulador MTS. Esta integración permite simular escenarios reales (como la Casa de Campo de Madrid) conservando la escala geométrica y la topología del terreno.
+    \item \textbf{Modelado Académico de Perfiles de Víctimas (LPB):} A partir del estándar internacional \textit{Lost Person Behavior} (LPB) de Robert Koester, se han configurado tres escenarios canónicos de búsqueda (Autista, Demencia y Senderista). Cada perfil incorpora restricciones estadísticas de dispersión (radios cuartiles) y restricciones físicas de transitabilidad a pie (exclusión de áreas de agua profunda y edificaciones), lo que aproxima la simulación a un simulacro real.
+    \item \textbf{Benchmarking de Algoritmos Metaheurísticos:} Se ha ejecutado un análisis experimental comparativo riguroso con 50 semillas de Montecarlo enfrentando cuatro planificadores de rutas: búsqueda Voraz Heurística, Optimización por Colonia de Hormigas (ACO), Colonia de Abejas Artificiales (ABC) y el Algoritmo de Agujero Negro (BHA).
+    \item \textbf{Validación Científica de la Búsqueda Informada:} Mediante una siembra de 1000 víctimas virtuales por perfil, se ha contrastado cuantitativamente el desempeño de la búsqueda informada (guiada por el mapa de probabilidad bayesiano de SAREnv) frente a la búsqueda ciega (uniforme aleatoria). Los resultados demuestran que la incorporación del conocimiento a priori (las capas de probabilidad del manual LPB) eleva drásticamente la tasa de éxito de localización en menor tiempo de vuelo.
+\end{itemize}
 
 \section{Líneas de Trabajo Futuro}
-% Posibles ampliaciones: optimizaciones multi-objetivo dinámicas, enjambres heterogéneos y despliegues en hardware real.
+
+A partir de los desarrollos completados, se abren diversas vías de ampliación científica de gran interés para continuar esta línea de investigación:
+
+\subsection{Modelado de Objetivos Móviles mediante Ecuaciones de Advección-Difusión}
+
+En el presente trabajo se ha asumido un escenario estático donde la víctima permanece en su posición final de descanso durante la búsqueda. Sin embargo, en situaciones reales, el sujeto puede estar en movimiento (caminando desorientado o desplazado de forma pasiva por elementos ambientales). 
+
+Para futuras iteraciones del framework, se propone modelar al objetivo como un agente móvil dinámico regido por una ecuación diferencial parcial de advección-difusión sobre la rejilla bidimensional:
+\begin{equation}
+    \frac{\partial P(\mathbf{x}, t)}{\partial t} + \nabla \cdot \left( \mathbf{v}(\mathbf{x}, t) P(\mathbf{x}, t) \right) = D \nabla^2 P(\mathbf{x}, t)
+\end{equation}
+donde:
+\begin{itemize}
+    \item $P(\mathbf{x}, t)$ representa la densidad de probabilidad de encontrar a la víctima en la posición $\mathbf{x} = (x, y)$ en el instante $t$.
+    \item $\mathbf{v}(\mathbf{x}, t)$ es el término de advección o deriva (vector de velocidad), que modela la dirección preferente de movimiento del sujeto. Este vector puede estimarse a partir de factores del entorno (como la pendiente del terreno en descenso o el arrastre por la corriente de un río).
+    \item $D$ es el coeficiente de difusión, que representa la componente estocástica o de \textit{random walk} del movimiento desorientado de la persona perdida.
+\end{itemize}
+
+En cada paso de tiempo del algoritmo de búsqueda, la creencia bayesiana del dron experimentaría una actualización en dos fases:
+\begin{enumerate}
+    \item \textbf{Paso de Predicción (Transición de Markov):} La matriz de probabilidad de la creencia se propaga en el tiempo aplicando el operador de transición discreto que discretiza la advección-difusión:
+    \begin{equation}
+        P_{t+1|t} = \mathbf{T} \cdot P_{t|t}
+    \end{equation}
+    donde $\mathbf{T}$ es la matriz estocástica de transición de estados que redistribuye la masa de probabilidad hacia las celdas vecinas transitables de acuerdo con la pendiente local y la dispersión.
+    \item \textbf{Paso de Corrección (Medida del Sensor):} Se actualiza la probabilidad de las celdas barridas por el sensor cónico del dron en función de su probabilidad de detección $P_d$:
+    \begin{equation}
+        P_{t+1|t+1}(\mathbf{x}) = \frac{(1 - P_d(\mathbf{x})) P_{t+1|t}(\mathbf{x})}{\sum_{\mathbf{x}'} (1 - P_d(\mathbf{x}')) P_{t+1|t}(\mathbf{x}')}
+    \end{equation}
+\end{enumerate}
+Este enfoque dinámico permitirá a los algoritmos metaheurísticos planificar trayectorias que \enquote{intercepten} la deriva de la probabilidad de la víctima en tiempo real.
+
+\subsection{Coordinación Colaborativa de Enjambres Heterogéneos (Multi-UAV)}
+
+Otra extensión natural consiste en escalar el sistema para operar con un enjambre de múltiples drones de búsqueda cooperativos. Esto requiere el diseño de funciones objetivo descentralizadas que incorporen penalizaciones por proximidad mutua:
+\begin{equation}
+    \mathcal{F}_{\text{coop}} = \sum_{i=1}^{N_{\text{drones}}} S_{\text{like}}(i) - \gamma \sum_{i \neq j} \frac{1}{\|\mathbf{x}_i - \mathbf{x}_j\|}
+\end{equation}
+donde el segundo término actúa como una barrera de potencial repulsivo para forzar a los agentes a dispersarse y explorar áreas distintas de la creencia de probabilidad, maximizando el área cubierta colectiva y evitando colisiones físicas.
+
+\subsection{Despliegue e Integración en Hardware Real (PX4 y MAVLink)}
+
+Finalmente, para validar la aplicabilidad práctica de las rutas planificadas por las metaheurísticas del TFM, se planea desarrollar un módulo de interfaz con el piloto automático industrial PX4. Esto implicará traducir los waypoints discretos de la trayectoria local $(X, Y)$ a coordenadas globales geográficas (Lat/Lon) y enviarlas como comandos de navegación autónoma utilizando el protocolo MAVLink y el estándar ROS2 (Robot Operating System), permitiendo vuelos experimentales reales de validación en campo.

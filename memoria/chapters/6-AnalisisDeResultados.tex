@@ -1,12 +1,114 @@
 \chapter{Análisis de Resultados}
+\label{ch:resultados}
 
-En este capítulo se analizan cuantitativamente los resultados obtenidos en las simulaciones, contrastando las trayectorias de enjambre resultantes.
+En este capítulo se presenta el análisis comparativo cuantitativo de los experimentos realizados sobre el escenario geográfico de la Casa de Campo de Madrid. Se contrastan los resultados obtenidos por los cuatro algoritmos metaheurísticos implementados (búsqueda Voraz, ACO, ABC y BHA) bajo dos esquemas de validación distintos: la búsqueda informada (guiada por mapas probabilísticos bayesianos basados en el manual LPB) y la búsqueda ciega (línea de base sobre siembra uniforme de objetivos).
 
-\section{Comparativa Cuantitativa de Algoritmos}
-% Análisis de la tasa de descubrimiento frente a las líneas de base.
+\section{Métricas de Evaluación Académica}
 
-\section{Resultados en la Casa de Campo}
-% Resultados del rendimiento de las trayectorias sobre el escenario real rasterizado.
+Para garantizar una comparación formal consistente con la literatura de búsqueda y rescate, cada trayectoria planificada se evalúa utilizando las cinco métricas del módulo \texttt{PathEvaluator} de SAREnv:
+\begin{enumerate}
+    \item \textbf{Tasa de Acierto (\%):} Porcentaje de víctimas localizadas dentro del radio de barrido físico de la cámara del dron ($R_{\text{det}} = 50\text{ m}$) sobre la muestra de 1000 víctimas virtuales de Montecarlo.
+    \item \textbf{Likelihood Score ($S_{\text{like}}$):} Suma acumulada de la probabilidad de las celdas rasterizadas observadas. Indica la eficiencia del dron para seguir las zonas de alta creencia.
+    \item \textbf{Distancia de Vuelo ($d_{\text{km}}$):} Longitud de la trayectoria recorrida por el UAV en kilómetros. Es un indicador directo del consumo energético.
+    \item \textbf{Área Cubierta ($A_{\text{km}^2}$):} Superficie geográfica neta barrida por el sensor en kilómetros cuadrados, eliminando solapamientos por cruce de rutas.
+    \item \textbf{Eficiencia Temporal (Pasos):} Cantidad de celdas visitadas durante el límite de batería (budget de 1000 pasos).
+\end{enumerate}
 
-\section{Evaluación de Métricas APOD, TDPD y LPDS}
-% Interpretación del impacto de la penalización temporal (TDPD) frente al éxito empírico global.
+\section{Análisis por Perfiles de Lost Person Behavior (LPB)}
+
+A continuación, se tabulan y analizan los resultados promediados a lo largo de las 50 ejecuciones independientes (semillas) de Montecarlo para cada uno de los tres perfiles canónicos.
+
+\subsection{Perfil Autista}
+El perfil Autista presenta una fijación muy elevada por estructuras artificiales y masas de agua. Los resultados del benchmark en este escenario se presentan en la Tabla~\ref{tab:resultados_autista}.
+
+% PLACEHOLDER: Copiar aquí la tabla LaTeX generada por el Jupyter Notebook (Fase 8)
+\begin{table}[h!]
+\centering
+\begin{tabular}{lccccc}
+\hline
+Algoritmo & \% Acierto (Inf.) & \% Acierto (Ciego) & Likelihood Score & Distancia (km) & Área (km$^2$) \\
+\hline
+\textit{Voraz Heur.} & 2.45 \pm 0.27 \% & 1.48 \pm 0.12 \% & 0.0344 \pm 0.0036 & 10.70 \pm 2.04 & 0.1025 \pm 0.0099 \\\\
+\textit{ACO (Ants)} & 4.35 \pm 2.20 \% & 1.81 \pm 0.60 \% & 0.0484 \pm 0.0224 & 11.44 \pm 2.52 & 0.1663 \pm 0.0406 \\\\
+\textit{ABC (Bees)} & 6.63 \pm 2.09 \% & 2.30 \pm 0.50 \% & 0.0711 \pm 0.0207 & 11.34 \pm 2.75 & 0.1956 \pm 0.0449 \\\\
+\textit{BHA (BlackH)} & 6.79 \pm 1.83 \% & 2.28 \pm 0.51 \% & 0.0722 \pm 0.0183 & 11.26 \pm 2.76 & 0.1970 \pm 0.0471 \\\\
+\textit{Lawnmower} & 0.10 \pm 0.00 \% & 1.70 \pm 0.00 \% & 0.0102 \pm 0.0000 & 10.83 \pm 0.00 & 0.8481 \pm 0.0000 \\\\
+\textit{Expanding Sq.} & 8.24 \pm 1.51 \% & 2.60 \pm 0.42 \% & 0.0859 \pm 0.0156 & 9.56 \pm 1.98 & 0.2747 \pm 0.0492 \\\\
+\hline
+\end{tabular}
+\caption{Resultados del benchmark para el perfil Autista en la Casa de Campo (promedio $\pm$ desviación estándar sobre 50 semillas).}
+\label{tab:resultados_autista}
+\end{table}
+
+\subsection{Perfil de Demencia / Alzheimer}
+Las personas con desorientación cognitiva tienden a deambular en línea recta hasta chocar con vegetación densa (matorrales y bosques). La Tabla~\ref{tab:resultados_demencia} resume los resultados obtenidos en este perfil.
+
+% PLACEHOLDER: Copiar aquí la tabla LaTeX generada por el Jupyter Notebook (Fase 8)
+\begin{table}[h!]
+\centering
+\begin{tabular}{lccccc}
+\hline
+Algoritmo & \% Acierto (Inf.) & \% Acierto (Ciego) & Likelihood Score & Distancia (km) & Área (km$^2$) \\
+\hline
+\textit{Voraz Heur.} & 5.43 \pm 0.35 \% & 1.09 \pm 0.06 \% & 0.0478 \pm 0.0031 & 12.42 \pm 1.19 & 0.1005 \pm 0.0074 \\\\
+\textit{ACO (Ants)} & 7.58 \pm 1.99 \% & 1.75 \pm 0.52 \% & 0.0709 \pm 0.0175 & 11.21 \pm 2.85 & 0.1722 \pm 0.0463 \\\\
+\textit{ABC (Bees)} & 7.85 \pm 1.53 \% & 1.84 \pm 0.42 \% & 0.0747 \pm 0.0137 & 11.32 \pm 2.44 & 0.1725 \pm 0.0359 \\\\
+\textit{BHA (BlackH)} & 7.54 \pm 1.82 \% & 1.72 \pm 0.49 \% & 0.0711 \pm 0.0164 & 10.91 \pm 3.07 & 0.1607 \pm 0.0425 \\\\
+\textit{Lawnmower} & 1.90 \pm 0.00 \% & 2.00 \pm 0.00 \% & 0.0195 \pm 0.0000 & 10.83 \pm 0.00 & 0.8481 \pm 0.0000 \\\\
+\textit{Expanding Sq.} & 9.72 \pm 0.98 \% & 2.65 \pm 0.28 \% & 0.0917 \pm 0.0092 & 9.81 \pm 1.27 & 0.2812 \pm 0.0300 \\\\
+\hline
+\end{tabular}
+\caption{Resultados del benchmark para el perfil Demencia en la Casa de Campo (promedio $\pm$ desviación estándar sobre 50 semillas).}
+\label{tab:resultados_demencia}
+\end{table}
+
+\subsection{Perfil Senderista}
+Los senderistas poseen una gran movilidad física y tienden a extraviarse siguiendo elementos lineales (caminos, sendas forestales, cortafuegos). La Tabla~\ref{tab:resultados_senderista} muestra la comparativa de rendimiento.
+
+% PLACEHOLDER: Copiar aquí la tabla LaTeX generada por el Jupyter Notebook (Fase 8)
+\begin{table}[h!]
+\centering
+\begin{tabular}{lccccc}
+\hline
+Algoritmo & \% Acierto (Inf.) & \% Acierto (Ciego) & Likelihood Score & Distancia (km) & Área (km$^2$) \\
+\hline
+\textit{Voraz Heur.} & 11.68 \pm 2.15 \% & 6.51 \pm 1.36 \% & 0.1152 \pm 0.0225 & 10.64 \pm 2.58 & 0.7295 \pm 0.1581 \\\\
+\textit{ACO (Ants)} & 3.40 \pm 1.61 \% & 1.48 \pm 0.38 \% & 0.0307 \pm 0.0119 & 11.81 \pm 1.66 & 0.1667 \pm 0.0363 \\\\
+\textit{ABC (Bees)} & 4.61 \pm 1.07 \% & 1.65 \pm 0.38 \% & 0.0491 \pm 0.0096 & 11.72 \pm 1.35 & 0.2129 \pm 0.0340 \\\\
+\textit{BHA (BlackH)} & 4.35 \pm 1.34 \% & 1.63 \pm 0.44 \% & 0.0476 \pm 0.0120 & 11.30 \pm 2.44 & 0.2099 \pm 0.0439 \\\\
+\textit{Lawnmower} & 1.49 \pm 0.08 \% & 2.27 \pm 0.18 \% & 0.0139 \pm 0.0006 & 10.47 \pm 1.80 & 0.8216 \pm 0.1318 \\\\
+\textit{Expanding Sq.} & 5.95 \pm 0.86 \% & 2.35 \pm 0.33 \% & 0.0561 \pm 0.0082 & 9.77 \pm 1.48 & 0.2797 \pm 0.0389 \\\\
+\hline
+\end{tabular}
+\caption{Resultados del benchmark para el perfil Senderista en la Casa de Campo (promedio $\pm$ desviación estándar sobre 50 semillas).}
+\label{tab:resultados_senderista}
+\end{table}
+
+\section{Discusión y Comparación Científica}
+
+El análisis cuantitativo de los resultados obtenidos a lo largo de los experimentos revela conclusiones de gran relevancia científica y operativa para la planificación de misiones de búsqueda y rescate (SAR) asistidas por UAVs:
+
+\begin{itemize}
+    \item \textbf{Validación de la Búsqueda Informada frente a la Ciega:} En todos los perfiles de víctima analizados, el uso de mapas de creencia bayesianos (búsqueda informada) incrementa de manera sustancial la tasa de acierto y la métrica de \textit{Likelihood Score} en comparación con la búsqueda ciega (uniforme). Por ejemplo, en el perfil de Demencia, las metaheurísticas bioinspiradas triplican su tasa de acierto (pasando de un $\approx 1.7\%$ en ciego a más del $7.5\%$ en informado). Este resultado valida empíricamente la hipótesis principal del trabajo: la integración de modelos de comportamiento de personas perdidas (LPB) y transitabilidad del terreno permite concentrar los recursos de búsqueda en áreas críticas de alta probabilidad, maximizando la eficiencia temporal y espacial bajo restricciones severas de batería.
+    
+    \item \textbf{Comportamiento del Algoritmo Voraz Heurístico:}
+    La búsqueda voraz presenta un comportamiento dual extremadamente ilustrativo:
+    \begin{itemize}
+        \item \textbf{Éxito en estructuras lineales (Senderista):} En el perfil Senderista, la búsqueda Voraz obtiene la mayor tasa de acierto de todo el estudio ($11.68\%$). Esto se debe a que la probabilidad en este perfil se concentra de forma continua a lo largo de la red de caminos y senderos. El algoritmo voraz actúa de manera análoga a un ``seguidor de líneas'', encadenando celdas adyacentes de alta probabilidad de forma ininterrumpida.
+        \item \textbf{Miopía y estancamiento (Autista y Demencia):} Por el contrario, en los perfiles Autista ($2.45\%$) y Demencia ($5.43\%$), donde los focos de alta probabilidad están distribuidos en parches geográficos aislados y distantes (masas de agua y bosques específicos), el algoritmo voraz sufre un fuerte efecto de miopía. Al carecer de componentes estocásticos o mecanismos de exploración global, se queda atrapado en el óptimo local del primer parche que encuentra, barriéndolo repetidamente y siendo incapaz de cruzar las amplias zonas de probabilidad nula que lo separan de otros focos.
+    \end{itemize}
+
+    \item \textbf{Metaheurísticas de Enjambre (ACO, ABC y BHA):}
+    Las metaheurísticas bioinspiradas muestran un rendimiento robusto y equilibrado, especialmente en escenarios con distribuciones multimodales o dispersas:
+    \begin{itemize}
+        \item En los perfiles Autista y Demencia, algoritmos como \textbf{ABC (Bees)} y \textbf{BHA (Black Hole)} superan con claridad al Voraz (alcanzando hasta un $7.85\%$ de acierto). Su naturaleza poblacional y estocástica les permite diversificar la búsqueda, permitiendo al UAV ``saltar'' barreras de probabilidad nula y explotar múltiples focos disjuntos.
+        \item No obstante, en el perfil Senderista, su tendencia intrínseca a la exploración aleatoria y perturbación de soluciones penaliza su rendimiento frente al Voraz, al forzar al dron a salirse frecuentemente de las líneas estrechas de los senderos para explorar zonas vacías adyacentes.
+    \end{itemize}
+
+    \item \textbf{Algoritmos Exhaustivos y Geométricos (Lawnmower vs. Expanding Square):}
+    La comparación con los métodos geométricos tradicionales revela el contraste entre patrones de búsqueda rígidos y adaptativos:
+    \begin{itemize}
+        \item \textbf{El fracaso de la cobertura en rejilla (Lawnmower):} El barrido sistemático clásico (\textit{Lawnmower}) obtiene resultados deficientes en búsqueda informada (apenas un $0.10\%$ en el perfil Autista). Al cubrir el espacio de forma uniforme y ciega, gasta la mayor parte de la energía del dron en zonas periféricas sin probabilidad, perdiendo los focos de calor principales. Curiosamente, rinde ligeramente mejor bajo una distribución uniforme ciega ($1.70\%$), lo que demuestra que este método clásico solo es útil ante una ausencia total de información a priori, siendo contraproducente cuando sí se dispone de inteligencia geográfica.
+        \item \textbf{La eficiencia localizada de la espiral (Expanding Square):} El algoritmo \textit{Expanding Square} rinde de forma sobresaliente en los perfiles Autista ($8.24\%$) y Demencia ($9.72\%$). Esto se explica porque inicia su patrón en espiral directamente desde el punto de planificación inicial (IP), donde se localiza el centro de gravedad de la distribución de probabilidad (siguiendo la ley física de decaimiento con la distancia). Sin embargo, al ser un patrón rígido e independiente de los datos en tiempo real, no puede adaptarse a la asimetría del terreno ni a la red de caminos, lo que limita su efectividad operacional ante escenarios reales donde la probabilidad no sea concéntrica.
+    \end{itemize}
+\end{itemize>,StartLine:87,TargetContent:

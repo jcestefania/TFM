@@ -1,0 +1,37 @@
+todas las figuras, mapas, etc a inglés
+
+añadir imagen raster y tipo Google earth del polígono casa de campo
+
+en fase 4 añadir explicación de la resolución del mapa de búsqueda
+
+parametrizar rutas para trabajos futuros
+
+hacer comparación del json resultante mts con el de sarenv 
+
+
+dejar guardada la información 
+
+considerar la restricción del filtro en la optimización de trayectorias con los algoritmos bioinspirados y los demás
+
+revisar configuración del filtro de restricciones 
+
+probar a integrar las restricciones dentro del mapa de indicios inicial y visualizar antes y después
+
+
+métricas de evaluación:
+métricas de sarenv para evaluar las trayectorias
+
+métricas mts
+métricas de algoritmos bioinspirados: expected, discounted…
+
+algoritmos de búsqueda:
+algoritmos de sarenv (describir cuáles son)
+algoritmos de mts
+
+hacer pruebas pequeñas primero e ir empaquetando
+
+ver el modelo de observación de sarenv 
+
+hacer otro notebook aparte de análisis de resultados
+
+GitHub: https://github.com/Jompy-GitHub/MTS-UncertainEnvironment/tree/Algoritmos-bioinspirados

@@ -13,12 +13,15 @@ SAREnv/results/
 *.csv
 *.mp4
 
-# 2. Resultados de MTS
+# 2. Resultados y Backups pesados de MTS
 **/resultados/
 **/resultados_ext/
 **/resultados_high_budget/
 **/resultados_opt/
+**/resultados_backup_originales/
+**/resultados_high_budget_backup_originales/
 **/pruebas/TFM_JC/
+**/scratch/
 framwork-MTS/*/pruebas_test/
 framwork-MTS/*/imagenes/
 framwork-MTS/*/TFG_Alejandro/resultados/

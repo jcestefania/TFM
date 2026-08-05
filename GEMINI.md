@@ -14,7 +14,8 @@ Este archivo centraliza la estrategia, el estado de los componentes y los próxi
 3. **Fase 3: El Middleware (Integración SAREnv y MTS)** - *Conversión a JSON y transformación de coordenadas.* **[COMPLETA]**
 4. **Fase 4: Hito Visual (Paso 1)** - *Carga del mapa real en la web app de MTS y validación.* **[COMPLETA]**
 5. **Fase 5: Escenarios Canónicos por Capas y Benchmarking** - *Modelar perfiles del manual (Autista, Demencia, Senderista) y comparar la búsqueda informada frente a la aleatoria.* **[COMPLETA]**
-6. **Fase 6: Trayectoria de Bomberos y Trabajo Futuro** - *Simular el rendimiento de la ruta real de los bomberos y documentar objetivos móviles.* **[PLANIFICADA]**
+6. **Fase 6: Nuevas Peticiones de Jompy y Unificación del Pipeline** - *Estructura, inglés, verificación visual, filtro de agua/estructuras, unificación de métricas y empaquetamiento.* **[EN CURSO]**
+7. **Fase 7: Trayectoria de Bomberos y Trabajo Futuro** - *Simular el rendimiento de la ruta real de los bomberos y documentar objetivos móviles.* **[PLANIFICADA]**
 
 ## 📑 Estado de la Memoria
 1. **Capítulo 1 (Introducción):** Estructurado y redactado con objetivos y contexto. **[COMPLETO]**
@@ -46,9 +47,39 @@ Este archivo centraliza la estrategia, el estado de los componentes y los próxi
 ### FASE 5: Escenarios Canónicos por Capas y Benchmarking
 - [x] **Definir perfiles de víctimas (LPB):** Redactar en LaTeX la justificación de los perfiles del manual (Autista, Demencia, Senderista) y las 5 métricas en el Capítulo 5.
 - [x] **Generar mapas de calor por capas:** Crear los mapas en SAREnv con restricciones de transitabilidad física para Autista (capa estructuras/agua), Demencia (bosques) y Senderista (caminos).
-- [x] **Ejecutar simulaciones masivas (1000 iteraciones):** Correr por detrás las simulaciones en MTS (semillas 0-49) de Voraz, ACO, ABC y BHA y guardar las trayectorias.
+- [x] **Ejecutar simulaciones masivas (1000 iteraciones):** Correr por detrás las simulaciones en MTS (semillas 0-49) de Voraz, ACO, ABC and BHA y guardar las trayectorias.
 - [x] **Evaluar rendimiento y tasa de acierto:** Evaluar en Python con `PathEvaluator` de SAREnv el rendimiento de la búsqueda informada (con heatmap) frente a la ciega (totalmente aleatoria).
 
-### FASE 6: Trayectoria de Bomberos y Trabajo Futuro
+### FASE 6: Nuevas Peticiones de Jompy y Unificación del Pipeline (Reunión Viernes)
+- [ ] **1. Estructura, GitHub e Inglés (Cosmética):**
+  - [ ] Aceptar la invitación al repositorio MTS-UncertainEnvironment e integrar carpeta TFM_JC
+  - [ ] Traducir títulos, etiquetas y leyendas de gráficas al inglés en cuadernos
+  - [ ] Parametrizar rutas relativas en los notebooks
+  - [ ] Crear el nuevo notebook de análisis `Analisis_Resultados.ipynb`
+  - [ ] Limpiar código moviendo funciones de los cuadernos a scripts .py
+- [ ] **2. Contexto Geográfico e Investigación de Sensores:**
+  - [ ] Añadir imagen raster y satélite del polígono Casa de Campo al inicio de Fase 3
+  - [ ] Explicar resolución de celda ($10\text{ m}$) en Fase 4
+  - [ ] Investigar y documentar modelo de observación/cámara de SAREnv (50m radio) vs radar en MTS
+- [ ] **3. Validación Visual de Coordenadas:**
+  - [ ] Añadir celda de validación para comparar JSON local de MTS vs heatmap original .npy
+- [ ] **4. Filtro de Restricciones (Agua y Estructuras):**
+  - [ ] Revisar configuración del filtro de restricciones en SAREnv
+  - [ ] Integrar restricciones en el mapa de calor inicial (poner a 0 agua/edificios y normalizar)
+  - [ ] Visualizar mapa "Antes y Después" con y sin restricciones
+  - [ ] Configurar algoritmos de MTS para respetar las restricciones de transitabilidad
+- [ ] **5. Registro Temporal y Mapas de Evolución (Visualizaciones del Paper):**
+  - [ ] Registrar posiciones del dron e hitos temporales en instantes 0, 100, 300, 500 en los resultados
+  - [ ] Generar el Mapa del Escenario Inicial por perfil: mapa de calor (2D/3D) marcando con una "X" la posición de la víctima y el punto de inicio del dron
+  - [ ] Generar los Mapas de Evolución Temporal (gráfica de 4 paneles para pasos 0, 100, 300, 500) mostrando la trayectoria superpuesta sobre el mapa 3D/2D
+  - [ ] Crear el script gráfico para comparar visualmente dos algoritmos distintos lado a lado en estos instantes
+- [ ] **6. Glosario, Algoritmos y Métricas (MTS vs SAREnv):**
+  - [ ] Escribir glosario descriptivo de algoritmos y métricas en Markdown
+  - [ ] Programar métricas de MTS en SAREnv y viceversa para evaluación cruzada
+- [ ] **7. Pruebas Cortas y Escalabilidad:**
+  - [ ] Validar con pruebas cortas (pocas semillas/pasos) en local
+  - [ ] Preparar script optimizado listo para simulación masiva en el servidor del laboratorio
+
+### FASE 7: Trayectoria de Bomberos y Trabajo Futuro
 - [ ] **Simular ruta de Bomberos:** Simular la detección en la trayectoria real de los bomberos en el simulacro de la Casa de Campo y compararla en la tabla de resultados.
 - [ ] **Documentar objetivos móviles:** Redactar en el capítulo de Conclusiones el modelo teórico markoviano de objetivos móviles como Trabajo Futuro utilizando el manual y el notebook de referencia.

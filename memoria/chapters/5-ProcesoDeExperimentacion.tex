@@ -94,6 +94,43 @@ Para asegurar una comparativa justa (\textit{benchmark}) entre las estrategias h
     \item \textbf{Resolución del mapa:} Un tamaño de celda en el grid de probabilidad de $10 \times 10$ metros para garantizar tanto el detalle geográfico de la Casa de Campo como la eficiencia en el cálculo computacional.
 \end{itemize}
 
+\subsection{Parámetros de Configuración de los Algoritmos Metaheurísticos}
+
+Además de las variables físicas y del sensor, los algoritmos metaheurísticos de planificación (ACO, ABC y BHA) implementados en el simulador MTS requieren la definición de hiperparámetros específicos. Estos regulan el equilibrio entre la explotación (avanzar hacia las celdas con mayor concentración de probabilidad actual) y la exploración (desviar la ruta hacia zonas inexploradas para evitar quedar atrapado en óptimos locales de probabilidad).
+
+La calibración de estos parámetros se ha realizado de forma empírica y basándose en los estándares de la literatura de optimización por enjambres (como las configuraciones de referencia propuestas por Dorigo para ACO). Aunque teóricamente es viable utilizar marcos de optimización de hiperparámetros automáticos (como \textit{Optuna}), para este trabajo se ha optado por una calibración manual fija y justificada. Esto se debe a dos motivos fundamentales: en primer lugar, la hipótesis fundamental del TFM (demostrar que la búsqueda guiada por mapas bayesianos de SAREnv supera drásticamente a la búsqueda ciega) queda plenamente validada y contrastada con la configuración actual; en segundo lugar, una búsqueda automatizada masiva mediante Optuna supondría un coste computacional inasumible dada la duración de cada simulación sobre cartografía real.
+
+En la Tabla \ref{tab:parametros_algoritmos} se detallan los valores seleccionados y su correspondiente justificación de diseño o procedencia académica.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|c|l|}
+\hline
+\textbf{Algoritmo} & \textbf{Parámetro} & \textbf{Valor} & \textbf{Justificación / Descripción Académica} \\
+\hline
+\textbf{Físicos (Dron)} & Batería (\textit{num\_steps}) & 1000 / 5000 & Autonomía estándar de vuelo real (~30 min o extendido). \\
+& Altura de vuelo ($H$) & 50 m & Equilibrio óptimo entre resolución y campo de visión. \\
+& Radio sensor ($R_{\text{det}}$) & 50 m & Calculado mediante $\theta_{\text{FOV}} = 90^\circ$ y $H=50$ m. \\
+\hline
+\textbf{ACO (Hormigas)} & Hormigas (\textit{n\_ants}) & 20 & Diversidad de caminos candidatos por paso físico. \\
+& Iteraciones ACO & 5 & Ciclos de convergencia del enjambre por paso. \\
+& Importancia Feromona ($\alpha$) & 1.0 & Peso moderado de la memoria colectiva del dron. \\
+& Importancia Heurística ($\beta$) & 3.0 & Configuración $\beta > \alpha$ para priorizar el mapa bayesiano. \\
+& Evaporación global ($\rho$) & 0.1 & Evaporación del 10\% para evitar atasco en rutas pasadas. \\
+\hline
+\textbf{ABC (Abejas)} & Iteraciones ABC & 10 & Ciclos de explotación local por paso. \\
+& Límite de abandono (\textit{limit}) & 10 & Intentos sin mejora antes de explorar otra zona (exploradora). \\
+& Abejas empleadas / espectadoras & 1 / 1 & Población mínima ajustada para un único agente físico. \\
+\hline
+\textbf{BHA (Black Hole)}& Iteraciones BHA & 10 & Ciclos de atracción gravitacional de soluciones por paso. \\
+& Número de estrellas & 5 & Caminos candidatos vecinos evaluados por el agujero negro. \\
+\hline
+\end{tabular}
+\caption{PARÁMETROS DE CONFIGURACIÓN DE LOS PLANIFICADORES Y JUSTIFICACIÓN ACADÉMICA}
+\label{tab:parametros_algoritmos}
+\end{table}
+
+
 \section{Metodología de Validación y Métricas de Rendimiento}
 
 Dada la naturaleza estocástica de los algoritmos metaheurísticos de planificación (como la selección probabilística en ACO y las perturbaciones aleatorias en ABC y BHA), resulta indispensable validar los resultados estadísticamente. Para cuantificar la eficacia empírica de las trayectorias planificadas, el framework emplea un método de evaluación por simulación de Montecarlo distribuyendo virtualmente una muestra de $100$ víctimas independientes por el entorno. Estas posiciones de víctimas objetivo se \enquote{siembran} en el área obedeciendo estrictamente a la densidad topológica de la Matriz de Probabilidades (MAP). Por consiguiente, los agentes de búsqueda son evaluados en función de su eficiencia para maximizar el consumo de probabilidad acumulada y localizar estadísticamente el mayor número de estas víctimas sembradas.

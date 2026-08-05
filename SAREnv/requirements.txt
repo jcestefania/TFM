@@ -16,3 +16,4 @@ elevation
 seaborn
 nbformat>=4.2.0
 tqdm
+optuna

@@ -4,7 +4,10 @@ import json
 import os
 from pathlib import Path
 
-import elevation
+try:
+    import elevation
+except ImportError:
+    elevation = None
 import geopandas as gpd
 import numpy as np
 import pandas as pd

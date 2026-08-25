@@ -5,14 +5,20 @@ Collection of visualization functions for SAREnv data.
 import os
 from pathlib import Path
 
-import contextily as cx
+try:
+    import contextily as cx
+except ImportError:
+    cx = None
 import geopandas as gpd
 import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend for scientific plotting
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
+try:
+    import plotly.graph_objects as go
+except ImportError:
+    go = None
 import seaborn as sns
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch, Circle

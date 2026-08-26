@@ -1,30 +1,28 @@
 # ==========================================
-# GITIGNORE UNIFICADO PARA TFM
+# GITIGNORE PROFESIONAL PARA SARENV-MTS
 # ==========================================
 
-# 1. Archivos y carpetas muy pesados
+# 1. Archivos y carpetas pesadas no deseadas
 *.zip
 SAREnv/sarenv_dataset/
 SAREnv/resultados_casa_de_campo*/
 SAREnv/cache/
 SAREnv/data/
 SAREnv/results/
-*.geojson
-*.csv
-*.mp4
+SAREnv/TFM_JC/
 
-# 2. Resultados y Backups pesados de MTS
-**/resultados/
-**/resultados_ext/
-**/resultados_high_budget/
-**/resultados_opt/
+# 2. Resultados pesados de backups no necesarios
 **/resultados_backup_originales/
+**/resultados_high_budget/
 **/resultados_high_budget_backup_originales/
-**/pruebas/TFM_JC/
+**/resultados_ext/
+**/resultados_opt/
 **/scratch/
 framwork-MTS/*/pruebas_test/
-framwork-MTS/*/imagenes/
-framwork-MTS/*/TFG_Alejandro/resultados/
+framwork-MTS/MTS-UncertainEnvironment-Algoritmos-bioinspirados/resultados/
+framwork-MTS/*/TFG_*/Resultados/
+framwork-MTS/*/TFG_*/mission_data/
+framwork-MTS/*/TFG_*/TFG_Romeo/
 
 # 3. Entornos Virtuales
 tfm/
@@ -34,7 +32,7 @@ env/
 .venv/
 SAREnv/tfm/
 
-# 4. Python
+# 4. Python & Build Caches
 __pycache__/
 *.py[cod]
 *.class

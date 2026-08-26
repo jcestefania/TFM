@@ -13,23 +13,20 @@ Este archivo centraliza la estrategia, el estado de los componentes y la hoja de
   - `TFM_JC/notebooks/`: Cuadernos interactivos oficiales (`Notebook_Demo_Rapida_Interactiva.ipynb`, `Analisis_Resultados.ipynb`, `Benchmark_Perfiles_Real_Interactivo.ipynb`).
   - `TFM_JC/resultados/`: Base de datos de 900 simulaciones, CSV maestro y figuras 300 DPI en inglés.
 
-## 🚀 Hoja de Ruta del Proyecto
-1. **Fase 1: Remates Finales en SAREnv** - **[COMPLETA]**
-2. **Fase 2: Preparación del Entorno de Pruebas (MTS)** - **[COMPLETA]**
-3. **Fase 3: Middleware e Integración de Coordenadas UTM** - **[COMPLETA]**
-4. **Fase 4: Hito Visual y Cuaderno Demostración Rápida** - **[COMPLETA]**
-5. **Fase 5: Verificación de Rutas Relativas y Portabilidad Total** - **[COMPLETA]**
-6. **Fase 6: Framework Modular y Publicación en GitHub (`sarenv-mts`)** - **[COMPLETA]**
-7. **Fase 7: Simulación Trayectoria Bomberos vs Drones** - **[SIGUIENTE PASO]**
-8. **Fase 8: Redacción de Trabajo Futuro (Objetivos Móviles)** - **[PLANIFICADA]**
-9. **Fase 9: Cierre y Compilación Final de la Memoria LaTeX** - **[PLANIFICADA]**
-10. **Fase 10: Diapositivas y Preparación de la Defensa** - **[PLANIFICADA]**
+## 🚀 Hoja de Ruta Restante (Hacia la Entrega y Defensa)
+1. **Fase 1: Verificación de Cuadernos en VS Code** - **[EN CURSO POR EL USUARIO]**
+2. **Fase 2: Redacción Integral y Compilación de la Memoria LaTeX** - **[SIGUIENTE PASO]**
+   - Integrar documentos de modelado de sensor (50 m), restricciones físicas, RBF y Montecarlo.
+   - Insertar tablas de 900 simulaciones y figuras vectoriales en inglés.
+   - Redactar Conclusiones y Trabajo Futuro (Ruta Bomberos + Víctimas Dinámicas).
+   - Compilación limpia del PDF final.
+3. **Fase 3: Preparación de Diapositivas y Defensa del TFM** - **[PLANIFICADA]**
 
-## 📑 Estado de la Memoria
-1. **Capítulo 1 (Introducción):** Estructurado y redactado con objetivos y contexto. **[COMPLETO]**
-2. **Capítulo 2 (Estado del Arte):** Detallado y fusionado con fundamentos bayesianos. **[COMPLETO]**
-3. **Capítulo 3 (Modelado):** Ampliado con las formulaciones de SAREnv, sensor (50 m), RBF y Montecarlo. **[COMPLETO]**
-4. **Capítulo 4 (Desarrollo e Integración):** Middleware UTM, arquitectura de paquetes y filtros OSM. **[BORRADOR LISTO]**
-5. **Capítulo 5 (Experimentación):** Justificación LPB por perfiles de Koester, Optuna y métricas. **[BORRADOR REDACTADO]**
-6. **Capítulo 6 (Análisis de Resultados):** Tablas definitivas de 900 simulaciones e interpretación. **[COMPLETO]**
-7. **Capítulo 7 (Conclusiones y Trabajo Futuro):** En redacción (incluye extensión de víctimas dinámicas). **[BORRADOR]**
+## 📑 Estado de los Capítulos de la Memoria (`Software/memoria/`)
+1. **Capítulo 1 (Introducción y Motivación):** Redactado con objetivos del proyecto.
+2. **Capítulo 2 (Estado del Arte):** Detallado con fundamentos bayesianos y algoritmos SAR.
+3. **Capítulo 3 (Modelado del Entorno y Sensor):** Formulación de SAREnv, sensor de 50 m y filtros OSM.
+4. **Capítulo 4 (Arquitectura e Integración):** Arquitectura modular `sarenv-mts` y middleware UTM.
+5. **Capítulo 5 (Marco Experimental):** Justificación LPB de perfiles de Koester, Optuna y métricas.
+6. **Capítulo 6 (Análisis de Resultados):** Tablas de 900 simulaciones, boxplots y discusión.
+7. **Capítulo 7 (Conclusiones y Trabajo Futuro):** Resumen de aportaciones, rutas reales de bomberos y objetivos móviles.

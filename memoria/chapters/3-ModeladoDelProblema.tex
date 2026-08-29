@@ -21,7 +21,7 @@ donde $\mathcal{G}_{\text{OSM}}$ son las características geográficas descargad
 
 Los algoritmos de planificación de rutas en cuadrículas no pueden procesar un mapa geométrico continuo; requieren una representación discreta. Para ello, el espacio geográfico se sectoriza proyectándolo en una matriz bidimensional (rejilla o \textit{grid} de Numpy).
 
-La resolución del mapa discreto se controla a través del parámetro fundamental $meter\_per\_bin$ (denotado como $\delta$), que establece cuántos metros reales mide cada lado de una celda de la cuadrícula. Para este trabajo, se ha seleccionado $\delta = 20$, lo que implica que cada celda o sector representa un área física real de $20 \times 20$ metros ($400~\text{m}^2$).
+La resolución del mapa discreto se controla a través del parámetro fundamental $meter\_per\_bin$ (denotado como $\delta$), que establece cuántos metros reales mide cada lado de una celda de la cuadrícula. Para este trabajo, se ha seleccionado $\delta = 10$, lo que implica que cada celda o sector representa un área física real de $10 \times 10$ metros ($100~\text{m}^2$).
 
 El framework calcula las dimensiones de la matriz de la siguiente manera. Sean $(x_{\min}, y_{\min})$ y $(x_{\max}, y_{\max})$ los límites coordenados proyectados (Bounds) del polígono de búsqueda, y $b$ el valor del margen de seguridad o \textit{buffer}. El número de celdas en el eje de abscisas ($N_x$) y ordenadas ($N_y$) se determina mediante:
 \begin{equation}
@@ -30,11 +30,11 @@ El framework calcula las dimensiones de la matriz de la siguiente manera. Sean $
 \begin{equation}
     N_y = \left\lfloor \frac{|y_{\max} - y_{\min} + 2b|}{\delta} \right\rfloor
 \end{equation}
-donde $\lfloor \cdot \rfloor$ representa la función piso. El escenario discretizado completo queda modelado por una matriz de tamaño $N_y \times N_x$. Cada celda de coordenadas discretas $(i, j)$ se asocia a una zona física del parque.
+donde $\lfloor \cdot \rfloor$ representa la función piso. El escenario discretizado completo de la Casa de Campo queda modelado por una matriz de $458 \times 481$ celdas, abarcando una superficie total de aproximadamente $12.75~\text{km}^2$. Cada celda de coordenadas discretas $(i, j)$ se asocia unívocamente a una zona física del parque.
 
 \section{Fusión Probabilística Multicapa (SAREnv)}
 
-Para que los drones puedan tomar decisiones orientadas a la optimización de la probabilidad, el espacio discreto debe asociarse a una distribución de probabilidad espacial inicial, conocida como Mapa de Calor (\textit{Heatmap}) o matriz de Probabilidad de Área (POA). El modelado probabilístico de SAREnv se construye en dos fases: un modelado continuo a nivel vectorial y una proyección discreta a nivel de rejilla.
+Para que los drones puedan tomar decisiones orientadas a la optimización de la probabilidad, el espacio discreto debe asociarse a una distribución de probabilidad espacial inicial, conocida como Mapa de Creencias Inicial $b(v^0)$ o matriz de Probabilidad de Área (POA). El modelado probabilístico de SAREnv se construye en dos fases: un modelado continuo a nivel vectorial y una proyección discreta a nivel de rejilla.
 
 \subsection{Modelado Continuo a Nivel Vectorial}
 
@@ -65,7 +65,7 @@ Finalmente, la Probabilidad de Área ($POA$) normalizada para cada característi
 
 \subsection{Proyección y Fusión a Nivel de Rejilla (Rasterización)}
 
-Para su procesamiento autónomo por la flota de drones, los datos vectoriales y sus probabilidades asociadas se proyectan sobre el espacio discretizado de celdas $(i, j)$ de resolución $\delta$.
+Para su procesamiento autónomo por la flota de drones, los datos vectoriales y sus probabilidades asociadas se proyectan sobre el espacio discretizado de celdas $(i, j)$ de resolución $\delta = 10\text{ m}$.
 
 Las características se clasifican en capas semánticas principales:
 \begin{itemize}
@@ -75,99 +75,87 @@ Las características se clasifican en capas semánticas principales:
     \item \textbf{Zonas naturales:} Bosques y prados (\textit{tags}: \texttt{natural:wood}, \texttt{natural:scrub}).
 \end{itemize}
 
-El proceso de fusión consta de los siguientes pasos:
+A diferencia del diseño inicial de SAREnv, que utilizaba un operador de máximo en cada celda para evitar acumulaciones de probabilidad, en este trabajo se ha modificado la lógica de combinación para implementar una \textbf{suma ponderada y posterior normalización global}. 
+
+El artículo original de SAREnv \cite{sarenv2024} señala explícitamente como una limitación del operador de máximo el hecho de no considerar el efecto acumulativo cuando convergen múltiples características favorables en un mismo punto, lo que puede infravalorar zonas ricas en características (\textit{feature-rich zones}), tales como la confluencia de un sendero forestal con el acceso a una estructura.
+
+Para resolver esta limitación, el proceso de fusión se formula en los siguientes pasos:
 \begin{enumerate}
     \item \textbf{Rasterización de capas binarias:} Para cada capa $k$, se genera una matriz binaria $\mathbf{M}_k(i, j) \in \{0, 1\}$ indicando la presencia espacial del elemento.
-    \item \textbf{Ponderación de capa:} Se multiplica cada capa binaria por su probabilidad o peso específico del tipo de terreno:
+    \item \textbf{Suma Ponderada Multicapa:}
     \begin{equation}
-        \mathbf{P}_k(i, j) = \mathbf{M}_k(i, j) \times \alpha_k
+        \mathbf{POA}_{\text{unnorm}}(i, j) = \sum_{k} \mathbf{M}_k(i, j) \cdot \alpha_k
     \end{equation}
-    donde los coeficientes $\alpha_k$ corresponden a las estimaciones del tipo (por ejemplo, $\alpha_{\text{wood}} = 0.45$, $\alpha_{\text{water}} = 0.25$, $\alpha_{\text{highway}} = 0.10$, $\alpha_{\text{building}} = 0.05$).
-    \item \textbf{Fusión por Operador de Máxima Probabilidad:} En las celdas donde coinciden o se superponen múltiples capas geográficas, la verosimilitud más alta toma precedencia para evitar picos artificiales. Se utiliza el operador del máximo en cada celda:
+    donde $\alpha_k$ es el peso asignado a la capa $k$ según el perfil de búsqueda.
+    \item \textbf{Normalización Global:}
     \begin{equation}
-        \mathbf{POA}(i, j) = \max_{k} \left( \mathbf{P}_k(i, j) \right)
-    \end{equation}
-    \item \textbf{Normalización final:} La cuadrícula combinada se normaliza para constituir una distribución válida:
-    \begin{equation}
-        \mathbf{POA}_{\text{norm}}(i, j) = \frac{\mathbf{POA}(i, j)}{\sum_{u=1}^{N_y} \sum_{v=1}^{N_x} \mathbf{POA}(u, v)}
+        \mathbf{POA}_{\text{norm}}(i, j) = \frac{\mathbf{POA}_{\text{unnorm}}(i, j)}{\sum_{u=1}^{N_y} \sum_{v=1}^{N_x} \mathbf{POA}_{\text{unnorm}}(u, v)}
     \end{equation}
 \end{enumerate}
-Esta matriz normalizada es el mapa de calor final que alimentará las misiones de búsqueda.
 
+Debido a que la topología de OpenStreetMap genera capas de suelo (bosque, prados) geográficamente disjuntas que no se solapan entre sí, los únicos solapamientos se producen por elementos lineales (caminos) e infraestructuras sobre dichos fondos. Por tanto, la suma no genera un mapa diluido, sino que preserva los picos de los caminos y eleva de forma realista la importancia de sus intersecciones.
 
-\section{Observaciones y Modelo del Sensor}
+\section{Filtro Físico de Restricciones No Transitables}
 
-La capacidad del dron para localizar a la víctima depende de su sensor a bordo (óptico o térmico), modelado mediante la Probabilidad de Detección (POD).
+En un entorno real de búsqueda terrestre, existen zonas donde la víctima no puede encontrarse de forma transitable a pie, tales como el interior de masas de agua profunda (lagos y estanques principales) o el interior inaccesible de edificaciones urbanas cerradas.
 
-En cada instante de tiempo $t$, la huella del sensor del UAV cubre una porción del terreno. La probabilidad condicional de detectar a la víctima si se encuentra en la celda $(i,j)$ bajo la huella del sensor se denota como $POD(i,j)$. Físicamente, el modelo del sensor se define por tres parámetros:
-\begin{itemize}
-    \item $P_{\max}$: La probabilidad máxima de detección en condiciones ideales (directamente bajo la vertical del dron).
-    \item $d_{\max}$: El radio máximo de cobertura visual del sensor en metros.
-    \item $\sigma$: El factor de atenuación de la visibilidad que modela la pérdida de nitidez y el decaimiento de la capacidad del sensor a medida que aumenta la distancia al centro de la huella o se incrementa la oclusión del terreno (densidad arbórea).
-\end{itemize}
-
-Para una celda $(i, j)$ situada a una distancia euclídea $d$ de la proyección del dron en el suelo, la POD se modela como una función exponencial decreciente:
+Para dotar al mapa de calor de coherencia física estricta, el sistema aplica un filtro de restricciones duras mediante indexación espacial jerárquica con árboles R-Tree (\texttt{sindex}). Para cada celda $(i, j)$ que intersecta con un polígono de masa de agua o edificio no transitable $\mathcal{G}_{\text{restringido}}$, su probabilidad se anula estrictamente:
 \begin{equation}
-    POD(i, j) = \begin{cases}
-        P_{\max} \cdot \exp\left(-\frac{d^2}{2\sigma^2}\right), & \text{si } d \le d_{\max} \\
-        0, & \text{si } d > d_{\max}
+    b(v^0)(i, j) = \begin{cases}
+        0.0 & \text{si } (i, j) \cap \mathcal{G}_{\text{restringido}} \neq \emptyset \\
+        \mathbf{POA}_{\text{norm}}(i, j) & \text{en otro caso}
     \end{cases}
 \end{equation}
+Tras la aplicación de la máscara, la matriz se renormaliza globalmente, asegurando que $\sum_{i,j} b(v^0)(i,j) = 1.0$.
 
-\section{Filtro Recursivo Bayesiano (RBF)}
+\section{Observaciones y Modelo del Sensor (Sensor Ideal de Nivel 1)}
+
+La capacidad del UAV para localizar a la víctima en el terreno se modela mediante el enfoque canónico de \textbf{Sensor Ideal de Huella Geométrica (Nivel 1)}, adaptado del modelo de observación desarrollado por Yago Brotón.
+
+Bajo este modelo, la probabilidad de detección condicional $P_d(x,y \mid p_k)$ de una víctima ubicada en las coordenadas $(x,y)$ dada la posición del dron $p_k = (x_k, y_k)$ a una altitud de vuelo $h$ se define como una función determinista de cobertura binaria:
+\begin{equation}
+    P_d(x,y \mid p_k) = \begin{cases} 
+        1.0 & \text{si } \sqrt{(x - x_k)^2 + (y - y_k)^2} \le R_d \\ 
+        0.0 & \text{en otro caso} 
+    \end{cases}
+\end{equation}
+donde $R_d$ representa el radio de cobertura efectiva de la cámara a bordo, el cual viene determinado por la altitud $h$ y el ángulo del campo de visión (\textit{Field of View - FoV}) $\theta_{\text{FoV}}$:
+\begin{equation}
+    R_d = h \cdot \tan\left(\frac{\theta_{\text{FoV}}}{2}\right)
+\end{equation}
+
+Para las condiciones nominales de vuelo en la Casa de Campo ($h = 50\text{ m}$ de altitud y $\theta_{\text{FoV}} = 90^\circ$), el radio de cobertura resultante en el suelo es exactamente $R_d = 50\text{ metros}$.
+
+Dado el tamaño de celda de $10\text{ m} \times 10\text{ m}$, una huella circular de $R_d = 50\text{ m}$ cubre un radio discreto de 5 celdas a partir de la posición del dron. Si la celda cae dentro de este radio de barrido, se marca como observada y su probabilidad acumulada es absorbida por el dron.
+
+\section{Filtro Recursivo Bayesiano (RBF) y Mapa de Creencias Residual}
 
 Cuando un dron sobrevuela una región y no detecta a la víctima, esta observación negativa aporta información. El sistema debe reducir la probabilidad de presencia en las celdas observadas y, por conservación de la masa de probabilidad, aumentar proporcionalmente la probabilidad en el resto de las zonas no exploradas.
 
-Este proceso de actualización dinámica de la matriz de creencias se implementa mediante el Filtro Recursivo Bayesiano. Denotemos como $\mathbf{b}_t(i, j)$ la creencia (prior) de que la víctima está en la celda $(i, j)$ en el tiempo $t$. Si el dron inspecciona el área en el paso $t$ y la observación $y_t$ es negativa ($y_t = 0$, víctima no encontrada), la creencia actualizada para el paso $t+1$ se calcula aplicando el teorema de Bayes:
-
+Este proceso de actualización dinámica de la matriz de creencias se implementa mediante el Filtro Recursivo Bayesiano. Denotemos como $b_t(i, j)$ la creencia (prior) de que la víctima está en la celda $(i, j)$ en el tiempo $t$. Si el dron inspecciona el área en el paso $t$ y la observación $y_t$ es negativa ($y_t = 0$, víctima no encontrada), la creencia actualizada para el paso $t+1$ se calcula aplicando el teorema de Bayes:
 \begin{equation}
-    \mathbf{b}_{t+1}(i, j) = P\left(x = (i,j) \mid y_t = 0, \mathbf{b}_t\right) = \frac{P\left(y_t = 0 \mid x = (i,j)\right) \cdot \mathbf{b}_t(i, j)}{P\left(y_t = 0 \mid \mathbf{b}_t\right)}
+    b_{t+1}(i, j) = P\left(x = (i,j) \mid y_t = 0, b_t\right) = \frac{P\left(y_t = 0 \mid x = (i,j)\right) \cdot b_t(i, j)}{P\left(y_t = 0 \mid b_t\right)}
 \end{equation}
 
-Dado que $P\left(y_t = 1 \mid x = (i,j)\right) = POD_t(i, j)$, la probabilidad de no detección condicional es:
+Dado que bajo el sensor ideal $P\left(y_t = 1 \mid x = (i,j)\right) = P_d(i, j)$, la probabilidad de no detección condicional es $P\left(y_t = 0 \mid x = (i,j)\right) = 1 - P_d(i, j)$. La regla de actualización del RBF para cada celda $(i, j)$ es:
 \begin{equation}
-    P\left(y_t = 0 \mid x = (i,j)\right) = 1 - POD_t(i, j)
-\end{equation}
-
-El denominador corresponde a la probabilidad total de no detectar a la víctima en todo el mapa bajo el plan actual:
-\begin{equation}
-    P\left(y_t = 0 \mid \mathbf{b}_t\right) = \sum_{u=1}^{N_y} \sum_{v=1}^{N_x} \left(1 - POD_t(u, v)\right) \cdot \mathbf{b}_t(u, v) = 1 - \sum_{u=1}^{N_y} \sum_{v=1}^{N_x} POD_t(u, v) \cdot \mathbf{b}_t(u, v)
-\end{equation}
-
-Sustituyendo estos términos, la regla de actualización del RBF para cada celda $(i, j)$ en el planificador centralizado es:
-\begin{equation}
-    \mathbf{b}_{t+1}(i, j) = \frac{\left(1 - POD_t(i, j)\right) \cdot \mathbf{b}_t(i, j)}{1 - \sum_{u=1}^{N_y} \sum_{v=1}^{N_x} POD_t(u, v) \cdot \mathbf{b}_t(u, v)}
+    b_{t+1}(i, j) = \frac{\left(1 - P_d(i, j)\right) \cdot b_t(i, j)}{1 - \sum_{u=1}^{N_y} \sum_{v=1}^{N_x} P_d(u, v) \cdot b_t(u, v)}
 \end{equation}
 Este filtro redistribuye dinámicamente la masa de probabilidad durante la simulación, guiando a los planificadores inteligentes hacia zonas no exploradas que aún conservan alta probabilidad de éxito.
 
-\section{Simulación de Víctimas y Evaluación Estadística (El Método de Montecarlo)}
+\section{Simulación de Víctimas y Evaluación Estadística (Método de Montecarlo)}
 
-Para validar la eficacia de los algoritmos de enrutamiento y estimar sus métricas de rendimiento reales (como la tasa de descubrimiento de personas perdidas LPDS), se requiere una validación matemática consistente. En SAREnv, esto se implementa mediante simulaciones estadísticas de Montecarlo.
+Para validar la eficacia de los algoritmos de enrutamiento y estimar sus métricas de rendimiento reales, se requiere una validación matemática consistente. En el framework integrado, esto se implementa mediante simulaciones estadísticas de Montecarlo.
 
-\subsection{El Significado de las $N$ Víctimas}
-
-En un despliegue de rescate real, los drones buscan a \textbf{una única persona}. Sin embargo, en el código, configurar un parámetro de simulación como $n = 100$ víctimas \textbf{no significa} que se asuma una catástrofe masiva con 100 personas perdidas simultáneamente.
-
-Significa que el sistema de validación ejecutará \textbf{100 simulaciones independientes (100 universos paralelos)}:
+En un despliegue de rescate real, los drones buscan a \textbf{una única persona}. En la experimentación, simular $N = 50$ semillas independientes significa que el sistema ejecutará \textbf{50 misiones completas e independientes}:
 \begin{itemize}
-    \item En cada simulación $k \in \{1, \dots, 100\}$, el sistema genera de forma estocástica la ubicación de una sola víctima virtual $v_k$ en el mapa.
-    \item Esta generación de coordenadas no es uniforme ni puramente aleatoria; utiliza el mapa de calor $\mathbf{POA}_{\text{norm}}$ como una distribución de probabilidad acumulada de densidad. De este modo, es mucho más probable que la víctima sea sembrada cerca de un camino o río que en una zona verde inaccesible.
-    \item Durante la simulación del universo $k$, se comprueba si la trayectoria de los drones intercepta la huella del sensor de la víctima en algún paso de tiempo. Si lo hace, la búsqueda en el universo $k$ se considera un \textbf{éxito} ($x_k = 1$). De lo contrario, es un fallo ($x_k = 0$).
+    \item En cada simulación $k \in \{1, \dots, 50\}$, el sistema genera de forma estocástica la ubicación de una sola víctima virtual $v_k$ en el mapa.
+    \item Esta generación de coordenadas no es uniforme; utiliza el mapa de calor $b(v^0)$ como una función de distribución acumulada de probabilidad en celdas transitables ($P > 0$).
+    \item Durante la simulación del universo $k$, se comprueba si la trayectoria del dron intercepta la huella del sensor de la víctima ($d \le 50\text{ m}$) en algún paso de tiempo. Si lo hace, la búsqueda se considera un \textbf{éxito} ($x_k = 1$). De lo contrario, es un fallo ($x_k = 0$).
 \end{itemize}
 
-El promedio de éxitos sobre los 100 universos independientes define la métrica de éxito empírico \textbf{Lost Person Discovery Score (LPDS)} o tasa de víctimas encontradas:
+El promedio de éxitos sobre las 50 simulaciones independientes define la métrica de éxito empírico:
 \begin{equation}
-    LPDS = \frac{1}{n} \sum_{k=1}^{n} x_k
+    \text{Success Rate} = \frac{1}{N} \sum_{k=1}^{N} x_k
 \end{equation}
 Esta tasa acumulada proporciona robustez estadística, garantizando que el rendimiento reportado para un algoritmo no sea fruto de la suerte espacial de una única ejecución.
-
-\subsection{Fase de Generación de Trayectoria Estática vs. Fase de Evaluación}
-
-Una característica operativa clave en la simulación es que \textbf{el dron no vuela de forma reactiva en tiempo real}. La misión se planifica de la siguiente manera:
-
-\begin{enumerate}
-    \item \textbf{Fase de Planificación (Generación offline - Una sola ejecución):} El algoritmo de enrutamiento (por ejemplo, Pizza Zigzag o la metaheurística ABC) recibe únicamente el mapa de calor estático $\mathbf{POA}_{\text{norm}}$ y el presupuesto máximo de batería de la flota (presupuesto $B$). Con estas variables, el algoritmo diseña de manera óptima las trayectorias completas de los drones. Se genera \textbf{una única ruta fija (trayectoria estática)}.
-    \item \textbf{Fase de Validación (Evaluación Montecarlo):} Para comprobar la calidad y robustez de esa trayectoria estática generada, la ruta se "congela" sobre el mapa. Posteriormente, se lanza la simulación de Montecarlo con las $n$ víctimas sembradas estocásticamente de forma secuencial. El sistema calcula cuántos de estos escenarios independientes son resueltos (pisados) por la misma ruta estática.
-\end{enumerate}
-
-Este desacoplamiento simula fielmente la operativa real de rescates en emergencias civiles, donde un operador planifica la ruta óptima de los drones en la estación de control terrestre antes del despegue y, una vez en el aire, los drones ejecutan de manera autónoma y sistemática el plan de vuelo preprogramado.

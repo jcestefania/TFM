@@ -1,178 +1,159 @@
-\chapter{Proceso de Experimentación}
+\chapter{Marco Experimental y Benchmarking}
+\label{ch:experimentacion}
 
-En este capítulo se expone el diseño experimental planteado para comparar el rendimiento de los planificadores metaheurísticos propuestos frente a las líneas de base tradicionales. Para dotar a las pruebas de realismo y validez académica, la experimentación se fundamenta en las estadísticas reales de comportamiento de personas perdidas (\textit{Lost Person Behavior} o LPB) y en las métricas de evaluación formales del simulador SAREnv.
+En este capítulo se describe el diseño experimental planteado para evaluar el rendimiento de los planificadores metaheurísticos bioinspirados frente a las líneas de base clásicas. La experimentación se fundamenta en las estadísticas reales de comportamiento de personas desaparecidas (\textit{Lost Person Behavior} - LPB), la calibración bayesiana de hiperparámetros mediante Optuna y la evaluación cuantitativa estandarizada a través de 900 simulaciones completas de Montecarlo.
 
-\section{Diseño del Banco de Pruebas: Escenarios Canónicos y LPB}
+\section{Escenarios Canónicos y Perfiles LPB de Robert Koester}
 
-Para la evaluación rigurosa de los algoritmos de planificación de trayectorias con UAVs, resulta indispensable contar con un escenario base o \textit{Ground Truth} que no dependa de distribuciones aleatorias ad-hoc, sino de modelados basados en el comportamiento real humano. El framework SAREnv fundamenta su modelo de probabilidad en los estudios estadísticos de comportamiento de personas perdidas (\textit{Lost Person Behavior} o LPB) desarrollados por Koester. En lugar de realizar una búsqueda uniforme, el sistema emplea la cartografía vectorial de OpenStreetMap para generar una Matriz de Probabilidades (MAP o \textit{Heatmap}) que prioriza los sectores de búsqueda.
+Para dotar al benchmark de realismo operativo y evitar distribuciones sintéticas arbitrarias, el entorno de simulación se apoya en los registros históricos internacionales de operaciones SAR recopilados en la base de datos ISRID por Robert Koester \cite{koester2008lost}. 
 
-\subsection{Probabilidad Espacial: Cuartiles de Distancia al LKP}
+\subsection{Fundamentación de los Perfiles de Comportamiento}
 
-El primer componente estadístico del modelo LPB define el límite geográfico de la búsqueda a partir de la distancia recorrida desde el punto de planificación o LKP (\textit{Last Known Point}). Para el caso de estudio de la Casa de Campo, clasificado como un entorno llano y de clima templado (\textit{flat temperate}), el framework aplica internamente las siguientes distancias estadísticas de dispersión:
-\begin{itemize}
-    \item \textbf{Radio Small (0.6 km):} Abarca el 25\% de los casos históricos de dispersión.
-    \item \textbf{Radio Medium (1.8 km):} Abarca el 50\% de los casos históricos de dispersión (mediana).
-    \item \textbf{Radio Large (3.2 km):} Abarca el 75\% de los casos históricos de dispersión.
-    \item \textbf{Radio XLarge (9.9 km):} Abarca el 95\% de los casos de dispersión.
-\end{itemize}
+El modelo LPB clasifica a las personas extraviadas en categorías psicológicas y médicas específicas, determinando tanto su propensión a desplazarse hacia ciertos elementos del terreno como su capacidad de dispersión física desde el Punto de Planificación Inicial (LKP):
 
-\subsection{Probabilidad Topológica y Fusión de Capas}
+\begin{enumerate}
+    \item \textbf{Perfil Autista:} Caracterizado por una atracción estadística predominante hacia estructuras artificiales y recintos cerrados ($45\%$), así como una tendencia a aproximarse a masas de agua ($9\%$). Su movilidad física puede ser considerable, alcanzando distancias de dispersión elevadas en terreno llano.
+    \item \textbf{Perfil de Demencia (Alzheimer):} Caracterizado por una severa desorientación cognitiva unida a limitaciones físicas. Estas personas tienden a seguir la ley del mínimo esfuerzo, apartándose con facilidad de los senderos pavimentados y quedando retenidas en zonas de vegetación densa (bosques y matorrales). Su radio de dispersión es sustancialmente más reducido.
+    \item \textbf{Perfil de Senderista (\textit{Hiker}):} Caracterizado por personas con plena movilidad física e intención activa de navegación. Su patrón de movimiento está fuertemente vinculado a la red de senderos, pistas y carreteras ($25\%$), recorriendo distancias moderadas a altas para intentar reorientarse.
+\end{enumerate}
 
-Basándose en la tabla de probabilidades climáticas del LPB, la ponderación porcentual asignada a las capas cartográficas varía significativamente dependiendo de si el entorno es templado o seco. En la Tabla \ref{tab:probabilidades_clima} se detallan los pesos asignados a cada una de las características geográficas vectorizadas en función del tipo de clima.
+\subsection{Ponderación de Capas Topológicas y Radios Cuartiles}
+
+En la Tabla~\ref{tab:perfiles_koester} se detallan las ponderaciones porcentuales normalizadas asignadas a cada una de las seis coberturas del suelo en OpenStreetMap, así como los cuatro radios cuartiles de dispersión estadística $[25\%, 50\%, 75\%, 95\%]$ para clima templado y terreno llano.
 
 \begin{table}[H]
 	\ttabbox[\FBwidth]
-	{\caption{PONDERACIÓN PROBABILÍSTICA DE LAS CAPAS CARTOGRÁFICAS SEGÚN EL CLIMA EN EL MODELO LPB}}
-	{\label{tab:probabilidades_clima}
-	\begin{tabular}{|l|c|c|}
+	{\caption{PONDERACIÓN DE CAPAS CARTOGRÁFICAS Y RADIOS CUARTILES LPB}}
+	{\label{tab:perfiles_koester}
+	\begin{tabular}{|l|c|c|c|}
 		\hline
-		\textbf{Característica Geográfica (Capa)} & \textbf{Ponderación Clima Templado} & \textbf{Ponderación Clima Seco} \\
+		\textbf{Característica / Capa} & \textbf{Perfil Autista} & \textbf{Perfil Demencia} & \textbf{Perfil Senderista} \\
 		\hline
-		Elementos lineales (vallas, vías) & 25\% & 31\% \\
+		Estructuras (\textit{Building}) & 45\% & 20\% & 13\% \\
+		Carreteras y Caminos (\textit{Road}) & 18\% & 18\% & 25\% \\
+		Bosques (\textit{Woodland}) & 9\% & 17\% & 7\% \\
+		Campo abierto (\textit{Field}) & 9\% & 14\% & 14\% \\
+		Masas de agua (\textit{Water}) & 9\% & 7\% & 8\% \\
+		Matorral denso (\textit{Brush}) & 9\% & 6\% & 3\% \\
 		\hline
-		Campo abierto (\textit{Field}) & 14\% & 1\% \\
+		\textbf{Radios Cuartiles $[25\%, 50\%, 75\%, 95\%]$} & $[0.6, 1.6, 3.7, 15.2]$ km & $[0.3, 1.0, 2.4, 12.8]$ km & $[0.6, 1.8, 3.2, 9.9]$ km \\
 		\hline
-		Caminos y carreteras (\textit{Road}) & 13\% & 17\% \\
-		\hline
-		Estructuras (\textit{Building}) & 13\% & 10\% \\
-		\hline
-		Drenajes y arroyos (\textit{Drainage}) & 12\% & 18\% \\
-		\hline
-		Masas de agua (\textit{Water}) & 8\% & 9\% \\
-		\hline
-		Bosques (\textit{Woodland}) & 7\% & 6\% \\
-		\hline
-		Rocas & 4\% & 2\% \\
-		\hline
-		Matorral ralo (\textit{Scrub}) & 3\% & 3\% \\
-		\hline
-		Matorral denso (\textit{Brush}) & 2\% & 2\% \\
-		\hline
-		\multicolumn{3}{l}{Fuente: Datos estadísticos de Lost Person Behavior (Koester).}
 	\end{tabular}}
 \end{table}
 
-Para generar el mapa de calor final, las geometrías son rasterizadas en matrices binarias y multiplicadas por los pesos descritos en la Tabla \ref{tab:probabilidades_clima}. En caso de solapamiento de capas, el framework no realiza una suma de probabilidades, sino que emplea una fusión por máximos mediante el operador de máximo elemento a elemento (\enquote{\texttt{np.maximum}}), garantizando que cada sector herede estrictamente la probabilidad de la característica geográfica más relevante.
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{MAPA DE CALOR PROBABILÍSTICO INICIAL $b(v^0)$ PARA EL PERFIL DEMENCIA}}
+	{\label{fig:escenario_demencia}
+	\includegraphics[width=0.90\textwidth]{imagenes/escenario_inicial_demencia.png}}
+\end{figure}
 
-\subsection{Definición de Escenarios Canónicos y Perfiles de Víctimas}
+\section{Calibración Bayesiana de Hiperparámetros con Optuna}
 
-La evaluación de los algoritmos de búsqueda bioinspirados (Colonia de Hormigas, Enjambre de Abejas y Agujeros Negros) se realiza sobre escenarios que replican situaciones operativas reales en el entorno de la Casa de Campo de Madrid. A partir de los datos recopilados en la literatura y de la parametrización probabilística explicada, se definen tres escenarios canónicos que modelan perfiles específicos de víctimas:
+Los algoritmos metaheurísticos bioinspirados (Colonia de Hormigas, Colonia de Abejas y Agujeros Negros) poseen hiperparámetros que modulan el equilibrio entre la exploración global y la explotación de zonas de alta probabilidad. Para maximizar la imparcialidad del benchmark, se implementó una fase de calibración automatizada mediante optimización bayesiana con el framework \textit{Optuna} \cite{akiba2019optuna}.
 
-\begin{enumerate}
-    \item \textbf{Escenario A: Perfil de Demencia (Alzheimer):}
-    \begin{itemize}
-        \item \textbf{Justificación LPB:} Las personas con demencia senil o enfermedad de Alzheimer suelen presentar una desorientación cognitiva severa acompañada de limitaciones físicas de movilidad. Estadísticamente, la distancia de dispersión desde el punto de planificación o LKP (\textit{Last Known Point}) es reducida, concentrándose la gran mayoría de los casos en un radio muy cercano. En SAREnv, esto se modela utilizando un radio de búsqueda \enquote{small} ($0.6$~km), equivalente al percentil 25 de dispersión.
-        \item \textbf{Comportamiento y Capas:} Estas víctimas tienden a seguir la ley del mínimo esfuerzo físico, desviándose con facilidad de los senderos pavimentados y quedando frecuentemente atrapadas en zonas de vegetación densa (bosques, matorrales) o cerca de estructuras aisladas. En la fusión bayesiana, se asignan pesos elevados a las capas de coberturas de bosques (\textit{woodland}) y matorrales (\textit{brush}), y nulos o muy bajos a la red vial activa, forzando un mapa de probabilidad concentrado en el arbolado y estructuras cercanas al LKP.
-    \end{itemize}
+\subsection{Espacio de Búsqueda y Protocolo de Ajuste}
 
-    \item \textbf{Escenario B: Perfil de Senderista (Hiker):}
-    \begin{itemize}
-        \item \textbf{Justificación LPB:} Los senderistas o excursionistas perdidos disponen de plena capacidad física e intención de desplazarse a través del terreno. Por ende, la distancia de dispersión con respecto al LKP es sustancialmente mayor. Se utiliza el radio de búsqueda \enquote{large} ($3.2$~km), representativo del percentil 75 en las estadísticas de LPB.
-        \item \textbf{Comportamiento y Capas:} El movimiento del senderista está fuertemente condicionado por la infraestructura lineal disponible. Suelen seguir caminos, senderos y pistas forestales en su intento de orientarse o regresar. Para este perfil, la capa lineal de la red de caminos (\textit{road} y \textit{linear}) recibe la ponderación preponderante en la fusión bayesiana de SAREnv. Esto produce un mapa de probabilidad de distribución alargado a lo largo de las vías de comunicación de la Casa de Campo.
-    \end{itemize}
+Para cada algoritmo metaheurístico y para cada uno de los tres perfiles canónicos, Optuna ejecutó $30$ ensayos independientes de optimización utilizando el estimador Parzen Tree Estimator (TPE). La función objetivo a maximizar correspondió a la tasa media de éxito de detección sobre un conjunto de misiones de validación cruzada.
 
-    \item \textbf{Escenario C: Escenario Dinámico (Víctima Móvil):}
-    \begin{itemize}
-        \item \textbf{Justificación LPB y Dinámica:} En muchas situaciones reales de emergencia, la persona extraviada no permanece estática, sino que continúa caminando de forma errática o siguiendo una dirección preferente. Esto altera dinámicamente la distribución espacial de la probabilidad de encontrar a la víctima a lo largo de la misión.
-        \item \textbf{Modelado en MTS:} Aprovechando las capacidades de simulación del framework MTS (\textit{Multi-Agent Target Search}), se introduce una matriz de probabilidad de transición espacial $P_{\text{transicion}}$. La víctima inicia su posición en una celda central según el mapa bayesiano de SAREnv y, en cada paso temporal del dron, su posición evoluciona estocásticamente siguiendo una caminata aleatoria restringida por las coberturas transitables del terreno.
-    \end{itemize}
-\end{enumerate}
-
-
-\section{Variables y Parámetros Controlados}
-
-Para asegurar una comparativa justa (\textit{benchmark}) entre las estrategias heurísticas y de base, se fijan de forma rigurosa los siguientes parámetros experimentales en el middleware y en el entorno de simulación:
-
+Los rangos del espacio de búsqueda explorados fueron:
 \begin{itemize}
-    \item \textbf{Número de agentes búsqueda:} Se configura un único vehículo aéreo no tripulado (dron) de búsqueda para simplificar el análisis y evitar problemas ajenos al enrutamiento como la colisión de agentes en el simulador MTS.
-    \item \textbf{Presupuesto de movimiento (\textit{budget}):} Limitado a un número fijo de pasos o distancia de vuelo equivalente a la capacidad nominal de la batería de un dron comercial estándar (estimada en $30$ minutos de vuelo).
-    \item \textbf{Altitud de vuelo ($H$):} Fijada de forma constante en $50$ metros sobre el nivel del suelo, equilibrando el campo de visión de la cámara con la resolución necesaria para la detección de personas.
-    \item \textbf{Parámetros del sensor a bordo:} Se asume una cámara con un campo de visión angular (FOV) de $90^{\circ}$, lo que determina un radio de detección física de la víctima $R_{\text{det}}$ a partir de la proyección cónica del sensor:
-    \begin{equation}
-        R_{\text{det}} = H \cdot \tan\left(\frac{\theta_{\text{FOV}}}{2}\right) = 50 \cdot \tan(45^{\circ}) = 50 \text{ metros}
-    \end{equation}
-    \item \textbf{Resolución del mapa:} Un tamaño de celda en el grid de probabilidad de $10 \times 10$ metros para garantizar tanto el detalle geográfico de la Casa de Campo como la eficiencia en el cálculo computacional.
+    \item \textbf{Colonia de Hormigas (ACO):} Peso de feromona $\alpha \in [0.5, 2.5]$, peso heurístico $\beta \in [1.0, 5.0]$, tasa de evaporación global $\rho \in [0.01, 0.30]$, tasa local $\rho_{\text{local}} \in [0.01, 0.20]$, constante de depósito $Q \in [0.1, 5.0]$ e iteraciones internas $\in [3, 10]$.
+    \item \textbf{Colonia de Abejas (ABC):} Límite de abandono de fuente $\text{limit} \in [5, 30]$, abejas empleadas $N_e \in [1, 4]$, abejas observadoras $N_o \in [1, 5]$ e iteraciones internas $\in [5, 15]$.
+    \item \textbf{Agujero Negro (BHA):} Número de estrellas candidatas $N_{\text{stars}} \in [4, 15]$ e iteraciones gravitacionales $\in [5, 15]$.
 \end{itemize}
 
-\subsection{Parámetros de Configuración de los Algoritmos Metaheurísticos}
+\subsection{Resultados de la Calibración Bayesiana}
 
-Además de las variables físicas y del sensor, los algoritmos metaheurísticos de planificación (ACO, ABC y BHA) implementados en el simulador MTS requieren la definición de hiperparámetros específicos. Estos regulan el equilibrio entre la explotación (avanzar hacia las celdas con mayor concentración de probabilidad actual) y la exploración (desviar la ruta hacia zonas inexploradas para evitar quedar atrapado en óptimos locales de probabilidad).
-
-La calibración de estos parámetros se ha realizado de forma empírica y basándose en los estándares de la literatura de optimización por enjambres (como las configuraciones de referencia propuestas por Dorigo para ACO). Aunque teóricamente es viable utilizar marcos de optimización de hiperparámetros automáticos (como \textit{Optuna}), para este trabajo se ha optado por una calibración manual fija y justificada. Esto se debe a dos motivos fundamentales: en primer lugar, la hipótesis fundamental del TFM (demostrar que la búsqueda guiada por mapas bayesianos de SAREnv supera drásticamente a la búsqueda ciega) queda plenamente validada y contrastada con la configuración actual; en segundo lugar, una búsqueda automatizada masiva mediante Optuna supondría un coste computacional inasumible dada la duración de cada simulación sobre cartografía real.
-
-En la Tabla \ref{tab:parametros_algoritmos} se detallan los valores seleccionados y su correspondiente justificación de diseño o procedencia académica.
+En la Tabla~\ref{tab:optuna_params} se presentan los hiperparámetros óptimos seleccionados por Optuna para cada perfil, los cuales se fijaron para la ejecución de la batería masiva de 900 simulaciones.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|c|l|}
+\begin{tabular}{|l|l|c|c|c|}
 \hline
-\textbf{Algoritmo} & \textbf{Parámetro} & \textbf{Valor} & \textbf{Justificación / Descripción Académica} \\
+\textbf{Algoritmo} & \textbf{Hiperparámetro} & \textbf{Autista} & \textbf{Demencia} & \textbf{Senderista} \\
 \hline
-\textbf{Físicos (Dron)} & Batería (\textit{num\_steps}) & 1000 / 5000 & Autonomía estándar de vuelo real (~30 min o extendido). \\
-& Altura de vuelo ($H$) & 50 m & Equilibrio óptimo entre resolución y campo de visión. \\
-& Radio sensor ($R_{\text{det}}$) & 50 m & Calculado mediante $\theta_{\text{FOV}} = 90^\circ$ y $H=50$ m. \\
+\textbf{ACO} & $\alpha$ (Peso Feromona) & 0.81 & 0.73 & 1.48 \\
+& $\beta$ (Peso Heurístico) & 2.07 & 2.22 & 2.09 \\
+& $\rho$ (Evaporación Global) & 0.07 & 0.22 & 0.14 \\
+& $\rho_{\text{local}}$ (Evaporación Local) & 0.09 & 0.13 & 0.02 \\
+& $Q$ (Depósito de Feromona) & 0.51 & 2.02 & 0.89 \\
+& Iteraciones ACO & 5 & 6 & 4 \\
 \hline
-\textbf{ACO (Hormigas)} & Hormigas (\textit{n\_ants}) & 20 & Diversidad de caminos candidatos por paso físico. \\
-& Iteraciones ACO & 5 & Ciclos de convergencia del enjambre por paso. \\
-& Importancia Feromona ($\alpha$) & 1.0 & Peso moderado de la memoria colectiva del dron. \\
-& Importancia Heurística ($\beta$) & 3.0 & Configuración $\beta > \alpha$ para priorizar el mapa bayesiano. \\
-& Evaporación global ($\rho$) & 0.1 & Evaporación del 10\% para evitar atasco en rutas pasadas. \\
+\textbf{ABC} & Iteraciones ABC & 9 & 8 & 13 \\
+& Límite de abandono (\textit{limit}) & 19 & 11 & 16 \\
+& Abejas empleadas ($N_e$) & 1 & 3 & 2 \\
+& Abejas observadoras ($N_o$) & 4 & 4 & 3 \\
 \hline
-\textbf{ABC (Abejas)} & Iteraciones ABC & 10 & Ciclos de explotación local por paso. \\
-& Límite de abandono (\textit{limit}) & 10 & Intentos sin mejora antes de explorar otra zona (exploradora). \\
-& Abejas empleadas / espectadoras & 1 / 1 & Población mínima ajustada para un único agente físico. \\
-\hline
-\textbf{BHA (Black Hole)}& Iteraciones BHA & 10 & Ciclos de atracción gravitacional de soluciones por paso. \\
-& Número de estrellas & 5 & Caminos candidatos vecinos evaluados por el agujero negro. \\
+\textbf{BHA} & Iteraciones BHA & 8 & 12 & 9 \\
+& Número de estrellas ($N_{\text{stars}}$) & 9 & 10 & 8 \\
 \hline
 \end{tabular}
-\caption{PARÁMETROS DE CONFIGURACIÓN DE LOS PLANIFICADORES Y JUSTIFICACIÓN ACADÉMICA}
-\label{tab:parametros_algoritmos}
+\caption{HIPERPARÁMETROS ÓPTIMOS CALIBRADOS MEDIANTE OPTUNA (30 ENSAYOS POR ALGORITMO)}
+\label{tab:optuna_params}
 \end{table}
 
+\section{Protocolo Experimental del Servidor (Batería de Montecarlo)}
 
-\section{Metodología de Validación y Métricas de Rendimiento}
+Para asegurar significancia estadística y robustez frente a fluctuaciones aleatorias, el benchmark completo se ejecutó de forma automatizada sobre un servidor de cálculo dedicado mediante el siguiente diseño factorial:
 
-Dada la naturaleza estocástica de los algoritmos metaheurísticos de planificación (como la selección probabilística en ACO y las perturbaciones aleatorias en ABC y BHA), resulta indispensable validar los resultados estadísticamente. Para cuantificar la eficacia empírica de las trayectorias planificadas, el framework emplea un método de evaluación por simulación de Montecarlo distribuyendo virtualmente una muestra de $100$ víctimas independientes por el entorno. Estas posiciones de víctimas objetivo se \enquote{siembran} en el área obedeciendo estrictamente a la densidad topológica de la Matriz de Probabilidades (MAP). Por consiguiente, los agentes de búsqueda son evaluados en función de su eficiencia para maximizar el consumo de probabilidad acumulada y localizar estadísticamente el mayor número de estas víctimas sembradas.
+\begin{equation}
+    N_{\text{simulaciones}} = 6 \text{ Algoritmos} \times 3 \text{ Perfiles LPB} \times 50 \text{ Semillas} = 900 \text{ Misiones Completas}
+\end{equation}
 
-Adicionalmente, para capturar la variabilidad de las heurísticas de enrutamiento, cada simulación de búsqueda sobre los escenarios canónicos se repite a lo largo de $50$ ejecuciones independientes (Montecarlo global). Esto permite obtener valores medios y desviaciones típicas robustas de cada una de las métricas de rendimiento y realizar comparaciones estadísticas significativas.
+Los seis algoritmos evaluados incluyen:
+\begin{enumerate}
+    \item \textbf{Colonia de Abejas Artificiales (ABC):} Metaheurística bioinspirada con búsqueda local y rescate de exploradoras.
+    \item \textbf{Algoritmo de Agujeros Negros (BHA):} Metaheurística basada en atracción gravitacional y horizonte de sucesos.
+    \item \textbf{Colonia de Hormigas (ACO):} Metaheurística basada en rastros de feromona e información heurística.
+    \item \textbf{Búsqueda Voraz Heurística (\textit{Greedy}):} Baseline informado miope de un solo paso que maximiza la ganancia inmediata de creencia.
+    \item \textbf{Patrón en Espiral Creciente (\textit{Expanding Spiral}):} Baseline geométrico clásico de búsqueda desde el LKP.
+    \item \textbf{Patrón de Barrido Lawnmower:} Baseline de cobertura en zig-zag sistemático.
+\end{enumerate}
 
-Para la evaluación formal de las trayectorias de búsqueda generadas por los algoritmos, se adoptan las cinco métricas académicas implementadas en el módulo \texttt{PathEvaluator} de SAREnv, garantizando una comparación matemáticamente consistente con la literatura científica:
+\subsection{Parámetros de Vuelo y Esquema de Evaluación}
+
+Las variables operativas del UAV se mantuvieron constantes en todas las simulaciones:
+\begin{itemize}
+    \item \textbf{Presupuesto de Vuelo (\textit{Budget}):} 250 pasos de avance físico por misión (equivalente a aproximadamente 25 minutos de autonomía de batería a $10\text{ m/s}$).
+    \item \textbf{Altitud y Sensor:} Altitud constante de $H = 50\text{ m}$ y huella circular de detección de $R_d = 50\text{ m}$.
+    \item \textbf{Condición de Inicio:} El dron despega siempre desde el centro geométrico del parque o Punto de Planificación Inicial (LKP).
+    \item \textbf{Validación Doble (Búsqueda Informada vs. Búsqueda Ciega):} Cada algoritmo se evalúa bajo dos modalidades:
+    \begin{itemize}
+        \item \textit{Búsqueda Informada:} El dron planifica guiado por el mapa de creencias bayesiano $b(v^0)$ generado con las restricciones del perfil correspondiente.
+        \item \textit{Búsqueda Ciega (Línea Base):} El dron no dispone del mapa de calor y navega sobre una distribución uniforme no informada.
+    \end{itemize}
+\end{itemize}
+
+\section{Formulación Matemática de las Métricas SAR Unificadas (\texttt{PathEvaluatorTFM})}
+
+Todas las trayectorias resultantes se evalúan cuantitativamente a través de las cinco métricas estandarizadas del módulo \texttt{PathEvaluatorTFM}:
 
 \begin{enumerate}
-    \item \textbf{Probabilidad de Detección Acumulada (\textit{Likelihood Score} - $S_{\text{like}}$):}
-    Representa la suma de los valores de probabilidad de todas las celdas del mapa de calor que han sido observadas al menos una vez por el sensor del dron a lo largo del recorrido. Si definimos el conjunto de todas las celdas únicas cubiertas por la proyección del sensor a lo largo de la trayectoria como $\mathcal{C}_{\text{obs}}$, la métrica se define como:
+    \item \textbf{Tasa de Éxito (\textit{Success Rate}, $SR$):} Porcentaje de misiones en las que la trayectoria del UAV $\mathcal{T} = \{p_0, p_1, \dots, p_K\}$ intercepta la posición de la víctima $v_{\text{real}}$ dentro del radio de detección de 50 metros:
     \begin{equation}
-        S_{\text{like}} = \sum_{(r,c) \in \mathcal{C}_{\text{obs}}} \mathcal{M}_{r,c}
+        SR = \frac{1}{N} \sum_{k=1}^{N} \mathbb{I}\left( \min_{t} \|p_t^{(k)} - v_{\text{real}}^{(k)}\|_2 \le 50\text{ m} \right) \times 100
     \end{equation}
-    donde $\mathcal{M}_{r,c}$ es el valor de la probabilidad en la celda situada en la fila $r$ y columna $c$ de la matriz del mapa de calor, normalizada tal que $\sum_{r,c} \mathcal{M}_{r,c} = 1.0$.
+    donde $\mathbb{I}(\cdot)$ es la función indicatriz y $N=50$ es el número de semillas de Montecarlo.
 
-    \item \textbf{Puntuación Descontada por Tiempo (\textit{Time-Discounted Score} - $S_{\text{td}}$):}
-    En misiones SAR, localizar a la víctima de forma temprana es crítico para su supervivencia. Esta métrica introduce un factor de descuento geométrico $\gamma \in (0, 1]$ que penaliza la demora en visitar las zonas de alta probabilidad. Para cada instante temporal de la trayectoria a una distancia acumulada $d(t)$, se evalúan las celdas visibles $\mathcal{V}(x(t))$:
+    \item \textbf{Pasos hasta el Hallazgo (\textit{Steps to Goal}, $S_{\text{goal}}$):} En las misiones exitosas, representa el número de pasos transcurridos hasta el primer instante de detección $t_{\text{det}}$:
     \begin{equation}
-        S_{\text{td}} = \sum_{t} \left( \sum_{(r,c) \in \mathcal{V}(x(t))} \mathcal{M}_{r,c} \right) \cdot \gamma^{d(t)}
-    \end{equation}
-    donde $d(t)$ actúa como proxy del tiempo transcurrido y $\gamma$ se fija por defecto en $0.999$ por metro de avance.
-
-    \item \textbf{Porcentaje de Víctimas Localizadas ($P_{\text{found}}$):}
-    Mide el porcentaje de acierto de localización sobre un conjunto de víctimas estocásticas situadas en el entorno según la distribución de probabilidad subyacente. Si la trayectoria del dron se denota como el conjunto de puntos $P$ y definimos el área de cobertura efectiva mediante la unión de buffers de detección de radio $R_{\text{det}}$:
-    \begin{equation}
-        \mathcal{A}_{\text{eff}} = \bigcup_{p \in P} \mathcal{B}(p, R_{\text{det}})
-    \end{equation}
-    El conjunto de víctimas encontradas $\mathcal{V}_{\text{encontradas}}$ son aquellas cuyas coordenadas geográficas $v_i$ se encuentran dentro de $\mathcal{A}_{\text{eff}}$:
-    \begin{equation}
-        P_{\text{found}} = \frac{|\{ v_i \in \mathcal{V}_{\text{total}} \mid v_i \in \mathcal{A}_{\text{eff}} \}|}{|\mathcal{V}_{\text{total}}|} \times 100
+        S_{\text{goal}} = \min \left\{ t \in [0, K] \mid \|p_t - v_{\text{real}}\|_2 \le 50\text{ m} \right\}
     \end{equation}
 
-    \item \textbf{Área de Cobertura Efectiva ($A_{\text{cov}}$):}
-    Indica la superficie total barrida por el sensor del dron en kilómetros cuadrados. Al calcularse mediante la unión de los buffers de la trayectoria, se evita contabilizar doblemente las zonas de solape o cruce de rutas:
+    \item \textbf{Probabilidad Acumulada Reducida (\textit{Reduced Belief}, $P_{\text{red}}$):} Fracción de la masa de probabilidad original $b(v^0)$ que ha sido eliminada por las observaciones del dron al finalizar la misión:
     \begin{equation}
-        A_{\text{cov}} = \frac{\text{Área}(\mathcal{A}_{\text{eff}})}{10^6} \text{ km}^2
+        P_{\text{red}} = 1.0 - \frac{\sum_{i=1}^{N_y} \sum_{j=1}^{N_x} b(v^{\text{Final}})(i,j)}{\sum_{i=1}^{N_y} \sum_{j=1}^{N_x} b(v^0)(i,j)}
     \end{equation}
 
-    \item \textbf{Longitud Total de la Trayectoria ($L_{\text{tray}}$):}
-    Suma de las distancias euclídeas de los segmentos de vuelo realizados por el dron. Sirve como métrica de eficiencia energética y operativa de la ruta planificada:
+    \item \textbf{Área Geográfica Barrida (\textit{Covered Area}, $A_{\text{cov}}$):} Superficie total en kilómetros cuadrados cubierta por la unión geométrica de las huellas circulares del sensor a lo largo de la trayectoria:
     \begin{equation}
-        L_{\text{tray}} = \frac{1}{1000} \sum_{i=1}^{N-1} d(p_i, p_{i+1}) \text{ km}
+        A_{\text{cov}} = \frac{\text{Área}\left( \bigcup_{t=0}^{K} \mathcal{B}(p_t, R_d) \right)}{10^6} \text{ km}^2
+    \end{equation}
+    donde $\mathcal{B}(p_t, R_d)$ representa el círculo de radio $R_d = 50\text{ m}$ centrado en $p_t$.
+
+    \item \textbf{Distancia Total de Vuelo (\textit{Total Flight Length}, $D_{\text{total}}$):} Longitud métrica euclídea acumulada recorrida por el vehículo aéreo:
+    \begin{equation}
+        D_{\text{total}} = \frac{1}{1000} \sum_{t=0}^{K-1} \|p_{t+1} - p_t\|_2 \text{ km}
     \end{equation}
 \end{enumerate}

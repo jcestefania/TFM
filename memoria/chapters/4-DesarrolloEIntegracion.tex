@@ -1,18 +1,193 @@
-\chapter{Desarrollo del Framework e Integración}
+\chapter{Desarrollo del Framework e Integración Modular}
+\label{ch:propuesta}
 
-En este capítulo se describe el desarrollo del software puente para conectar el framework de modelado geográfico SAREnv con el motor de búsqueda en tiempo mínimo (MTS).
+En este capítulo se presenta la arquitectura del framework desarrollado e integrado en este trabajo, denominado \texttt{sarenv-mts}. Se detalla la filosofía de diseño desacoplado del sistema, el flujo de datos entre sus cinco módulos constitutivos y la formulación matemática del middleware de transformación espacial.
 
-\section{Filosofía de Diseño y Desacoplamiento}
-% Justificación de la arquitectura modular y la pasarela de intercambio de datos.
+\section{Arquitectura General de la Propuesta}
 
-\section{Requisitos del Sistema}
-% Requisitos funcionales y no funcionales para la integración de ambos simuladores.
+Para conectar de forma robusta la generación de mapas probabilísticos realistas basados en cartografía abierta con los motores de optimización de búsqueda en tiempo mínimo (MTS), se ha diseñado una arquitectura modular basada en cinco bloques funcionales independientes, ilustrada en la Figura~\ref{fig:diagrama_general}.
 
-\section{Modificación de la Inicialización de MTS}
-% Explicación del pipeline de inyección de datos de mapas reales en el planificador.
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{DIAGRAMA DE ARQUITECTURA GENERAL DEL SISTEMA INTEGRADO SARENV-MTS}}
+	{\label{fig:diagrama_general}
+	\begin{center}
+	\begin{tikzpicture}[node distance=1.8cm, auto, >=latex', 
+	    block/.style={rectangle, draw=azulUC3M, fill=gray97, thick, text width=2.4cm, text centered, rounded corners, minimum height=1.3cm, font=\footnotesize\bfseries},
+	    line/.style={draw=azulUC3M, thick, ->}]
+	    
+	    \node [block] (m1) {Módulo 1\\Modelado Topológico\\(SAREnv \& LPB)};
+	    \node [block, right of=m1, node distance=3.2cm] (m2) {Módulo 2\\Filtro de Restricciones\\(Sindex R-Tree)};
+	    \node [block, right of=m2, node distance=3.2cm] (m3) {Módulo 3\\Middleware UTM\\(Proyección X,Y)};
+	    \node [block, right of=m3, node distance=3.2cm] (m4) {Módulo 4\\Planificación MTS\\(ACO, ABC, BHA)};
+	    \node [block, right of=m4, node distance=3.2cm] (m5) {Módulo 5\\Evaluador SAR\\(PathEvaluator)};
+	    
+	    \path [line] (m1) -- node[above, font=\tiny] {$POA_{\text{base}}$} (m2);
+	    \path [line] (m2) -- node[above, font=\tiny] {$b(v^0)$} (m3);
+	    \path [line] (m3) -- node[above, font=\tiny] {JSON / NPY} (m4);
+	    \path [line] (m4) -- node[above, font=\tiny] {Trayectorias} (m5);
+	\end{tikzpicture}
+	\end{center}}
+\end{figure}
 
-\section{Pasarela Binaria Compacta}
-% Descripción del proceso de importación y normalización de la matriz (.npy).
+El diseño desacoplado garantiza que cada módulo opere como una pasarela independiente:
+\begin{itemize}
+    \item El modelado geográfico y probabilístico se calcula una sola vez de forma analítica en el Módulo 1.
+    \item El enmascaramiento físico de seguridad y no transitabilidad se ejecuta en el Módulo 2.
+    \item El Módulo 3 transforma las coordenadas globales en formato estándar JSON/Numpy compatible con el planificador.
+    \item El Módulo 4 ejecuta la optimización bioinspirada de vuelo.
+    \item El Módulo 5 realiza el análisis cuantitativo unificado de métricas SAR.
+\end{itemize}
 
-\section{Viabilidad Operativa y Exportación (GPX)}
-% Integración del formato de intercambio de rutas estándar GPX para visualización en estaciones de tierra (QMapShack) en vuelos reales.
+\section{Módulo 1: Generación de Cartografía y Probabilidad Espacial}
+
+El primer módulo se encarga de descargar la geometría vectorial de OpenStreetMap y combinarla con el modelo probabilístico \textit{Lost Person Behavior} (LPB) de Robert Koester \cite{koester2008lost}.
+
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{FLUJO DEL MÓDULO 1: GENERACIÓN DE PROBABILIDAD TOPOLÓGICA}}
+	{\label{fig:diagrama_modulo1}
+	\begin{center}
+	\begin{tikzpicture}[node distance=1.5cm, auto, >=latex',
+	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=3.8cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
+	    line/.style={draw=azulUC3M, thick, ->}]
+	    
+	    \node [block] (osm) {Geometrías OSM (Casa de Campo)};
+	    \node [block, below of=osm] (lpb) {Pesos Estadísticos por Perfil LPB};
+	    \node [block, below of=lpb] (dist) {Dispersión Radial Log-Normal (LKP)};
+	    \node [block, right of=lpb, node distance=5.5cm] (fusion) {\textbf{Suma Ponderada y Normalización}\\$\mathbf{POA}(i,j) = \frac{\sum_k \mathbf{M}_k \alpha_k}{\sum \mathbf{POA}}$};
+	    \node [block, right of=fusion, node distance=4.5cm] (out1) {Matriz Base (.npy)};
+	    
+	    \path [line] (osm) -| (fusion);
+	    \path [line] (lpb) -- (fusion);
+	    \path [line] (dist) -| (fusion);
+	    \path [line] (fusion) -- (out1);
+	\end{tikzpicture}
+	\end{center}}
+\end{figure}
+
+Como se describió en el Capítulo 3, las capas semánticas (caminos, bosques, estructuras, agua, prados) se rasterizan en matrices binarias $\mathbf{M}_k$ y se combinan mediante una suma ponderada lineal, preservando los picos de verosimilitud de las intersecciones lineales.
+
+\section{Módulo 2: Motor de Filtrado de Restricciones Físicas (\texttt{Sindex})}
+
+El segundo módulo proyecta las geometrías de exclusión física (lagos profundos y edificaciones cerradas) sobre la rejilla espacial utilizando árboles de indexación jerárquica R-Tree (\texttt{sindex}), como se sintetiza en la Figura~\ref{fig:diagrama_modulo2}.
+
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{FLUJO DEL MÓDULO 2: FILTRADO ESPACIAL DE RESTRICCIONES DURAS}}
+	{\label{fig:diagrama_modulo2}
+	\begin{center}
+	\begin{tikzpicture}[node distance=1.5cm, auto, >=latex',
+	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=3.8cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
+	    line/.style={draw=azulUC3M, thick, ->}]
+	    
+	    \node [block] (in) {Matriz Base $\mathbf{POA}_{\text{base}}$};
+	    \node [block, below of=in] (polys) {Polígonos No Transitables (Agua / Edificios)};
+	    \node [block, right of=in, node distance=5.5cm] (mask) {\textbf{Máscara Espacial R-Tree}\\Anulación Estricta: $P(i,j) = 0.0$};
+	    \node [block, below of=mask] (renorm) {Renormalización Global\\$\sum_{i,j} b(v^0)(i,j) = 1.0$};
+	    \node [block, right of=mask, node distance=4.5cm] (out2) {Mapa de Creencias $b(v^0)$};
+	    
+	    \path [line] (in) -- (mask);
+	    \path [line] (polys) -| (mask);
+	    \path [line] (mask) -- (renorm);
+	    \path [line] (renorm) -| (out2);
+	\end{tikzpicture}
+	\end{center}}
+\end{figure}
+
+Este paso garantiza que los algoritmos de optimización reciban una distribución de probabilidad depurada $b(v^0)$, eliminando el desperdicio de batería sobre tejados o masas de agua y modelando una búsqueda aérea coordinada.
+
+\section{Módulo 3: Middleware de Transformación de Coordenadas}
+
+El tercer módulo actúa como pasarela matemática entre la cartografía georreferenciada global y la rejilla matricial discreta de simulación de MTS.
+
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{FLUJO DEL MÓDULO 3: TRANSFORMACIÓN Y EXPORTACIÓN DEL MIDDLEWARE}}
+	{\label{fig:diagrama_modulo3}
+	\begin{center}
+	\begin{tikzpicture}[node distance=1.5cm, auto, >=latex',
+	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=4.0cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
+	    line/.style={draw=azulUC3M, thick, ->}]
+	    
+	    \node [block] (utm) {Coordenadas UTM EPSG:32630\\$(x_{\min}, y_{\min}, x_{\max}, y_{\max})$};
+	    \node [block, right of=utm, node distance=5.5cm] (trans) {\textbf{Transformación a Rejilla}\\$X = \lfloor \frac{dx}{\delta} \rfloor, \quad Y = \lfloor \frac{dy}{\delta} \rfloor$\\Resolución: $\delta = 10\text{ m}$};
+	    \node [block, right of=trans, node distance=4.8cm] (json) {Escenario JSON / NPY\\Listo para MTS};
+	    
+	    \path [line] (utm) -- (trans);
+	    \path [line] (trans) -- (json);
+	\end{tikzpicture}
+	\end{center}}
+\end{figure}
+
+\subsection{Formulación Matemática de la Proyección de Coordenadas}
+
+Sea el Punto de Planificación Inicial o punto de despegue $LKP = (\text{lon}_{\text{LKP}}, \text{lat}_{\text{LKP}})$. El middleware realiza los siguientes pasos:
+\begin{enumerate}
+    \item \textbf{Proyección Geográfica a UTM:} Se proyecta el par angular $(\text{lon}, \text{lat})$ a coordenadas métricas globales UTM Zona 30 Norte ($\text{EPSG:32630}$):
+    \begin{equation}
+        (x_{\text{UTM}}, y_{\text{UTM}}) = \mathcal{T}_{\text{WGS84}\to\text{UTM}}(\text{lon}_{\text{LKP}}, \text{lat}_{\text{LKP}})
+    \end{equation}
+    \item \textbf{Cálculo de Distancias Relativas al Origen del Escenario:} Sabiendo que el origen de la rejilla $(0,0)$ corresponde a la esquina inferior izquierda $(x_{\min}, y_{\min})$:
+    \begin{equation}
+        \Delta x = x_{\text{UTM}} - x_{\min}, \quad \Delta y = y_{\text{UTM}} - y_{\min}
+    \end{equation}
+    \item \textbf{Discretización a Índices Matriciales:} Dividiendo por la resolución espacial $\delta = 10\text{ m}$:
+    \begin{equation}
+        X_{\text{local}} = \left\lfloor \frac{\Delta x}{\delta} \right\rfloor, \quad Y_{\text{local}} = \left\lfloor \frac{\Delta y}{\delta} \right\rfloor
+    \end{equation}
+\end{enumerate}
+El vector resultante $(X_{\text{local}}, Y_{\text{local}})$ define unívocamente la posición de despegue fija en la matriz discreta de MTS.
+
+\section{Módulo 4: Motor de Simulación y Algoritmos Bioinspirados (MTS)}
+
+El Módulo 4 carga el escenario JSON y ejecuta los algoritmos metaheurísticos bioinspirados de planificación de trayectorias (Colonia de Hormigas - ACO, Colonia de Abejas - ABC y Agujeros Negros - BHA), así como los baselines tradicionales de referencia (Búsqueda Voraz, Lawnmower y Expanding Spiral).
+
+Durante el vuelo, el dron explora el espacio aplicando el sensor de 50 metros de radio y actualizando paso a paso el mapa de creencias residual $b(v^k)$ mediante el Filtro Recursivo Bayesiano (RBF). Las trayectorias resultantes se exportan en registros de telemetría CSV y ficheros de coordenadas JSON.
+
+\section{Módulo 5: Evaluador Centralizado de Métricas SAR (\texttt{PathEvaluatorTFM})}
+
+El Módulo 5 centraliza la evaluación cuantitativa independiente de todas las trayectorias generadas, aplicando el estándar del módulo \texttt{PathEvaluatorTFM}:
+
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{FLUJO DEL MÓDULO 5: EVALUACIÓN UNIFICADA DE RENDIMIENTO SAR}}
+	{\label{fig:diagrama_modulo5}
+	\begin{center}
+	\begin{tikzpicture}[node distance=1.5cm, auto, >=latex',
+	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=3.8cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
+	    line/.style={draw=azulUC3M, thick, ->}]
+	    
+	    \node [block] (traj) {Trayectoria $(X,Y)$ y Telemetría CSV};
+	    \node [block, below of=traj] (map) {Mapa de Creencias Base $b(v^0)$};
+	    \node [block, right of=traj, node distance=5.5cm] (eval) {\textbf{PathEvaluatorTFM}\\Cálculo Vectorial Shapely / RBF};
+	    \node [block, right of=eval, node distance=4.5cm] (metrics) {5 Métricas SAR Oficiales (CSV / Boxplots)};
+	    
+	    \path [line] (traj) -- (eval);
+	    \path [line] (map) -| (eval);
+	    \path [line] (eval) -- (metrics);
+	\end{tikzpicture}
+	\end{center}}
+\end{figure}
+
+Las cinco métricas evaluadas son:
+\begin{enumerate}
+    \item \textbf{Tasa de Éxito (\textit{Success Rate}, \%):} Porcentaje de misiones en las que el dron intercepta la víctima virtual a una distancia $d \le 50\text{ m}$.
+    \item \textbf{Pasos hasta el Hallazgo (\textit{Steps to Goal}):} Número de instantes temporales transcurridos hasta la detección.
+    \item \textbf{Probabilidad Acumulada Absorbida (\textit{Reduced Belief}, \%):} Fracción de la masa de probabilidad total del mapa eliminada tras el paso del sensor.
+    \item \textbf{Área Geográfica Barrida (\textit{Covered Area}, $\text{km}^2$):} Superficie neta cubierta por la huella del sensor sin duplicar solapamientos.
+    \item \textbf{Distancia de Vuelo (\textit{Total Flight Length}, km):} Longitud métrica total de la trayectoria recorrida.
+\end{enumerate}
+
+\section{Herramientas de Control y Validación Interactiva (Jupyter Notebooks)}
+
+Para facilitar la experimentación, inspección visual y demostración en tiempo real de los algoritmos, se ha desarrollado un conjunto de cuadernos interactivos en Jupyter (\texttt{Notebook\_Demo\_Rapida\_Interactiva.ipynb}), cuya interfaz dual se ilustra en la Figura~\ref{fig:demo_interactiva}.
+
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{PANEL DUAL DE SIMULACIÓN Y MÉTRICAS EN TIEMPO REAL (DEMO INTERACTIVA)}}
+	{\label{fig:demo_interactiva}
+	\includegraphics[width=0.95\textwidth]{imagenes/comparativa_evolucion_demencia_abc_vs_bha.png}}
+\end{figure}
+
+Esta herramienta permite al operador seleccionar de forma interactiva el perfil de la víctima, visualizar el mapa de calor con restricciones, seleccionar el algoritmo deseado y observar instantáneamente tanto la trayectoria volada como el mapa de creencias residual $b(v^{\text{Final}})$ con su correspondiente cuadro de métricas SAR.

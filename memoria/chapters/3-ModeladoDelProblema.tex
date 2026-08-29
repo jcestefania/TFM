@@ -1,6 +1,6 @@
 \chapter{Modelado del Problema}
 
-En este capítulo se detalla cómo se ha construido el entorno virtual sobre el que operarán los algoritmos de búsqueda. El objetivo principal es transformar un espacio geográfico real (en este caso, el parque de la Casa de Campo en Madrid) en un modelo matemático y probabilístico que los drones puedan entender y procesar de forma eficiente.
+En este capítulo se detalla cómo se ha construido el entorno virtual sobre el que operarán los algoritmos de búsqueda. El objetivo principal es transformar un espacio geográfico real (el parque de la Casa de Campo en Madrid) en un modelo matemático y probabilístico que los drones puedan entender y procesar de forma eficiente.
 
 \section{Generación del Espacio de Búsqueda}
 
@@ -95,11 +95,11 @@ Para resolver esta limitación, el proceso de fusión se formula en los siguient
 
 Debido a que la topología de OpenStreetMap genera capas de suelo (bosque, prados) geográficamente disjuntas que no se solapan entre sí, los únicos solapamientos se producen por elementos lineales (caminos) e infraestructuras sobre dichos fondos. Por tanto, la suma no genera un mapa diluido, sino que preserva los picos de los caminos y eleva de forma realista la importancia de sus intersecciones.
 
-\section{Filtro Físico de Restricciones No Transitables}
+\section{Filtro Físico de Restricciones No Transitables y Búsqueda Coordinada}
 
-En un entorno real de búsqueda terrestre, existen zonas donde la víctima no puede encontrarse de forma transitable a pie, tales como el interior de masas de agua profunda (lagos y estanques principales) o el interior inaccesible de edificaciones urbanas cerradas.
+En un entorno real de búsqueda terrestre, existen zonas donde la víctima no puede encontrarse de forma transitable a pie o donde los sensores aerotransportados del dron resultan inútiles, tales como el interior de masas de agua profunda (lagos y estanques principales) o el interior de edificaciones urbanas cerradas.
 
-Para dotar al mapa de calor de coherencia física estricta, el sistema aplica un filtro de restricciones duras mediante indexación espacial jerárquica con árboles R-Tree (\texttt{sindex}). Para cada celda $(i, j)$ que intersecta con un polígono de masa de agua o edificio no transitable $\mathcal{G}_{\text{restringido}}$, su probabilidad se anula estrictamente:
+Para dotar al mapa de calor de coherencia operativa estricta, el sistema aplica un filtro de restricciones duras mediante indexación espacial jerárquica con árboles R-Tree (\texttt{sindex}). Para cada celda $(i, j)$ que intersecta con un polígono de masa de agua o edificio no transitable $\mathcal{G}_{\text{restringido}}$, su probabilidad se anula estrictamente:
 \begin{equation}
     b(v^0)(i, j) = \begin{cases}
         0.0 & \text{si } (i, j) \cap \mathcal{G}_{\text{restringido}} \neq \emptyset \\
@@ -107,6 +107,28 @@ Para dotar al mapa de calor de coherencia física estricta, el sistema aplica un
     \end{cases}
 \end{equation}
 Tras la aplicación de la máscara, la matriz se renormaliza globalmente, asegurando que $\sum_{i,j} b(v^0)(i,j) = 1.0$.
+
+\subsection{Justificación Operativa: La Búsqueda Coordinada en el Perfil Autista}
+
+Un caso de estudio fundamental que justifica la necesidad de este filtro surge en el **perfil Autista**. De acuerdo con las estadísticas oficiales del manual LPB \cite{koester2008lost}, los sujetos con autismo presentan una marcada tendencia a buscar refugio en estructuras cerradas ($45\%$) o a aproximarse a masas de agua ($9\%$), sumando un $54\%$ de la probabilidad estadística acumulada.
+
+Sin embargo, existe una distinción operativa crucial entre \textit{dónde se ubica estadísticamente la persona} y \textit{dónde es eficaz la cámara óptica de un vehículo aéreo}:
+\begin{enumerate}
+    \item \textbf{Incapacidad Física de Penetración Óptica:} El UAV vuela equipado con una cámara cenital orientada al suelo. El dron no posee capacidad de inspección radiográfica para penetrar los tejados de hormigón ni puede observar el fondo de aguas turbias. Si no se aplicase el filtro a cero en las edificaciones, los algoritmos de optimización (como Voraz o ACO) detectarían un pico de atracción del $45\%$ sobre los edificios del parque y dirigirían al dron a sobrevolar tejados de forma reiterada, agotando su batería sin posibilidad alguna de detección visual.
+    \item \textbf{Modelo de Búsqueda Coordinada (Mando de Incidente):} En una operación de rescate real coordinada por los servicios de emergencia, los recursos se distribuyen según su especialidad técnica:
+    \begin{itemize}
+        \item \textbf{Recursos Terrestres y Especializados:} Los equipos a pie con guías caninos inspeccionan el interior de estructuras y recintos cerrados, mientras que las unidades subacuáticas rastrean lagos y balsas de agua.
+        \item \textbf{Recursos Aéreos (Drones):} Los UAVs se asignan exclusivamente al rastreo exhaustivo de los corredores exteriores transitables: caminos peatonales ($18\%$), claros de campo ($9\%$) y masas boscosas abiertas ($9\%$), donde la visión aérea es decisiva.
+    \end{itemize}
+\end{enumerate}
+Al fijar a cero la probabilidad en agua y edificios, el planificador del dron redistribuye su esfuerzo de búsqueda hacia las zonas donde sus sensores sí tienen capacidad de detección, garantizando una utilización óptima del tiempo de vuelo.
+
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{VISTA SATELITAL Y FILTRO DE RESTRICCIONES FÍSICAS EN LA CASA DE CAMPO}}
+	{\label{fig:filtro_restricciones}
+	\includegraphics[width=0.95\textwidth]{imagenes/filtro_restricciones_satelite_autista.png}}
+\end{figure}
 
 \section{Observaciones y Modelo del Sensor (Sensor Ideal de Nivel 1)}
 
@@ -126,7 +148,7 @@ donde $R_d$ representa el radio de cobertura efectiva de la cámara a bordo, el 
 
 Para las condiciones nominales de vuelo en la Casa de Campo ($h = 50\text{ m}$ de altitud y $\theta_{\text{FoV}} = 90^\circ$), el radio de cobertura resultante en el suelo es exactamente $R_d = 50\text{ metros}$.
 
-Dado el tamaño de celda de $10\text{ m} \times 10\text{ m}$, una huella circular de $R_d = 50\text{ m}$ cubre un radio discreto de 5 celdas a partir de la posición del dron. Si la celda cae dentro de este radio de barrido, se marca como observada y su probabilidad acumulada es absorbida por el dron.
+Dado el tamaño de celda de $10\text{ m} \times 10\text{ m}$, una huella circular de $R_d = 50\text{ m}$ cubre un radio discreto de 5 celdas a partir de la posición del dron. Si el centroide de una celda queda dentro de este radio de barrido, la celda se marca como observada y su probabilidad acumulada es absorbida por el dron.
 
 \section{Filtro Recursivo Bayesiano (RBF) y Mapa de Creencias Residual}
 
@@ -149,10 +171,17 @@ Para validar la eficacia de los algoritmos de enrutamiento y estimar sus métric
 
 En un despliegue de rescate real, los drones buscan a \textbf{una única persona}. En la experimentación, simular $N = 50$ semillas independientes significa que el sistema ejecutará \textbf{50 misiones completas e independientes}:
 \begin{itemize}
-    \item En cada simulación $k \in \{1, \dots, 50\}$, el sistema genera de forma estocástica la ubicación de una sola víctima virtual $v_k$ en el mapa.
-    \item Esta generación de coordenadas no es uniforme; utiliza el mapa de calor $b(v^0)$ como una función de distribución acumulada de probabilidad en celdas transitables ($P > 0$).
-    \item Durante la simulación del universo $k$, se comprueba si la trayectoria del dron intercepta la huella del sensor de la víctima ($d \le 50\text{ m}$) en algún paso de tiempo. Si lo hace, la búsqueda se considera un \textbf{éxito} ($x_k = 1$). De lo contrario, es un fallo ($x_k = 0$).
+    \item \textbf{Punto Inicial Fijo de Despegue (LKP):} En todas las 50 ejecuciones, el dron despega de manera determinista desde el centro geométrico del parque o Punto de Planificación Inicial (LKP), reflejando el puesto de mando de emergencias.
+    \item \textbf{Generación Estocástica de Víctimas:} En cada simulación $k \in \{1, \dots, 50\}$, el sistema genera de forma estocástica la ubicación de una sola víctima virtual $v_k$ en el mapa. Esta siembra se realiza mediante un muestreo ponderado sobre el mapa de calor $b(v^0)$ restringido a celdas transitables ($P > 0$).
+    \item \textbf{Criterio de Descubrimiento:} Durante la simulación del universo $k$, se comprueba si la trayectoria del dron intercepta la huella del sensor de la víctima ($d \le 50\text{ m}$) en algún paso de tiempo. Si lo hace, la búsqueda se considera un \textbf{éxito} ($x_k = 1$). De lo contrario, es un fallo ($x_k = 0$).
 \end{itemize}
+
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{CROQUIS DE EVALUACIÓN MONTECARLO: DESPEGUE FIJO (LKP) Y MUESTREO DE VÍCTIMAS ESTOCÁSTICAS}}
+	{\label{fig:croquis_montecarlo}
+	\includegraphics[width=0.90\textwidth]{imagenes/croquis_aleatoriedad_escenario.png}}
+\end{figure}
 
 El promedio de éxitos sobre las 50 simulaciones independientes define la métrica de éxito empírico:
 \begin{equation}

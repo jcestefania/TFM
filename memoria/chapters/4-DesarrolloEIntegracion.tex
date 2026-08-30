@@ -11,10 +11,9 @@ Para conectar de forma robusta la generación de mapas probabilísticos realista
 	\ffigbox[\FBwidth]
 	{\caption{DIAGRAMA DE ARQUITECTURA GENERAL DEL SISTEMA INTEGRADO SARENV-MTS}}
 	{\label{fig:diagrama_general}
-	\begin{center}
-	\begin{tikzpicture}[node distance=1.8cm, auto, >=latex', 
+	\begin{tikzpicture}[node distance=1.8cm, auto,
 	    block/.style={rectangle, draw=azulUC3M, fill=gray97, thick, text width=2.4cm, text centered, rounded corners, minimum height=1.3cm, font=\footnotesize\bfseries},
-	    line/.style={draw=azulUC3M, thick, ->}]
+	    line/.style={draw=azulUC3M, thick, -latex}]
 	    
 	    \node [block] (m1) {Módulo 1\\Modelado Topológico\\(SAREnv \& LPB)};
 	    \node [block, right of=m1, node distance=3.2cm] (m2) {Módulo 2\\Filtro de Restricciones\\(Sindex R-Tree)};
@@ -26,8 +25,7 @@ Para conectar de forma robusta la generación de mapas probabilísticos realista
 	    \path [line] (m2) -- node[above, font=\tiny] {$b(v^0)$} (m3);
 	    \path [line] (m3) -- node[above, font=\tiny] {JSON / NPY} (m4);
 	    \path [line] (m4) -- node[above, font=\tiny] {Trayectorias} (m5);
-	\end{tikzpicture}
-	\end{center}}
+	\end{tikzpicture}}
 \end{figure}
 
 El diseño desacoplado garantiza que cada módulo opere como una pasarela independiente:
@@ -47,10 +45,9 @@ El primer módulo se encarga de descargar la geometría vectorial de OpenStreetM
 	\ffigbox[\FBwidth]
 	{\caption{FLUJO DEL MÓDULO 1: GENERACIÓN DE PROBABILIDAD TOPOLÓGICA}}
 	{\label{fig:diagrama_modulo1}
-	\begin{center}
-	\begin{tikzpicture}[node distance=1.5cm, auto, >=latex',
+	\begin{tikzpicture}[node distance=1.5cm, auto,
 	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=3.8cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
-	    line/.style={draw=azulUC3M, thick, ->}]
+	    line/.style={draw=azulUC3M, thick, -latex}]
 	    
 	    \node [block] (osm) {Geometrías OSM (Casa de Campo)};
 	    \node [block, below of=osm] (lpb) {Pesos Estadísticos por Perfil LPB};
@@ -62,8 +59,7 @@ El primer módulo se encarga de descargar la geometría vectorial de OpenStreetM
 	    \path [line] (lpb) -- (fusion);
 	    \path [line] (dist) -| (fusion);
 	    \path [line] (fusion) -- (out1);
-	\end{tikzpicture}
-	\end{center}}
+	\end{tikzpicture}}
 \end{figure}
 
 Como se describió en el Capítulo 3, las capas semánticas (caminos, bosques, estructuras, agua, prados) se rasterizan en matrices binarias $\mathbf{M}_k$ y se combinan mediante una suma ponderada lineal, preservando los picos de verosimilitud de las intersecciones lineales.
@@ -76,10 +72,9 @@ El segundo módulo proyecta las geometrías de exclusión física (lagos profund
 	\ffigbox[\FBwidth]
 	{\caption{FLUJO DEL MÓDULO 2: FILTRADO ESPACIAL DE RESTRICCIONES DURAS}}
 	{\label{fig:diagrama_modulo2}
-	\begin{center}
-	\begin{tikzpicture}[node distance=1.5cm, auto, >=latex',
+	\begin{tikzpicture}[node distance=1.5cm, auto,
 	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=3.8cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
-	    line/.style={draw=azulUC3M, thick, ->}]
+	    line/.style={draw=azulUC3M, thick, -latex}]
 	    
 	    \node [block] (in) {Matriz Base $\mathbf{POA}_{\text{base}}$};
 	    \node [block, below of=in] (polys) {Polígonos No Transitables (Agua / Edificios)};
@@ -91,8 +86,7 @@ El segundo módulo proyecta las geometrías de exclusión física (lagos profund
 	    \path [line] (polys) -| (mask);
 	    \path [line] (mask) -- (renorm);
 	    \path [line] (renorm) -| (out2);
-	\end{tikzpicture}
-	\end{center}}
+	\end{tikzpicture}}
 \end{figure}
 
 Este paso garantiza que los algoritmos de optimización reciban una distribución de probabilidad depurada $b(v^0)$, eliminando el desperdicio de batería sobre tejados o masas de agua y modelando una búsqueda aérea coordinada.
@@ -105,19 +99,17 @@ El tercer módulo actúa como pasarela matemática entre la cartografía georref
 	\ffigbox[\FBwidth]
 	{\caption{FLUJO DEL MÓDULO 3: TRANSFORMACIÓN Y EXPORTACIÓN DEL MIDDLEWARE}}
 	{\label{fig:diagrama_modulo3}
-	\begin{center}
-	\begin{tikzpicture}[node distance=1.5cm, auto, >=latex',
+	\begin{tikzpicture}[node distance=1.5cm, auto,
 	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=4.0cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
-	    line/.style={draw=azulUC3M, thick, ->}]
+	    line/.style={draw=azulUC3M, thick, -latex}]
 	    
 	    \node [block] (utm) {Coordenadas UTM EPSG:32630\\$(x_{\min}, y_{\min}, x_{\max}, y_{\max})$};
-	    \node [block, right of=utm, node distance=5.5cm] (trans) {\textbf{Transformación a Rejilla}\\$X = \lfloor \frac{dx}{\delta} \rfloor, \quad Y = \lfloor \frac{dy}{\delta} \rfloor$\\Resolución: $\delta = 10\text{ m}$};
+	    \node [block, right of=utm, node distance=5.5cm] (trans) {\textbf{Transformación a Rejilla}\\$X = \lfloor \frac{\Delta x}{\delta} \rfloor, \quad Y = \lfloor \frac{\Delta y}{\delta} \rfloor$\\Resolución: $\delta = 10\text{ m}$};
 	    \node [block, right of=trans, node distance=4.8cm] (json) {Escenario JSON / NPY\\Listo para MTS};
 	    
 	    \path [line] (utm) -- (trans);
 	    \path [line] (trans) -- (json);
-	\end{tikzpicture}
-	\end{center}}
+	\end{tikzpicture}}
 \end{figure}
 
 \subsection{Formulación Matemática de la Proyección de Coordenadas}
@@ -153,10 +145,9 @@ El Módulo 5 centraliza la evaluación cuantitativa independiente de todas las t
 	\ffigbox[\FBwidth]
 	{\caption{FLUJO DEL MÓDULO 5: EVALUACIÓN UNIFICADA DE RENDIMIENTO SAR}}
 	{\label{fig:diagrama_modulo5}
-	\begin{center}
-	\begin{tikzpicture}[node distance=1.5cm, auto, >=latex',
+	\begin{tikzpicture}[node distance=1.5cm, auto,
 	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=3.8cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
-	    line/.style={draw=azulUC3M, thick, ->}]
+	    line/.style={draw=azulUC3M, thick, -latex}]
 	    
 	    \node [block] (traj) {Trayectoria $(X,Y)$ y Telemetría CSV};
 	    \node [block, below of=traj] (map) {Mapa de Creencias Base $b(v^0)$};
@@ -166,8 +157,7 @@ El Módulo 5 centraliza la evaluación cuantitativa independiente de todas las t
 	    \path [line] (traj) -- (eval);
 	    \path [line] (map) -| (eval);
 	    \path [line] (eval) -- (metrics);
-	\end{tikzpicture}
-	\end{center}}
+	\end{tikzpicture}}
 \end{figure}
 
 Las cinco métricas evaluadas son:

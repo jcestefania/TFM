@@ -278,12 +278,39 @@ hmargin=3cm
 \thispagestyle{plain}
 \setcounter{page}{3}
 	
-	% ESCRIBIR EL RESUMEN AQUÍ
+En las operaciones de Búsqueda y Salvamento (SAR) en entornos naturales y semiurbanos, el tiempo de respuesta es un factor crítico para maximizar la probabilidad de supervivencia de personas extraviadas. El despliegue de Vehículos Aéreos No Tripulados (UAVs) ofrece una plataforma ágil y versátil; sin embargo, los métodos de barrido geométrico tradicional (como \textit{Lawnmower} o espirales) resultan ineficientes al no considerar la probabilidad de presencia ni las restricciones físicas del terreno. 
+
+En este Trabajo de Fin de Máster se desarrolla e integra una arquitectura modular, denominada \texttt{sarenv-mts}, que combina la extracción de cartografía vectorial abierta (OpenStreetMap), el modelado estadístico de comportamiento de personas desaparecidas (\textit{Lost Person Behavior} - LPB de Robert Koester) y algoritmos de optimización metaheurística bioinspirada (Colonia de Hormigas - ACO, Colonia de Abejas Artificiales - ABC y Algoritmo de Agujeros Negros - BHA). Se implementa un filtro espacial de restricciones duras ($P=0.0$) para modelar una búsqueda aérea coordinada sobre zonas no transitables (lagos y edificaciones), una pasarela middleware de transformación de coordenadas UTM a rejilla discreta y el modelo de observación de sensor ideal de 50 metros. 
+
+La metodología se valida mediante un benchmark masivo de 900 simulaciones de Montecarlo calibradas con Optuna sobre el parque de la Casa de Campo de Madrid, evaluando tres perfiles canónicos (Demencia, Autista y Senderista). Los resultados demuestran cuantitativamente que la búsqueda guiada por mapas de calor bayesianos multiplica entre 3x y 6x la tasa de éxito frente a la búsqueda ciega tradicional, logrando los algoritmos ABC y BHA el equilibrio óptimo entre exploración global y concentración de probabilidad, mitigando de forma robusta la trampa de los óptimos locales.
 	
-	\textbf{Palabras clave:}
-	% Escribir las palabras clave aquí
+\vspace{0.5cm}
+\noindent\textbf{Palabras clave:} Búsqueda y Salvamento (SAR), Vehículos Aéreos No Tripulados (UAVs), Algoritmos Bioinspirados, Mapas de Creencias Bayesianos, Lost Person Behavior (LPB), Optimización Metaheurística, Entornos de Incertidumbre.
 	
-	\vfill
+\vfill
+\end{abstract}
+
+\newpage % página en blanco o de cortesía
+\thispagestyle{empty}
+\mbox{}
+
+%----------
+%	ABSTRACT EN INGLÉS
+%----------	
+\renewcommand\abstractname{\large\bfseries\filcenter\uppercase{Abstract}}
+\begin{abstract}
+\thispagestyle{plain}
+	
+In Search and Rescue (SAR) operations across wilderness and peri-urban environments, rapid response is crucial for maximizing lost person survival rates. While Unmanned Aerial Vehicles (UAVs) provide a flexible aerial reconnaissance platform, conventional geometric coverage patterns (such as \textit{Lawnmower} or expanding spirals) are inherently inefficient due to their blindness to spatial probability distributions and terrain constraints. 
+
+This Master's Thesis develops and integrates a modular software framework, named \texttt{sarenv-mts}, that unifies open vector cartography (OpenStreetMap), empirical Lost Person Behavior (LPB) statistical modeling by Robert Koester, and bio-inspired metaheuristic trajectory planners (Ant Colony Optimization - ACO, Artificial Bee Colony - ABC, and Black Hole Algorithm - BHA). The architecture features a spatial hard constraint filter ($P=0.0$) to enforce coordinated aerial search over non-traversable geometries (deep water and buildings), a coordinate transformation middleware from UTM to local discrete grids, and a 50-meter sensor observation model. 
+
+The proposed system is rigorously validated through a 900 Monte Carlo simulation benchmark tuned with Optuna over Madrid's Casa de Campo park across three canonical behavior profiles (Dementia, Autistic, and Hiker). Quantitative results demonstrate that informed Bayesian search increases discovery rates by 3x to 6x compared to blind geometric baselines, with ABC and BHA achieving the optimal balance between global exploration and local belief accumulation while effectively avoiding myopic local optima traps.
+	
+\vspace{0.5cm}
+\noindent\textbf{Keywords:} Search and Rescue (SAR), Unmanned Aerial Vehicles (UAVs), Bio-inspired Algorithms, Bayesian Belief Maps, Lost Person Behavior (LPB), Metaheuristic Optimization, Uncertain Environments.
+	
+\vfill
 \end{abstract}
 
 	\newpage % página en blanco o de cortesía

@@ -77,7 +77,7 @@ Las características se clasifican en capas semánticas principales:
 
 A diferencia del diseño inicial de SAREnv, que utilizaba un operador de máximo en cada celda para evitar acumulaciones de probabilidad, en este trabajo se ha modificado la lógica de combinación para implementar una \textbf{suma ponderada y posterior normalización global}. 
 
-El artículo original de SAREnv \cite{sarenv2024} señala explícitamente como una limitación del operador de máximo el hecho de no considerar el efecto acumulativo cuando convergen múltiples características favorables en un mismo punto, lo que puede infravalorar zonas ricas en características (\textit{feature-rich zones}), tales como la confluencia de un sendero forestal con el acceso a una estructura.
+El artículo original de SAREnv \cite{drones9090628} señala explícitamente como una limitación del operador de máximo el hecho de no considerar el efecto acumulativo cuando convergen múltiples características favorables en un mismo punto, lo que puede infravalorar zonas ricas en características (\textit{feature-rich zones}), tales como la confluencia de un sendero forestal con el acceso a una estructura.
 
 Para resolver esta limitación, el proceso de fusión se formula en los siguientes pasos:
 \begin{enumerate}

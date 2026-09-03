@@ -133,7 +133,7 @@ El vector resultante $(X_{\text{local}}, Y_{\text{local}})$ define unívocamente
 
 \section{Módulo 4: Motor de Simulación y Algoritmos Bioinspirados (MTS)}
 
-El Módulo 4 carga el escenario JSON y ejecuta los algoritmos metaheurísticos bioinspirados de planificación de trayectorias (Colonia de Hormigas - ACO, Colonia de Abejas - ABC y Agujeros Negros - BHA), así como los baselines tradicionales de referencia (Búsqueda Voraz, Lawnmower y Expanding Spiral).
+El Módulo 4 carga el escenario generado en formato JSON y ejecuta los algoritmos metaheurísticos bioinspirados de planificación de trayectorias (Colonia de Hormigas - ACO, Colonia de Abejas - ABC y Agujeros Negros - BHA), así como los baselines tradicionales de referencia (Búsqueda Voraz, Lawnmower y Expanding Spiral). Este módulo se integra sobre el núcleo de simulación de \textit{MTS-UncertainEnvironment} \cite{Broton_Gutierrez_MTS-UncertainEnvironment}.
 
 Durante el vuelo, el dron explora el espacio aplicando el sensor de 50 metros de radio y actualizando paso a paso el mapa de creencias residual $b(v^k)$ mediante el Filtro Recursivo Bayesiano (RBF). Las trayectorias resultantes se exportan en registros de telemetría CSV y ficheros de coordenadas JSON.
 

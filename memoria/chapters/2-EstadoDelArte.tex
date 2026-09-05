@@ -62,7 +62,7 @@ Ejemplos de algoritmos heurísticos utilizados en planificación multi-UAV inclu
 
 \subsection{Métodos Metaheurísticos}
 
-Los métodos metaheurísticos han demostrado ser efectivos para la planificación de rutas multi-UAV. Según la revisión de 2025 sobre planificación de rutas multi-UAV \cite{alqudsi2025, guo2025}, los algoritmos más utilizados incluyen:
+Los métodos metaheurísticos han demostrado ser efectivos para la planificación de rutas multi-UAV. Según revisiones de referencia sobre planificación de rutas y control de enjambres \cite{alqudsi2025, guo2025}, los algoritmos más utilizados incluyen:
 
 \begin{itemize}
 	\item \textbf{Algoritmos Genéticos (GA):} Utilizados para reducir rutas de vuelo y optimizar la asignación de tareas, aunque pueden no ser rentables en términos computacionales.
@@ -80,7 +80,7 @@ Q-learning es una técnica destacada de RL, aunque presenta problemas de sobrees
 
 El algoritmo DDPG (Deep Deterministic Policy Gradient) muestra mejor rendimiento abordando problemas de consumo energético y convergencia comparado con el mecanismo de retrazado. MADDPG (Multi-Agent Deep Deterministic Policy Gradient) puede planificar rutas para enjambres de UAVs en entornos complejos \cite{jeon2024}.
 
-Investigaciones recientes (2024-2025) han propuesto enfoques híbridos como WDQN (Whale-inspired Deep Q-Network) \cite{wang2025} que combina el Algoritmo de la Ballena (WoA) con DQN para mejorar la eficiencia de aprendizaje y velocidad de convergencia, equilibrando explotación y exploración en el modelo DQN.
+Investigaciones consolidadas han propuesto enfoques avanzados de navegación autónoma con evasión de obstáculos basados en redes neuronales profundas para enjambres \cite{wang2025}, equilibrando explotación y exploración en entornos continuos.
 
 \subsection{Exploración Ergódica}
 
@@ -88,9 +88,9 @@ La exploración ergódica busca asignar el esfuerzo de búsqueda proporcionalmen
 
 Miller et al. \cite{miller2016} presentaron el concepto de exploración ergódica de información distribuida, donde los agentes generan trayectorias que pasan tiempo en áreas proporcional a la información esperada en esas regiones. Este enfoque ha sido extendido a múltiples agentes y ha demostrado ser efectivo para la búsqueda y rescate.
 
-Investigaciones recientes \cite{rao2023, seewald2024} han desarrollado formulaciones de optimización ergódica dispersa que determinan cuándo y dónde tomar mediciones del sensor mientras optimizan la trayectoria del agente para cobertura, adhiriéndose a restricciones de recursos de sensado.
+Investigaciones clave \cite{rao2023, seewald2024} han desarrollado formulaciones de optimización ergódica continua y multiagente que determinan la trayectoria óptima para cobertura considerando estrictas restricciones de batería en vehículos aéreos.
 
-El método HEDAC (Heat equation-driven area coverage) \cite{hedac2025} es una técnica de control ergódico basada en la ecuación de calor que ha sido validada experimentalmente en entornos reales de karst mediterráneo para búsqueda de humanos con UAVs.
+El método HEDAC (Heat equation-driven area coverage) \cite{hedac2025} es una técnica de control ergódico basada en la ecuación de calor que genera campos potenciales para dirigir enjambres en coberturas de áreas y búsqueda de personas en terrenos agrestes.
 
 \subsection{POMDP y Procesos de Decisión}
 
@@ -98,7 +98,7 @@ Los Procesos de Decisión de Markov Parcialmente Observables (POMDP) proporciona
 
 En SAR con UAVs, los POMDPs capturan incertidumbres en ubicaciones de objetivos, observaciones de sensores y condiciones ambientales mientras optimizan rutas. Modelan estados ambientales desconocidos, información imperfecta del sensor y la compleja interdependencia entre decisiones y observaciones futuras.
 
-Trabajos recientes han formulizado la planificación de rutas UAV-SAR como POMDPs, proponiendo soluciones como ``Shrinking POMCP'' para abordar restricciones de tiempo \cite{zhang2024}. El algoritmo ABT (Adaptive Belief Tree) ha sido utilizado para resolver POMDPs online en navegación autónoma de UAVs en entornos GPS-denied y con obstáculos \cite{sandino2020}.
+Diversos trabajos han formulado la planificación de rutas UAV-SAR como POMDPs descentralizados para búsqueda y seguimiento activo de objetivos múltiples \cite{zhang2024}. Por su parte, la navegación autónoma con árboles de creencias adaptativas ha sido demostrada eficazmente para operaciones SAR en entornos con obstáculos y sin cobertura GPS \cite{sandino2020}.
 
 Los Dec-POMDPs (Decentralized POMDPs) permiten a los UAVs tomar decisiones bajo incertidumbre con observabilidad limitada, entrenados offline usando PPO (Proximal Policy Optimization) para maximizar la suma esperada de recompensas descontadas.
 

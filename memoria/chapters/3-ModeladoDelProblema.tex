@@ -45,7 +45,7 @@ El parque de la Casa de Campo se representa mediante un conjunto de característ
     \begin{equation}
         \omega_{\text{type}}(f) = P_{\text{type}}(T(f))
     \end{equation}
-    donde $P_{\text{type}}$ es la probabilidad histórica asociada al tipo de característica $T(f)$ obtenida de las bases de datos de rescate (ISRID) \cite{koester2008lost}.
+    donde $P_{\text{type}}$ es la probabilidad histórica asociada al tipo de característica $T(f)$ obtenida de las bases de datos de rescate (ISRID) \cite{koester2008lost, romero2018manual}.
     \item \textbf{Peso Basado en la Distancia Espacial ($\omega_{\text{spatial}}$):} Modela la dispersión radial de la víctima desde el IPP. El paper de SAREnv demuestra empíricamente que la distancia recorrida $d$ se ajusta óptimamente a una distribución log-normal (con un error RMSE de 1.76~km frente a los 6.83~km de una distribución normal):
     \begin{equation}
         \omega_{\text{spatial}}(f) \sim \text{LN}(d; \mu_{\text{LPB}}, \sigma_{\text{LPB}})
@@ -110,7 +110,7 @@ Tras la aplicación de la máscara, la matriz se renormaliza globalmente, asegur
 
 \subsection{Justificación Operativa: La Búsqueda Coordinada en el Perfil Autista}
 
-Un caso de estudio fundamental que justifica la necesidad de este filtro surge en el **perfil Autista**. De acuerdo con las estadísticas oficiales del manual LPB \cite{koester2008lost}, los sujetos con autismo presentan una marcada tendencia a buscar refugio en estructuras cerradas ($45\%$) o a aproximarse a masas de agua ($9\%$), sumando un $54\%$ de la probabilidad estadística acumulada.
+Un caso de estudio fundamental que justifica la necesidad de este filtro surge en el **perfil Autista**. De acuerdo con las estadísticas oficiales del manual LPB \cite{koester2008lost, romero2018manual}, los sujetos con autismo presentan una marcada tendencia a buscar refugio en estructuras cerradas ($45\%$) o a aproximarse a masas de agua ($9\%$), sumando un $54\%$ de la probabilidad estadística acumulada.
 
 Sin embargo, existe una distinción operativa crucial entre \textit{dónde se ubica estadísticamente la persona} y \textit{dónde es eficaz la cámara óptica de un vehículo aéreo}:
 \begin{enumerate}

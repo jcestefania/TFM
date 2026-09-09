@@ -68,29 +68,31 @@ Los rangos del espacio de búsqueda explorados fueron:
 En la Tabla~\ref{tab:optuna_params} se presentan los hiperparámetros óptimos seleccionados por Optuna para cada perfil, los cuales se fijaron para la ejecución de la batería masiva de 900 simulaciones.
 
 \begin{table}[H]
-\centering
-\begin{tabular}{|l|l|c|c|c|}
-\hline
-\textbf{Algoritmo} & \textbf{Hiperparámetro} & \textbf{Autista} & \textbf{Demencia} & \textbf{Senderista} \\
-\hline
-\textbf{ACO} & $\alpha$ (Peso Feromona) & 0.81 & 0.73 & 1.48 \\
-& $\beta$ (Peso Heurístico) & 2.07 & 2.22 & 2.09 \\
-& $\rho$ (Evaporación Global) & 0.07 & 0.22 & 0.14 \\
-& $\rho_{\text{local}}$ (Evaporación Local) & 0.09 & 0.13 & 0.02 \\
-& $Q$ (Depósito de Feromona) & 0.51 & 2.02 & 0.89 \\
-& Iteraciones ACO & 5 & 6 & 4 \\
-\hline
-\textbf{ABC} & Iteraciones ABC & 9 & 8 & 13 \\
-& Límite de abandono (\textit{limit}) & 19 & 11 & 16 \\
-& Abejas empleadas ($N_e$) & 1 & 3 & 2 \\
-& Abejas observadoras ($N_o$) & 4 & 4 & 3 \\
-\hline
-\textbf{BHA} & Iteraciones BHA & 8 & 12 & 9 \\
-& Número de estrellas ($N_{\text{stars}}$) & 9 & 10 & 8 \\
-\hline
-\end{tabular}
-\caption{HIPERPARÁMETROS ÓPTIMOS CALIBRADOS MEDIANTE OPTUNA (30 ENSAYOS POR ALGORITMO)}
-\label{tab:optuna_params}
+	\ttabbox[\textwidth]
+	{\caption{HIPERPARÁMETROS ÓPTIMOS CALIBRADOS MEDIANTE OPTUNA (30 ENSAYOS POR ALGORITMO)}}
+	{\label{tab:optuna_params}
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{|l|l|c|c|c|}
+		\hline
+		\textbf{Algoritmo} & \textbf{Hiperparámetro} & \textbf{Autista} & \textbf{Demencia} & \textbf{Senderista} \\
+		\hline
+		\textbf{ACO} & $\alpha$ (Peso Feromona) & 0.81 & 0.73 & 1.48 \\
+		& $\beta$ (Peso Heurístico) & 2.07 & 2.22 & 2.09 \\
+		& $\rho$ (Evaporación Global) & 0.07 & 0.22 & 0.14 \\
+		& $\rho_{\text{local}}$ (Evaporación Local) & 0.09 & 0.13 & 0.02 \\
+		& $Q$ (Depósito de Feromona) & 0.51 & 2.02 & 0.89 \\
+		& Iteraciones ACO & 5 & 6 & 4 \\
+		\hline
+		\textbf{ABC} & Iteraciones ABC & 9 & 8 & 13 \\
+		& Límite de abandono (\textit{limit}) & 19 & 11 & 16 \\
+		& Abejas empleadas ($N_e$) & 1 & 3 & 2 \\
+		& Abejas observadoras ($N_o$) & 4 & 4 & 3 \\
+		\hline
+		\textbf{BHA} & Iteraciones BHA & 8 & 12 & 9 \\
+		& Número de estrellas ($N_{\text{stars}}$) & 9 & 10 & 8 \\
+		\hline
+	\end{tabular}%
+	}}
 \end{table}
 
 \section{Protocolo Experimental del Servidor (Batería de Montecarlo)}

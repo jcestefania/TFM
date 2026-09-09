@@ -12,9 +12,10 @@ A continuación, se presentan las tablas de resultados estadísticos consolidada
 El perfil de Demencia presenta una fuerte concentración probabilística en el arbolado y matorrales cercanos al punto de despegue (LKP). Los resultados consolidados se resumen en la Tabla~\ref{tab:resultados_demencia}.
 
 \begin{table}[H]
-	\ttabbox[\FBwidth]
+	\ttabbox[\textwidth]
 	{\caption{RESULTADOS DEL BENCHMARK PARA EL PERFIL DEMENCIA (50 SEMILLAS MONTECARLO)}}
 	{\label{tab:resultados_demencia}
+	\resizebox{\textwidth}{!}{%
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
 		\textbf{Algoritmo} & \textbf{\% Acierto (Inf.)} & \textbf{\% Acierto (Ciego)} & \textbf{Likelihood ($S_{\text{like}}$)} & \textbf{Distancia (km)} & \textbf{Área (km$^2$)} \\
@@ -26,7 +27,8 @@ El perfil de Demencia presenta una fuerte concentración probabilística en el a
 		Lawnmower (Barrido)       &  2.30 $\pm$ 0.00\% &  2.30 $\pm$ 0.00\% & 0.0195 $\pm$ 0.0000 & 10.83 $\pm$ 0.00 & 0.8481 $\pm$ 0.0000 \\
 		Expanding Spiral          &  8.93 $\pm$ 0.89\% &  1.67 $\pm$ 0.16\% & 0.0917 $\pm$ 0.0092 &  9.81 $\pm$ 1.27 & 0.2812 $\pm$ 0.0300 \\
 		\hline
-	\end{tabular}}
+	\end{tabular}%
+	}}
 \end{table}
 
 En este escenario, los algoritmos bioinspirados ABC y BHA alcanzan una tasa de acierto del $7.62\%$ y $7.61\%$, superando ampliamente a la búsqueda voraz ($5.41\%$) y multiplicando por más de tres veces el rendimiento del barrido uniforme Lawnmower ($2.30\%$). Debido a que la persona con demencia se encuentra estadísticamente muy próxima al LKP (radio del $50\%$ de $1.0\text{ km}$), el patrón geométrico Expanding Spiral aprovecha de forma natural la concentración radial concéntrica alcanzando el $8.93\%$.
@@ -36,9 +38,10 @@ En este escenario, los algoritmos bioinspirados ABC y BHA alcanzan una tasa de a
 El perfil Autista combina una alta dispersión espacial con una concentración inicial en estructuras y agua, la cual es filtrada a $P=0.0$ para guiar al UAV hacia los corredores abiertos transitables. La Tabla~\ref{tab:resultados_autista} detalla las métricas obtenidas.
 
 \begin{table}[H]
-	\ttabbox[\FBwidth]
+	\ttabbox[\textwidth]
 	{\caption{RESULTADOS DEL BENCHMARK PARA EL PERFIL AUTISTA (50 SEMILLAS MONTECARLO)}}
 	{\label{tab:resultados_autista}
+	\resizebox{\textwidth}{!}{%
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
 		\textbf{Algoritmo} & \textbf{\% Acierto (Inf.)} & \textbf{\% Acierto (Ciego)} & \textbf{Likelihood ($S_{\text{like}}$)} & \textbf{Distancia (km)} & \textbf{Área (km$^2$)} \\
@@ -50,7 +53,8 @@ El perfil Autista combina una alta dispersión espacial con una concentración i
 		Lawnmower (Barrido)       &  1.50 $\pm$ 0.00\% &  1.40 $\pm$ 0.00\% & 0.0153 $\pm$ 0.0000 & 10.83 $\pm$ 0.00 & 0.8481 $\pm$ 0.0000 \\
 		Expanding Spiral          &  6.01 $\pm$ 0.61\% &  2.36 $\pm$ 0.28\% & 0.0661 $\pm$ 0.0077 &  9.85 $\pm$ 1.34 & 0.2820 $\pm$ 0.0325 \\
 		\hline
-	\end{tabular}}
+	\end{tabular}%
+	}}
 \end{table}
 
 En el perfil Autista, BHA y ABC obtienen los mejores resultados entre los algoritmos adaptativos ($5.06\%$ y $4.94\%$), demostrando cómo la anulación de tejados y masas de agua reorienta de forma eficaz la energía del dron hacia caminos y bosques transitables.
@@ -60,9 +64,10 @@ En el perfil Autista, BHA y ABC obtienen los mejores resultados entre los algori
 El perfil de Senderista presenta una distribución fuertemente lineal orientada a la red de senderos y caminos peatonales de la Casa de Campo. La Tabla~\ref{tab:resultados_senderista} resume los resultados obtenidos.
 
 \begin{table}[H]
-	\ttabbox[\FBwidth]
+	\ttabbox[\textwidth]
 	{\caption{RESULTADOS DEL BENCHMARK PARA EL PERFIL SENDERISTA (50 SEMILLAS MONTECARLO)}}
 	{\label{tab:resultados_senderista}
+	\resizebox{\textwidth}{!}{%
 	\begin{tabular}{|l|c|c|c|c|c|}
 		\hline
 		\textbf{Algoritmo} & \textbf{\% Acierto (Inf.)} & \textbf{\% Acierto (Ciego)} & \textbf{Likelihood ($S_{\text{like}}$)} & \textbf{Distancia (km)} & \textbf{Área (km$^2$)} \\
@@ -74,7 +79,8 @@ El perfil de Senderista presenta una distribución fuertemente lineal orientada 
 		Lawnmower (Barrido)       &  1.39 $\pm$ 0.07\% &  2.18 $\pm$ 0.16\% & 0.0139 $\pm$ 0.0006 & 10.47 $\pm$ 1.80 & 0.8216 $\pm$ 0.1318 \\
 		Expanding Spiral          &  5.46 $\pm$ 0.81\% &  2.54 $\pm$ 0.33\% & 0.0561 $\pm$ 0.0082 &  9.77 $\pm$ 1.48 & 0.2797 $\pm$ 0.0389 \\
 		\hline
-	\end{tabular}}
+	\end{tabular}%
+	}}
 \end{table}
 
 En este escenario, el algoritmo Voraz Heurístico alcanza un acierto del $13.01\%$. Este comportamiento se debe a la topología continua de los caminos peatonales: al existir una traza lineal ininterrumpida de alta probabilidad, la búsqueda voraz sigue el sendero de forma natural sin caer en mínimos locales. Sin embargo, en terrenos complejos discontinuos (como Demencia), Voraz se bloquea prematuramente, mientras que BHA y ABC mantienen una estabilidad robusta en todos los perfiles.

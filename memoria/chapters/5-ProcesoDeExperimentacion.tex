@@ -22,9 +22,10 @@ El modelo LPB clasifica a las personas extraviadas en categorías psicológicas 
 En la Tabla~\ref{tab:perfiles_koester} se detallan las ponderaciones porcentuales normalizadas asignadas a cada una de las seis coberturas del suelo en OpenStreetMap, así como los cuatro radios cuartiles de dispersión estadística $[25\%, 50\%, 75\%, 95\%]$ para clima templado y terreno llano.
 
 \begin{table}[H]
-	\ttabbox[\FBwidth]
+	\ttabbox[\textwidth]
 	{\caption{PONDERACIÓN DE CAPAS CARTOGRÁFICAS Y RADIOS CUARTILES LPB}}
 	{\label{tab:perfiles_koester}
+	\resizebox{\textwidth}{!}{%
 	\begin{tabular}{|l|c|c|c|}
 		\hline
 		\textbf{Característica / Capa} & \textbf{Perfil Autista} & \textbf{Perfil Demencia} & \textbf{Perfil Senderista} \\
@@ -38,7 +39,8 @@ En la Tabla~\ref{tab:perfiles_koester} se detallan las ponderaciones porcentuale
 		\hline
 		\textbf{Radios Cuartiles $[25\%, 50\%, 75\%, 95\%]$} & $[0.6, 1.6, 3.7, 15.2]$ km & $[0.3, 1.0, 2.4, 12.8]$ km & $[0.6, 1.8, 3.2, 9.9]$ km \\
 		\hline
-	\end{tabular}}
+	\end{tabular}%
+	}}
 \end{table}
 
 \begin{figure}[H]

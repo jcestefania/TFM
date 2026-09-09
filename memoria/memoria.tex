@@ -50,6 +50,7 @@ hmargin=3cm
 \usepackage{mathtools} 
 \usepackage{tikz}
 \usetikzlibrary{arrows, arrows.meta, positioning, shapes, babel} 
+\usepackage{pdfpages} % Inclusión de documentos PDF externos (Declaración IAG) 
 
 % POSICIONAMIENTO DE FIGURAS/TABLAS (MANEJADO POR FLOATROW)
 \usepackage{caption} % para personalizar el título de tablas y figuras
@@ -249,7 +250,7 @@ hmargin=3cm
 			Tutores:\\
 			Jesús García Herrero\\
 			Juan Pedro Llerena Caña\\
-			Lugar y fecha de presentación prevista\\
+			Madrid, Septiembre 2026\\
 		\end{Large}
 	\end{center}
 	\vfill
@@ -448,10 +449,9 @@ The proposed system is rigorously validated through a 900 Monte Carlo simulation
 %	ANEXOS
 %----------	
 
-% Si tu trabajo incluye anexos, puedes descomentar las siguientes líneas
-%\chapter* {Anexo x}
-%\pagenumbering{gobble} % Las páginas de los anexos no se numeran
-
-
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Declaración de Uso de Inteligencia Artificial Generativa}
+\includepdf[pages=-]{declaracion_iag.pdf}
 
 \end{document}

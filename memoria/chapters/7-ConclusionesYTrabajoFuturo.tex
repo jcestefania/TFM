@@ -31,8 +31,12 @@ A pesar de la consistencia metodológica del framework desarrollado, es necesari
 Como extensión directa de los resultados y la arquitectura desarrollada, se plantean las siguientes líneas de trabajo futuro:
 
 \begin{itemize}
-    \item \textbf{Comparativa Empírica con Rutas Reales de Equipos de Rescate Terrestre (Bomberos):} 
-    Evaluar y contrastar cuantitativamente las trayectorias GPS registradas a pie por los equipos de bomberos durante simulacros reales en la Casa de Campo frente a los patrones óptimos calculados por los drones bioinspirados.
+    \item \textbf{Integración Operativa Aire-Tierra y Validación con Simulacros Reales de Bomberos:} 
+    El escenario seleccionado en este trabajo (Casa de Campo de Madrid) responde a un ejercicio operativo real de búsqueda y salvamento coordinado por cuerpos de bomberos y protección civil, del cual se dispone de la sectorización territorial, la ubicación del Puesto de Mando Avanzado (PMA) y los registros de posicionamiento GPS (\textit{tracks} GPX) de 12 equipos de batida terrestre. Como continuación directa, se plantea articular una arquitectura colaborativa multinivel que combine dos escalas operativas:
+    \begin{itemize}
+        \item \textit{Escala Macro (Exploración Aérea Temprana):} El UAV opera a $10\text{ m/s}$ ($36\text{ km/h}$) a $50\text{ m}$ de altitud como vector táctico de detección rápida sobre el macro-escenario completo. Su cometido prioritario es absorber la mayor masa de creencia bayesiana en los primeros 15--20 minutos, transmitiendo las coordenadas del contacto o las zonas de máxima certidumbre al PMA para focalizar el despliegue de los recursos a pie.
+        \item \textit{Escala Micro (Validación y Batida Sectorizada):} Restringir los algoritmos bioinspirados de \texttt{sarenv-mts} al polígono específico de uno de los subsectores asignados a los bomberos para contrastar cuantitativamente la trayectoria y el tiempo de cobertura del dron frente a la traza GPX registrada a pie por el equipo terrestre ($3\text{--}4\text{ km/h}$). Asimismo, cruzar el mapa de creencia residual $b(v^k)$ con las áreas batidas por los rescatadores a pie permitirá optimizar la reasignación dinámica de cuadrantes y eliminar búsquedas redundantes.
+    \end{itemize}
     
     \item \textbf{Modelado de Víctimas Dinámicas mediante Cadenas de Markov y Random Walk:} 
     Incorporar matrices de transición dinámicas $P(x, y, t)$ orientadas por la pendiente del terreno, senderos y perfiles psicológicos de dispersión extraídos del Manual de Búsqueda y Salvamento Terrestre \cite{romero2018manual}.

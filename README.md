@@ -77,11 +77,21 @@ pip install -r requirements.txt
 ```
 
 ### 3. Ejecutar los Cuadernos Interactivos
-Navega a la carpeta de cuadernos y abre Jupyter:
+El entorno dispone de tres cuadernos oficiales en `framwork-MTS/MTS-UncertainEnvironment-Algoritmos-bioinspirados/TFM_JC/notebooks/`:
+
+- **`Notebook_Demo_Rapida_Interactiva.ipynb` (Demostración Rápida Dual):**
+  Interfaz interactiva con panel dual dinámico. Permite seleccionar el perfil (Demencia, Autista, Senderista) y el algoritmo (ABC, BHA, ACO, Voraz, Lawnmower) mediante desplegables, observando en tiempo real la animación del vuelo del dron sobre el mapa de creencias junto a la evolución simultánea de las 5 métricas SAR.
+
+- **`Benchmark_Perfiles_Real_Interactivo.ipynb` (Panel Completo y Pipeline Avanzado):**
+  Cuaderno avanzado de ingeniería SAR. Permite configurar la descarga de capas vectoriales de OpenStreetMap, ajustar los pesos multicapa (`FEATURE_PROBABILITIES`), parametrizar los modelos de dispersión de Koester, definir autonomías de batería (pasos de vuelo), y ejecutar comparativas simultáneas entre múltiples planificadores bioinspirados y geométricos sobre el mapa completo de la Casa de Campo.
+
+- **`Analisis_Resultados.ipynb` (Evaluación Estadística y Generación de Figuras):**
+  Carga la base de datos maestra con las 900 simulaciones de Montecarlo (`resultados_totales.csv`), calcula estadísticas descriptivas (medias, medianas, IQR) y genera de forma automatizada y reproducible todas las figuras de alta resolución (boxplots a 300 DPI) incluidas en el Capítulo 6 de la memoria.
+
+Para arrancarlos:
 ```bash
-jupyter notebook framwork-MTS/MTS-UncertainEnvironment-Algoritmos-bioinspirados/TFM_JC/notebooks/Notebook_Demo_Rapida_Interactiva.ipynb
+jupyter lab framwork-MTS/MTS-UncertainEnvironment-Algoritmos-bioinspirados/TFM_JC/notebooks/
 ```
-En el cuaderno podras seleccionar el perfil (Demencia, Autista, Senderista), el algoritmo de vuelo, y visualizar en tiempo real la evolucion de la trayectoria y la absorcion del mapa de creencias.
 
 ---
 

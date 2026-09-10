@@ -149,6 +149,20 @@ Este esquema de generación informada asegura tres propiedades operativas indisp
     \item \textbf{Consistencia de Transitabilidad Física:} Al haber anulado estrictamente a cero ($P=0.0$) las geometrías de exclusión (lagos profundos y edificaciones cerradas), la probabilidad de que una víctima se ubique en zonas físicas inaccesibles o dentro del agua es idénticamente nula.
 \end{enumerate}
 
+Como reflejo directo de esta formulación en la arquitectura software, el Código~\ref{lst:muestreo_semillas} expone la rutina implementada en Python con la biblioteca NumPy: la matriz de creencias bidimensional se vectoriza y se transfiere como función de masa de probabilidad (\texttt{p=flat\_bk}) al generador pseudoaleatorio, garantizando que ninguna coordenada sea seleccionada con probabilidad uniforme desacoplada del perfil.
+
+\begin{lstlisting}[language=Python, caption={Muestreo estocástico informado de la posición de la víctima en la simulación}, label={lst:muestreo_semillas}]
+# Aplanar el mapa de creencias normalizado
+flat_bk = bk.flatten()
+
+# Muestreo ponderado de la celda objetivo segun la creencia a priori bk
+flat_idx = np.random.choice(len(flat_bk), p=flat_bk)
+
+# Reconstruir las coordenadas 2D discretas en la cuadricula
+y_goal, x_goal = np.unravel_index(flat_idx, bk.shape)
+goal = np.array([x_goal, y_goal], dtype=float)
+\end{lstlisting}
+
 \section{Formulación Matemática de las Métricas SAR Unificadas (\texttt{PathEvaluatorTFM})}
 
 Todas las trayectorias resultantes se evalúan cuantitativamente a través de las cinco métricas estandarizadas del módulo \texttt{PathEvaluatorTFM}:

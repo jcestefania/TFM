@@ -133,6 +133,22 @@ Las variables operativas del UAV se mantuvieron constantes en todas las simulaci
     \end{itemize}
 \end{itemize}
 
+\subsection{Muestreo Probabilístico Informado de Víctimas (Generación de Semillas)}
+
+Un aspecto metodológico fundamental del diseño experimental radica en el procedimiento de ubicación de las personas extraviadas para cada una de las 50 misiones independientes por perfil. En lugar de posicionar a la víctima mediante una distribución espacial uniforme y arbitraria sobre la totalidad del lienzo cartográfico, el framework ejecuta una \textit{colocación aleatoria informada} guiada directamente por la matriz de probabilidad a priori $b(v^0)$ obtenida en el Módulo~2.
+
+Formalmente, sea $b(v^0)(i, j)$ el mapa de creencias normalizado ($\sum_{i,j} b(v^0)(i,j) = 1.0$) tras la aplicación del filtro de restricciones físicas duras. Para cada semilla estocástica $s \in \{1, \dots, 50\}$, las coordenadas discretas de la víctima $\mathbf{p}_{\text{víctima}}^{(s)} = (x_{\text{goal}}, y_{\text{goal}})$ se obtienen mediante un muestreo estocástico categórico ponderado:
+\begin{equation}
+    P\Big(\mathbf{p}_{\text{víctima}}^{(s)} = (i, j)\Big) = b(v^0)(i, j)
+\end{equation}
+
+Este esquema de generación informada asegura tres propiedades operativas indispensables para la validez de los resultados:
+\begin{enumerate}
+    \item \textbf{Fidelidad al Manual LPB:} El $95\%$ de las víctimas simuladas quedan confinadas dentro de los radios cuartiles empíricos documentados por Robert Koester para cada tipología conductual (por ejemplo, con una fuerte concentración en el primer kilómetro para sujetos con demencia, o dispersiones más amplias a lo largo de senderos para excursionistas).
+    \item \textbf{Afinidad Semántica del Terreno:} La probabilidad de aparición sobre cada elemento geográfico de OpenStreetMap respeta estrictamente las ponderaciones estadísticas $\alpha_k$ del perfil (concentrándose en senderos peatonales para senderistas o en formaciones de pinar para demencia).
+    \item \textbf{Consistencia de Transitabilidad Física:} Al haber anulado estrictamente a cero ($P=0.0$) las geometrías de exclusión (lagos profundos y edificaciones cerradas), la probabilidad de que una víctima se ubique en zonas físicas inaccesibles o dentro del agua es idénticamente nula.
+\end{enumerate}
+
 \section{Formulación Matemática de las Métricas SAR Unificadas (\texttt{PathEvaluatorTFM})}
 
 Todas las trayectorias resultantes se evalúan cuantitativamente a través de las cinco métricas estandarizadas del módulo \texttt{PathEvaluatorTFM}:

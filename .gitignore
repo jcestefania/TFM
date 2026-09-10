@@ -4,6 +4,7 @@
 
 # 1. Archivos y carpetas pesadas no deseadas
 *.zip
+imagenes_overleaf/
 SAREnv/sarenv_dataset/
 SAREnv/resultados_casa_de_campo*/
 SAREnv/cache/

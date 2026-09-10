@@ -87,7 +87,7 @@ En este escenario, el algoritmo Voraz Heurístico alcanza un acierto del $13.01\
 
 \subsection{Síntesis Multiobjetivo mediante Diagramas de Radar}
 
-Para sintetizar de forma intuitiva la densa información numérica de las Tablas~\ref{tab:resultados_demencia}, \ref{tab:resultados_autista} y \ref{tab:resultados_senderista}, y exponer el compromiso multiobjetivo inherente a cada estrategia, la Figura~\ref{fig:radar_charts} ilustra los diagramas de radar normalizados correspondientes a los tres perfiles de búsqueda sobre las cinco métricas fundamentales evaluadas: Tasa de Acierto Informado ($SR$), Puntuación de Verosimilitud ($S_{\text{like}}$), Área Cubierta ($A_{\text{cov}}$), Eficiencia de Distancia (inverso de la longitud de vuelo) y Acierto en Búsqueda Ciega (línea base).
+Para comparar de forma más visual los resultados de las Tablas~\ref{tab:resultados_demencia}, \ref{tab:resultados_autista} y \ref{tab:resultados_senderista}, la Figura~\ref{fig:radar_charts} muestra los diagramas de radar de los tres perfiles con las cinco métricas analizadas: tasa de acierto informado ($SR$), verosimilitud acumulada ($S_{\text{like}}$), área cubierta ($A_{\text{cov}}$), eficiencia de distancia ($1/D$) y acierto en búsqueda ciega ($SR_{\text{blind}}$). De este modo se aprecian con rapidez los puntos fuertes y débiles de cada algoritmo.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -96,12 +96,12 @@ Para sintetizar de forma intuitiva la densa información numérica de las Tablas
 	\includegraphics[width=0.98\textwidth]{imagenes/radar_chart_perfiles.png}}
 \end{figure}
 
-El análisis visual de los diagramas de radar revela con inmediatez el perfil operativo y las debilidades de cada planificador:
+A partir de estos diagramas se observan claramente las diferencias de comportamiento entre los algoritmos:
 \begin{itemize}
-    \item \textbf{Lawnmower (Barrido Sistemático):} Muestra una geometría marcadamente asimétrica con un pico aislado hacia el área cubierta ($A_{\text{cov}} \approx 0.85\text{ km}^2$), pero su envolvente se colapsa drásticamente en las dimensiones críticas de verosimilitud y probabilidad de rescate ($1.39\% - 2.30\%$). Dispersa la energía del dron en zonas vacías.
-    \item \textbf{Metaheurísticas Bioinspiradas (ABC y BHA):} Despliegan un polígono amplio, armónico y equilibrado en los tres perfiles, dominando simultáneamente en tasa de rescate informada, verosimilitud acumulada y eficiencia cinemática sin incurrir en desplazamientos estériles.
-    \item \textbf{Voraz Heurístico:} Exhibe una fuerte variabilidad topológica: mientras que en Demencia y Autista su polígono se contrae por bloqueos en mínimos locales, en el perfil de Senderista alcanza la máxima extensión siguiendo la continuidad natural de las sendas.
-    \item \textbf{Expanding Spiral:} Presenta un desarrollo notable en Demencia ($8.93\%$) debido a la concentración radial en torno al LKP, pero sufre una notable merma en escenarios no centrados o canalizados en redes viarias.
+    \item \textbf{Lawnmower (Barrido Sistemático):} Destaca únicamente en área cubierta ($A_{\text{cov}} \approx 0.85\text{ km}^2$), pero obtiene los peores resultados en verosimilitud y tasa de acierto ($1.39\% - 2.30\%$), ya que dispersa la batería del dron sobre zonas sin probabilidad.
+    \item \textbf{Metaheurísticas Bioinspiradas (ABC y BHA):} Presentan el comportamiento más equilibrado en los tres perfiles, manteniendo valores altos en tasa de rescate informada, verosimilitud acumulada y eficiencia de distancia sin realizar desplazamientos innecesarios.
+    \item \textbf{Voraz Heurístico:} Varía drásticamente según el escenario: en Demencia y Autista sufre bloqueos prematuros en mínimos locales, mientras que en Senderista logra el mejor desempeño de toda la comparativa ($13.01\%$) al seguir de forma continua la red de caminos.
+    \item \textbf{Expanding Spiral:} Logra un porcentaje notable en Demencia ($8.93\%$) debido a la cercanía de las víctimas al punto de despegue (LKP), pero su rendimiento cae significativamente en perfiles con mayor dispersión o estructurados sobre senderos.
 \end{itemize}
 
 \section{Análisis de la Dinámica Espaciotemporal y Evolución del Mapa de Creencias}

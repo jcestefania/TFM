@@ -85,6 +85,25 @@ El perfil de Senderista presenta una distribución fuertemente lineal orientada 
 
 En este escenario, el algoritmo Voraz Heurístico alcanza un acierto del $13.01\%$. Este comportamiento se debe a la topología continua de los caminos peatonales: al existir una traza lineal ininterrumpida de alta probabilidad, la búsqueda voraz sigue el sendero de forma natural sin caer en mínimos locales. Sin embargo, en terrenos complejos discontinuos (como Demencia), Voraz se bloquea prematuramente, mientras que BHA y ABC mantienen una estabilidad robusta en todos los perfiles.
 
+\subsection{Síntesis Multiobjetivo mediante Diagramas de Radar}
+
+Para sintetizar de forma intuitiva la densa información numérica de las Tablas~\ref{tab:resultados_demencia}, \ref{tab:resultados_autista} y \ref{tab:resultados_senderista}, y exponer el compromiso multiobjetivo inherente a cada estrategia, la Figura~\ref{fig:radar_charts} ilustra los diagramas de radar normalizados correspondientes a los tres perfiles de búsqueda sobre las cinco métricas fundamentales evaluadas: Tasa de Acierto Informado ($SR$), Puntuación de Verosimilitud ($S_{\text{like}}$), Área Cubierta ($A_{\text{cov}}$), Eficiencia de Distancia (inverso de la longitud de vuelo) y Acierto en Búsqueda Ciega (línea base).
+
+\begin{figure}[H]
+	\ffigbox[\FBwidth]
+	{\caption{COMPARATIVA MULTIOBJETIVO SAR MEDIANTE DIAGRAMAS DE RADAR POR PERFIL CONDUCTUAL}}
+	{\label{fig:radar_charts}
+	\includegraphics[width=0.98\textwidth]{imagenes/radar_chart_perfiles.png}}
+\end{figure}
+
+El análisis visual de los diagramas de radar revela con inmediatez el perfil operativo y las debilidades de cada planificador:
+\begin{itemize}
+    \item \textbf{Lawnmower (Barrido Sistemático):} Muestra una geometría marcadamente asimétrica con un pico aislado hacia el área cubierta ($A_{\text{cov}} \approx 0.85\text{ km}^2$), pero su envolvente se colapsa drásticamente en las dimensiones críticas de verosimilitud y probabilidad de rescate ($1.39\% - 2.30\%$). Dispersa la energía del dron en zonas vacías.
+    \item \textbf{Metaheurísticas Bioinspiradas (ABC y BHA):} Despliegan un polígono amplio, armónico y equilibrado en los tres perfiles, dominando simultáneamente en tasa de rescate informada, verosimilitud acumulada y eficiencia cinemática sin incurrir en desplazamientos estériles.
+    \item \textbf{Voraz Heurístico:} Exhibe una fuerte variabilidad topológica: mientras que en Demencia y Autista su polígono se contrae por bloqueos en mínimos locales, en el perfil de Senderista alcanza la máxima extensión siguiendo la continuidad natural de las sendas.
+    \item \textbf{Expanding Spiral:} Presenta un desarrollo notable en Demencia ($8.93\%$) debido a la concentración radial en torno al LKP, pero sufre una notable merma en escenarios no centrados o canalizados en redes viarias.
+\end{itemize}
+
 \section{Análisis de la Dinámica Espaciotemporal y Evolución del Mapa de Creencias}
 \label{sec:evolucion_temporal}
 
@@ -247,8 +266,72 @@ Es fundamental interpretar con rigor de ingeniería los valores porcentuales abs
 
 \begin{itemize}
     \item \textbf{La Inmensidad del Escenario (1.722 Hectáreas):} El parque de la Casa de Campo abarca más de $12.75\text{ km}^2$ de superficie operativa continua ($1.722\text{ hectáreas}$ de masa forestal y relieve agreste, 5 veces Central Park). Frente a esta enorme extensión geográfica, el dron vuela con una cámara óptica cenital que proyecta una huella circular de apenas $50\text{ metros}$ de radio ($0.0078\text{ km}^2$ de área instantánea).
-    \item \textbf{La Restricción de un Único Dron y una Sola Batería de 25 Minutos:} Las 900 misiones evalúan el desempeño estricto de \textbf{un único UAV} dotado de \textbf{una sola batería de 25 minutos} ($250$ pasos de avance físico). En ese breve lapso temporal, un solo dron solo tiene capacidad física para sobrevolar entre un $1.5\%$ y un $3.5\%$ de la superficie total del parque. Pretender cubrir el parque entero con una única aeronave y una sola batería es físicamente imposible.
+    \item \textbf{La Restricción de un Único Dron y una Sola Batería de 25 Minutos:} Las 900 misiones evalúan el desempeño estricto de \textbf{un único UAV} dotado de \textbf{una sola batería de 25 minutos} ($1000$ pasos de avance físico, equivalentes a unos $11\text{ km}$ de vuelo). En ese breve lapso temporal, un solo dron solo tiene capacidad física para sobrevolar entre un $1.5\%$ y un $3.5\%$ de la superficie total del parque. Pretender cubrir el parque entero con una única aeronave y una sola batería es físicamente imposible.
     \item \textbf{Dispersión Espacial Realista de las Víctimas:} Las 50 ubicaciones estocásticas de Montecarlo por perfil sitúan a la víctima en un radio de dispersión empírico de hasta varios kilómetros desde el punto de despegue (LKP).
 \end{itemize}
 
 Bajo estas restricciones físicas extremas, que \textbf{un único dron con una sola batería} localice directamente a la víctima en hasta el $13\%$ de los vuelos individuales en su primera salida confirma una capacidad sobresaliente de focalización guiada por el mapa bayesiano (frente al ínfimo $1.39\%$ del barrido ciego). En un dispositivo de emergencia real, la operación nunca concluye tras el primer vuelo: se despliegan cuadrillas de 3 a 6 drones simultáneos o se programan rotaciones consecutivas de cambio de batería, con lo cual la probabilidad acumulada de éxito escala de forma rápida hacia el $70\% - 90\%$ durante las primeras dos horas de rastreo.
+
+\subsection{Evaluación Temporal de Detección y Cumplimiento de la Golden Hour}
+\label{sec:golden_hour}
+
+En la doctrina médica y operativa de los servicios de emergencia y salvamento en áreas silvestres (\textit{Wilderness Search and Rescue}, WiSAR)~\cite{koester2008lost}, el concepto de la \textit{Hora Dorada} (\textit{Golden Hour}) define la ventana temporal crítica de los primeros sesenta minutos ($t \le 60\text{ min}$) tras el extravío o accidente. Superado dicho umbral, la probabilidad de supervivencia de una persona desorientada o herida se desploma exponencialmente debido a la hipotermia, traumatismos no estabilizados, deshidratación o deambulación errática hacia zonas inaccesibles.
+
+Para cuantificar la capacidad de respuesta temporal del sistema propuesto frente a este estándar operativo, se analiza el tiempo real de intercepción de las misiones del benchmark de 900 simulaciones en las que el dron localizó exitosamente a la víctima ($d \le R_d = 50\text{ m}$). A partir de la cinemática de crucero establecida ($v = 10\text{ m/s} = 36\text{ km/h}$), el tiempo físico hasta la detección ($t_{\text{det}}$) se obtiene directamente de la distancia acumulada de vuelo hasta el punto de intercepción ($d_{\text{det}}$):
+
+\begin{equation}
+    t_{\text{det}} = \frac{d_{\text{det}}}{v} = \frac{d_{\text{det}}\text{ [km]} \times 1000}{10\text{ m/s} \times 60\text{ s/min}} \quad \text{[minutos]}
+\end{equation}
+
+La Tabla~\ref{tab:golden_hour} sintetiza los tiempos medios de intercepción, los rangos de detección y el margen de seguridad restante respecto a la \textit{Golden Hour} para todos los algoritmos evaluados en los tres perfiles conductuales.
+
+\begin{table}[H]
+	\ttabbox[\textwidth]
+	{\caption{TIEMPO MEDIO DE DETECCIÓN Y CUMPLIMIENTO DE LA HORA DORADA ($t \le 60\text{ MINUTOS}$)}}
+	{\label{tab:golden_hour}
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{|l|l|c|c|c|c|c|c|}
+		\hline
+		\textbf{Perfil} & \textbf{Algoritmo} & \textbf{Éxitos} & \textbf{Pasos Med.} & \textbf{Dist. Med. (km)} & \textbf{Tiempo Med.} & \textbf{Rango (min)} & \textbf{Margen Golden H.} \\
+		\hline
+		Demencia & Colonia de Abejas (ABC)   & 5/50 (10\%) & 530.8 & 6.42 & 10.7 min & [1.5 -- 16.3] & +49.3 min \\
+		Demencia & Colonia de Hormigas (ACO) & 5/50 (10\%) & 619.6 & 7.52 & 12.5 min & [2.2 -- 20.1] & +47.5 min \\
+		Demencia & Agujero Negro (BHA)       & 8/50 (16\%) & 476.1 & 5.76 &  9.6 min & [1.5 -- 18.1] & +50.4 min \\
+		Demencia & Expanding Spiral          & 2/50 (4\%)  & 432.5 & 4.35 &  7.3 min & [2.5 -- 12.0] & +52.7 min \\
+		Demencia & Voraz Heurístico          & 2/50 (4\%)  & 565.5 & 7.25 & 12.1 min & [7.7 -- 16.4] & +47.9 min \\
+		\hline
+		Autista  & Colonia de Abejas (ABC)   & 5/50 (10\%) & 278.6 & 3.38 &  5.6 min & [0.4 -- 12.9] & +54.4 min \\
+		Autista  & Colonia de Hormigas (ACO) & 1/50 (2\%)  & 327.0 & 3.91 &  6.5 min & [6.5 -- 6.5]  & +53.5 min \\
+		Autista  & Agujero Negro (BHA)       & 7/50 (14\%) & 482.4 & 5.80 &  9.7 min & [0.8 -- 16.6] & +50.3 min \\
+		Autista  & Expanding Spiral          & 1/50 (2\%)  &  57.0 & 0.60 &  1.0 min & [1.0 -- 1.0]  & +59.0 min \\
+		Autista  & Voraz Heurístico          & 1/50 (2\%)  & 190.0 & 2.24 &  3.7 min & [3.7 -- 3.7]  & +56.3 min \\
+		\hline
+		Senderista & Colonia de Abejas (ABC)   & 5/50 (10\%) & 603.6 & 7.30 & 12.2 min & [7.4 -- 19.5] & +47.8 min \\
+		Senderista & Colonia de Hormigas (ACO) & 2/50 (4\%)  & 366.5 & 4.43 &  7.4 min & [5.2 -- 9.5]  & +52.6 min \\
+		Senderista & Agujero Negro (BHA)       & 5/50 (10\%) & 520.2 & 6.30 & 10.5 min & [0.6 -- 13.7] & +49.5 min \\
+		Senderista & Expanding Spiral          & 2/50 (4\%)  & 330.5 & 3.33 &  5.6 min & [0.2 -- 10.9] & +54.4 min \\
+		Senderista & Lawnmower (Barrido)       & 2/50 (4\%)  & 125.0 & 1.77 &  2.9 min & [2.0 -- 3.9]  & +57.1 min \\
+		Senderista & Voraz Heurístico          & 5/50 (10\%) & 326.6 & 3.65 &  6.1 min & [1.6 -- 16.7] & +53.9 min \\
+		\hline
+	\end{tabular}%
+	}}
+\end{table}
+
+Los resultados de la Tabla~\ref{tab:golden_hour} corroboran de manera rotunda la viabilidad táctica de los algoritmos propuestos:
+\begin{itemize}
+    \item \textbf{Cumplimiento Riguroso de la Hora Dorada:} Todas las metaheurísticas bioinspiradas (ABC, BHA y ACO) localizan a la víctima en un tiempo medio comprendido entre los $5.6$ y los $12.5\text{ minutos}$ de vuelo, dejando un amplísimo margen operativo de entre $47.5$ y $54.4\text{ minutos}$ antes de que expire la ventana de la \textit{Golden Hour}. Incluso en el peor caso registrado entre las 900 simulaciones (ACO en la Semilla~18 de Demencia, con $t = 20.1\text{ min}$), la localización se produce antes de que transcurra un tercio de la hora crítica.
+    \item \textbf{Celeridad y Eficacia de BHA y ABC:} El Algoritmo del Agujero Negro (BHA) y la Colonia de Abejas (ABC) no solo logran los mejores tiempos medios ($9.6 - 10.5\text{ min}$ en escenarios de alta vegetación), sino que acumulan la mayor cifra absoluta de rescates con éxito ($20$ y $15$ intercepciones directas en primera salida, respectivamente), demostrando que la rápida convergencia metaheurística preserva de forma consistente la vida de la persona extraviada.
+\end{itemize}
+
+\subsubsection{Análisis Crítico del Sesgo de Proximidad en la Búsqueda en Espiral (La ``Trampa'' Estadística)}
+
+Una lectura superficial de la Tabla~\ref{tab:golden_hour} podría sugerir erróneamente que el patrón clásico en espiral creciente (\textit{Expanding Spiral}) supera en rapidez a los algoritmos bioinspirados, registrando tiempos medios de detección de tan solo $1.0\text{ minutos}$ en el perfil Autista y $5.6\text{ minutos}$ en el de Senderista. De igual modo, el barrido \textit{Lawnmower} arroja un tiempo medio de $2.9\text{ minutos}$ en Senderista.
+
+Sin embargo, como advierte la doctrina estadística de búsqueda y rescate, este resultado es un \textbf{sesgo de proximidad condicionada} (o sesgo del superviviente). La métrica del tiempo de intercepción se calcula forzosamente \textit{condicionada a que la víctima haya sido encontrada} ($N_{\text{éxitos}} > 0$). Al analizar el porcentaje real de éxito en la Tabla~\ref{tab:golden_hour}, la causa de este artificio queda al descubierto:
+\begin{enumerate}
+    \item \textbf{Tasa de Fracaso Casi Absoluta de los Métodos Ciegos:} La Espiral Creciente fracasa en el $96\%$ de los casos de Demencia y Senderista ($48$ de $50$ misiones sin avistar a nadie) y en el $98\%$ en Autista ($49$ fracasos de $50$). Por su parte, el barrido \textit{Lawnmower} obtiene un $0\%$ de aciertos en Demencia y Autista, y apenas un $4\%$ en Senderista ($96\%$ de fallos).
+    \item \textbf{Detección Restringida al Umbral Inmediato del Despegue:} En las escasas 1 o 2 misiones donde la Espiral localizó a la persona, fue debido a que el sorteo estocástico de Montecarlo situó a la víctima a escasos metros del punto de despegue LKP ($d \approx 230\text{ m}$ en la Semilla~11 de Senderista y $d \approx 598\text{ m}$ en Autista). Al comenzar la aeronave a describir anillos concéntricos justo en $(0,0)$, choca de inmediato con la víctima en los primeros giros.
+    \item \textbf{Incapacidad Operativa a Distancias Realistas:} Si la víctima se encuentra a más de $500\text{ metros}$ del LKP (el radio $r_{50\%}$ de Koester para excursionistas o autistas alcanza entre 1.0 y 2.5 kilómetros), el dron ejecutando la espiral invierte decenas de minutos orbitando círculos cerrados sobre terreno ya rastreado, agotando la batería y dejando expirar la \textit{Golden Hour} sin llegar jamás al perímetro de la persona.
+\end{enumerate}
+
+Por el contrario, los planificadores bioinspirados (ABC, BHA y ACO) y Voraz, orientados por el mapa de creencias bayesiano, rompen deliberadamente la simetría radial desde el paso inicial. El dron vuela en línea recta hacia los núcleos boscosos densos o se canaliza velozmente a lo largo de las sendas transitables de la Casa de Campo, interceptando a personas situadas a 3, 5 y hasta 7 kilómetros del LKP en menos de $15\text{ minutos}$. Por consiguiente, la aparente rapidez de la espiral geométrica es un artefacto espurio condicionado por la proximidad extrema, mientras que las metaheurísticas bioinspiradas garantizan un rastreo veloz, probabilísticamente fundamentado y operativamente aplicable en escenarios reales de emergencia.

@@ -119,7 +119,7 @@ Los seis algoritmos evaluados incluyen:
 
 Las variables operativas del UAV se mantuvieron constantes en todas las simulaciones:
 \begin{itemize}
-    \item \textbf{Presupuesto de Vuelo (\textit{Budget}):} 250 pasos de avance físico por misión (equivalente a aproximadamente 25 minutos de autonomía de batería a $10\text{ m/s}$).
+    \item \textbf{Presupuesto de Vuelo (\textit{Budget}):} 1000 pasos de avance físico por misión (equivalente a un recorrido total de entre $10.5$ y $12.4\text{ km}$ y una duración de vuelo de entre 18 y 25 minutos a una velocidad de crucero de $10\text{ m/s}$, representativo del ciclo de descarga de una batería comercial SAR estándar tipo DJI Matrice 300/350 RTK).
     \item \textbf{Altitud y Sensor ($H = 50\text{ m}$, $R_d = 50\text{ m}$):} Se establece una cota de vuelo constante de $50\text{ metros}$ sobre el terreno, proyectando una huella circular de detección en suelo de radio $R_d = 50\text{ metros}$. Esta cota de vuelo responde a un doble compromiso técnico-operativo fundamental en operaciones SAR con drones:
     \begin{enumerate}
         \item \textit{Compromiso GSD vs. Campo de Visión:} A una altitud de $50\text{ m}$, una cámara óptica cenital 4K estándar proporciona una distancia de muestreo sobre el suelo (\textit{Ground Sampling Distance} - GSD) en torno a $1.3\text{ cm/píxel}$. Esta resolución permite a un operador o a un detector visual discriminar con nitidez la silueta y ropa de una víctima tendida entre la maleza. A cotas superiores ($>100\text{ m}$), el GSD se degrada ($>3\text{ cm/píxel}$), impidiendo diferenciar a una persona de una roca o arbusto; mientras que a cotas inferiores ($<30\text{ m}$), la huella se reduce drásticamente, encareciendo inasumiblemente el tiempo de barrido.

@@ -18,6 +18,17 @@ Una vez definida la región geométrica, el sistema se conecta a la API de OpenS
 \end{equation}
 donde $\mathcal{G}_{\text{OSM}}$ son las características geográficas descargadas en bruto y $\mathcal{P}_{\text{búsqueda}}$ es el polígono del escenario del usuario. Esto descarta cualquier información fuera del lienzo de simulación.
 
+\subsection{Desacoplamiento Arquitectónico: Generación del Escenario Maestro vs. Evaluación en Simulación}
+
+Para garantizar la viabilidad operativa y la eficiencia computacional durante campañas masivas de experimentación (como la batería de 900 simulaciones de Montecarlo), la arquitectura de SAREnv desacopla el ciclo de vida del escenario en dos fases estancas:
+\begin{enumerate}
+    \item \textbf{Fase de Generación del Escenario Maestro (\textit{Offline}):} 
+    Se ejecuta una única vez previa al despliegue. El generador (\texttt{DataGenerator}) realiza las consultas a los servidores remotos de OpenStreetMap a través de \texttt{osmnx}, descarga las capas vectoriales dentro del polígono perimetral ($\mathcal{G}_{\text{OSM}} \cap \mathcal{P}_{\text{búsqueda}}$) y construye la matriz maestra de probabilidad. Este mapa base se exporta a disco en formato binario estructurado (\texttt{.npy}) junto a su fichero de metadatos georreferenciados (límites UTM $\text{EPSG:32630}$, resolución métrica $\delta$ y coordenadas del LKP).
+    
+    \item \textbf{Fase de Evaluación y Simulación (\textit{Online / Benchmark}):} 
+    Durante la ejecución de los algoritmos de enrutamiento y la siembra de víctimas estocásticas, el sistema no realiza ninguna petición de red ni recalcula geometrías. El módulo de carga (\texttt{DatasetLoader}) lee directamente las matrices desde memoria local en microsegundos. Este desacoplamiento elimina por completo los cuellos de botella por latencia de red, evita bloqueos por cuota de peticiones en las APIs públicas de OSM y asegura que todos los planificadores compitan exactamente sobre el mismo lienzo geoespacial determinista.
+\end{enumerate}
+
 \section{Proceso de Sectorización (Discretización)}
 
 Los algoritmos de planificación de rutas en cuadrículas no pueden procesar un mapa geométrico continuo, requieren una representación discreta. Para ello, el espacio geográfico se sectoriza proyectándolo en una matriz bidimensional (rejilla o \textit{grid} de Numpy).
@@ -68,13 +79,26 @@ Finalmente, la Probabilidad de Área ($POA$) normalizada para cada característi
 
 Para su procesamiento autónomo por la flota de drones, los datos vectoriales y sus probabilidades asociadas se proyectan sobre el espacio discretizado de celdas $(i, j)$ de resolución $\delta = 10\text{ m}$.
 
-Las características se clasifican en capas semánticas principales:
-\begin{itemize}
-    \item \textbf{Estructuras:} Edificios y refugios (\textit{tags}: \texttt{building}, \texttt{man\_made}).
-    \item \textbf{Vías terrestres:} Caminos y senderos (\textit{tags}: \texttt{highway}, \texttt{track}).
-    \item \textbf{Recursos hídricos:} Ríos y lagos (\textit{tags}: \texttt{waterway}, \texttt{natural:water}).
-    \item \textbf{Zonas naturales:} Bosques y prados (\textit{tags}: \texttt{natural:wood}, \texttt{natural:scrub}).
-\end{itemize}
+Las entidades vectoriales descargadas se descomponen y clasifican en cinco capas semánticas fundamentales mediante el diccionario de correspondencias (\texttt{tags\_mapping}) detallado en la Tabla~\ref{tab:capas_osm}.
+
+\begin{table}[H]
+	\ttabbox[\textwidth]
+	{\caption{CORRESPONDENCIA DE CAPAS SEMÁNTICAS Y ETIQUETAS OPENSTREETMAP EN SARENV}}
+	{\label{tab:capas_osm}
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{|l|l|p{8.5cm}|}
+		\hline
+		\textbf{Capa Semántica} & \textbf{Clave OSM} & \textbf{Etiquetas y Filtros Geoespaciales (\textit{Tags Mapping})} \\
+		\hline
+		Estructuras (\textit{structure}) & \texttt{building}, \texttt{man\_made} & \texttt{building=True}, \texttt{man\_made=True}, \texttt{bridge=True}, \texttt{tunnel=True} \\
+		Red Viaria (\textit{road}) & \texttt{highway}, \texttt{tracktype} & \texttt{highway=True} (red viaria, pistas forestales y sendas), \texttt{tracktype=True} \\
+		Barreras Lineales (\textit{linear}) & \texttt{railway}, \texttt{barrier} & \texttt{railway=True}, \texttt{barrier=True}, \texttt{fence=True}, \texttt{wall=True}, \texttt{pipeline=True} \\
+		Drenaje e Hidrología (\textit{drainage}) & \texttt{waterway}, \texttt{natural} & \texttt{waterway=['drain', 'ditch', 'culvert', 'canal']}, \texttt{natural=water} \\
+		Cobertura Vegetal (\textit{natural}) & \texttt{natural}, \texttt{landuse} & \texttt{natural=['wood', 'scrub', 'grassland']}, \texttt{landuse=forest} \\
+		\hline
+	\end{tabular}%
+	}}
+\end{table}
 
 A diferencia del diseño inicial de SAREnv, que utilizaba un operador de máximo en cada celda para evitar acumulaciones de probabilidad, en este trabajo se ha modificado la lógica de combinación para implementar una \textbf{suma ponderada y posterior normalización global}. 
 
@@ -133,23 +157,37 @@ Al fijar a cero la probabilidad en agua y edificios, el planificador del dron re
 
 \section{Observaciones y Modelo del Sensor (Sensor Ideal de Nivel 1)}
 
-La capacidad del UAV para localizar a la víctima en el terreno se modela mediante el enfoque canónico de \textbf{Sensor Ideal de Huella Geométrica (Nivel 1)}, adaptado del modelo de observación desarrollado por Yago Brotón.
+La capacidad del UAV para localizar a la víctima en el terreno requiere formalizar la interacción entre la cinemática de vuelo de la aeronave y la física del dispositivo óptico cenital.
 
-Bajo este modelo, la probabilidad de detección condicional $P_d(x,y \mid p_k)$ de una víctima ubicada en las coordenadas $(x,y)$ dada la posición del dron $p_k = (x_k, y_k)$ a una altitud de vuelo $h$ se define como una función determinista de cobertura binaria:
+\subsection{Formulación Teórica: Decaimiento Exponencial Continuo vs. Sensor Ideal}
+
+En la teoría clásica de búsqueda probabilística en tiempo mínimo (MTS) \cite{lanillos-bayesian}, la probabilidad condicional de que el sensor aerotransportado detecte a la víctima ubicada en las coordenadas $(x,y)$ dada la posición tridimensional del UAV $p_k = (x_k, y_k)$ se modela habitualmente como una función de decaimiento exponencial decreciente con la distancia euclídea horizontal $d = \sqrt{(x - x_k)^2 + (y - y_k)^2}$:
+\begin{equation}
+    P(z_k = 1 \mid (x,y), p_k) = P_{\max} \cdot \exp\left( -\sigma \left( \frac{d}{R_d} \right)^2 \right)
+\end{equation}
+donde $P_{\max} \in (0, 1]$ es la probabilidad máxima de detección en el nadir (centro geométrico de la cámara), $R_d$ es el radio del cono visual proyectado sobre el terreno y $\sigma$ representa el factor de atenuación marginal debido a distorsiones ópticas periféricas y perspectiva oblicua.
+
+No obstante, como argumenta Brotón Gutiérrez \cite{broton2025revision}, la inclusión de factores estocásticos marginales de decaimiento en el sensor introduce una varianza aleatoria espuria que distorsiona la comparación rigurosa entre algoritmos de enrutamiento: una trayectoria deficiente podría registrar éxitos fortuitos en los extremos del sensor, mientras que una ruta geométricamente óptima podría penalizarse por ruido de imagen. Por ello, siguiendo las directrices estandarizadas del framework MTS \cite{Broton_Gutierrez_MTS-UncertainEnvironment, broton2025revision}, en este trabajo se adopta el modelo de \textbf{Sensor Ideal de Huella Geométrica (Nivel 1)}.
+
+Bajo este modelo determinista de barrido cenital, la probabilidad de detección dentro de la huella circular proyectada sobre el suelo es unitaria ($P_d = 1.0$) y nula fuera de sus límites:
 \begin{equation}
     P_d(x,y \mid p_k) = \begin{cases} 
         1.0 & \text{si } \sqrt{(x - x_k)^2 + (y - y_k)^2} \le R_d \\ 
         0.0 & \text{en otro caso} 
     \end{cases}
 \end{equation}
-donde $R_d$ representa el radio de cobertura efectiva de la cámara a bordo, el cual viene determinado por la altitud $h$ y el ángulo del campo de visión (\textit{Field of View - FoV}) $\theta_{\text{FoV}}$:
+donde $R_d$ representa el radio de cobertura efectiva de la cámara a bordo, determinado trigonométricamente por la altitud de vuelo de crucero $h$ y la apertura angular del campo de visión (\textit{Field of View - FoV}) $\theta_{\text{FoV}}$:
 \begin{equation}
     R_d = h \cdot \tan\left(\frac{\theta_{\text{FoV}}}{2}\right)
 \end{equation}
 
-Para las condiciones nominales de vuelo en la Casa de Campo ($h = 50\text{ m}$ de altitud y $\theta_{\text{FoV}} = 90^\circ$), el radio de cobertura resultante en el suelo es exactamente $R_d = 50\text{ metros}$.
+Para las condiciones nominales de operación establecidas en la Casa de Campo ($h = 50\text{ m}$ de altitud y cámara con apertura cenital simétrica $\theta_{\text{FoV}} = 90^\circ$), el radio de cobertura resultante en el suelo es exactamente:
+\begin{equation}
+    R_d = 50\text{ m} \cdot \tan(45^\circ) = 50\text{ metros}
+\end{equation}
+lo que define un ancho de barrido frontal de $2 R_d = 100\text{ m}$.
 
-Dado el tamaño de celda de $10\text{ m} \times 10\text{ m}$, una huella circular de $R_d = 50\text{ m}$ cubre un radio discreto de 5 celdas a partir de la posición del dron. Si el centroide de una celda queda dentro de este radio de barrido, la celda se marca como observada y su probabilidad acumulada es absorbida por el dron.
+Dado el tamaño de celda seleccionado ($\delta = 10\text{ m}$), una huella circular de radio $R_d = 50\text{ m}$ abarca un radio discreto de 5 celdas a partir de la celda ocupada por el UAV. Si el centroide de una celda queda contenido dentro de este radio de barrido, la celda se marca como observada y su masa de probabilidad acumulada es absorbida por el dron.
 
 \section{Filtro Recursivo Bayesiano (RBF) y Mapa de Creencias Residual}
 

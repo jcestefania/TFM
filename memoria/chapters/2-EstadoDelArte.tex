@@ -80,7 +80,7 @@ Q-learning es una técnica destacada de RL, aunque presenta problemas de sobrees
 
 El algoritmo DDPG (Deep Deterministic Policy Gradient) muestra mejor rendimiento abordando problemas de consumo energético y convergencia comparado con el mecanismo de retrazado. MADDPG (Multi-Agent Deep Deterministic Policy Gradient) puede planificar rutas para enjambres de UAVs en entornos complejos \cite{jeon2024}.
 
-Investigaciones consolidadas han propuesto enfoques avanzados de navegación autónoma con evasión de obstáculos basados en redes neuronales profundas para enjambres \cite{wang2025}, equilibrando explotación y exploración en entornos continuos.
+Investigaciones consolidadas han propuesto enfoques avanzados de navegación autónoma con evasión de obstáculos basados en aprendizaje por refuerzo profundo explicable para UAVs \cite{wang2025}, equilibrando explotación y exploración en entornos continuos.
 
 \subsection{Exploración Ergódica}
 
@@ -98,7 +98,7 @@ Los Procesos de Decisión de Markov Parcialmente Observables (POMDP) proporciona
 
 En SAR con UAVs, los POMDPs capturan incertidumbres en ubicaciones de objetivos, observaciones de sensores y condiciones ambientales mientras optimizan rutas. Modelan estados ambientales desconocidos, información imperfecta del sensor y la compleja interdependencia entre decisiones y observaciones futuras.
 
-Diversos trabajos han formulado la planificación de rutas UAV-SAR como POMDPs descentralizados para búsqueda y seguimiento activo de objetivos múltiples \cite{zhang2024}. Por su parte, la navegación autónoma con árboles de creencias adaptativas ha sido demostrada eficazmente para operaciones SAR en entornos con obstáculos y sin cobertura GPS \cite{sandino2020}.
+Diversos trabajos han formulado la planificación de rutas UAV-SAR mediante marcos POMDP en tiempo real, proponiendo algoritmos como Shrinking POMCP para búsqueda activa de objetivos bajo restricciones temporales \cite{zhang2024}. Por su parte, la navegación autónoma y localización colaborativa con flotas multi-UAV ha sido demostrada eficazmente para operaciones SAR en entornos con obstáculos y sin cobertura GPS \cite{sandino2020}.
 
 Los Dec-POMDPs (Decentralized POMDPs) permiten a los UAVs tomar decisiones bajo incertidumbre con observabilidad limitada, entrenados offline usando PPO (Proximal Policy Optimization) para maximizar la suma esperada de recompensas descontadas.
 
@@ -114,7 +114,7 @@ La métrica de Probabilidad de Detección Acumulada ($L(\pi)$) cuantifica la pro
 L(\pi) = \int_{A_\pi} P_{prior}(x) \, dx
 \end{equation}
 
-donde $A_\pi$ denota el área visible desde $\pi$, y $P_{prior}(x)$ es la probabilidad previa de que una persona perdida esté en la ubicación $x$. Esta formulación ha sido utilizada en diversos trabajos de planificación SAR donde las funciones de costo se diseñan para minimizar la probabilidad acumulada de no detectar el objetivo \cite{li2020}.
+donde $A_\pi$ denota el área visible desde $\pi$, y $P_{prior}(x)$ es la probabilidad previa de que una persona perdida esté en la ubicación $x$. Esta formulación ha sido utilizada en diversos trabajos de planificación SAR donde las funciones de costo se diseñan para optimizar la coordinación multi-robot y minimizar la probabilidad acumulada de no detectar el objetivo en rescates agrestes \cite{li2020}.
 
 \subsection{Probabilidad de Detección con Descuento Temporal}
 
@@ -146,7 +146,7 @@ donde la función indicadora $\mathbb{I}(\pi, v_i)$ determina si la víctima $v_
 \end{cases}
 \end{equation}
 
-Los conteos brutos de personas encontradas han sido ampliamente utilizados en entornos de benchmarking como RoboCup Rescue \cite{kohlbrecher2015}. Formulaciones más recientes incluyen variantes ponderadas por tiempo donde las detecciones tempranas producen puntajes más altos, optimizando tanto el conteo de descubrimientos como el tiempo de descubrimiento usando planificación multi-objetivo \cite{trojanowski2024}.
+Los conteos brutos de personas encontradas han sido ampliamente utilizados en entornos de benchmarking como RoboCup Rescue \cite{kohlbrecher2015}. Formulaciones más recientes incluyen variantes ponderadas por tiempo donde las detecciones tempranas producen puntajes más altos, optimizando tanto el conteo de descubrimientos como el tiempo de descubrimiento mediante esquemas de planificación heurística y multi-objetivo \cite{trojanowski2024}.
 
 \subsection{Probabilidad de Éxito (POS)}
 

@@ -186,7 +186,24 @@ Desde una perspectiva de diseño cartográfico, podría plantearse la alternativ
 
 De este modo, el mapa filtrado (Panel~4 de la Figura~\ref{fig:filtro_restricciones}) retiene la probabilidad de búsqueda sobre las vías y paseos accesibles entre las atracciones y recintos, al tiempo que neutraliza estrictamente los tejados ciegos y la lámina de agua del lago, optimizando la asignación del tiempo de vuelo hacia objetivos visualmente alcanzables.
 
+\subsection{Validación Visual de los Mapas de Creencias Iniciales por Perfil}
+\label{sec:mapas_iniciales}
 
+Una vez aplicadas las ponderaciones empíricas de Robert Koester y ejecutado el filtrado jerárquico por R-Tree, el generador produce los mapas de creencias iniciales $b(v^0)$ georreferenciados que definen el escenario de búsqueda para cada tipología conductual. En la Figura~\ref{fig:comparativa_perfiles} se presenta la comparativa simultánea de las tres distribuciones obtenidas para el entorno de la Casa de Campo de Madrid:
+
+\begin{figure}[H]
+	\ffigbox[\textwidth]
+	{\caption{MAPAS DE CREENCIAS A PRIORI INICIALES $b(v^0)$ TRAS EL FILTRADO ESPACIAL R-TREE PARA LOS TRES PERFILES CONDUCTUALES CANÓNICOS (CASA DE CAMPO DE MADRID)}}
+	{\label{fig:comparativa_perfiles}
+	\includegraphics[width=\textwidth]{imagenes/comparativa_escenarios_iniciales.png}}
+\end{figure}
+
+El análisis comparativo de las tres matrices probabilísticas pone de manifiesto contrastes espaciales cuantitativos y morfológicos determinantes:
+\begin{enumerate}
+    \item \textbf{Perfil de Demencia (Panel Izquierdo):} Presenta la mayor concentración espacial en torno al LKP, alcanzando un valor pico de densidad de $b_{\max} \approx 10{,}5 \times 10^{-5}$. El $50\%$ cuartil de probabilidad queda confinado en un radio de tan solo $1{,}0\text{ km}$, reflejando la reducida capacidad de desplazamiento autónomo del paciente desorientado. La periferia exterior del parque permanece prácticamente en niveles residuales cercanos a cero.
+    \item \textbf{Perfil de Senderista (Panel Central):} Manifiesta una marcada dispersión longitudinal a lo largo de las pistas y sendas forestales de la red de OpenStreetMap. Debido a que la masa total de probabilidad ($1{,}0$) se distribuye a lo largo de ejes lineales que superan los $3\text{--}4\text{ km}$ de recorrido, el valor pico disminuye prácticamente a la mitad ($b_{\max} \approx 5{,}3 \times 10^{-5}$), obligando a las aeronaves a ejecutar vuelos de largo alcance.
+    \item \textbf{Perfil Autista (Panel Derecho):} Exhibe un perfil intermedio ($b_{\max} \approx 6{,}6 \times 10^{-5}$) caracterizado por una doble componente: concentración moderada en torno al origen y una sensible atracción probabilística sobre los corredores peatonales y claros arbolados del sector sur (complejos del Zoo y Parque de Atracciones), habiéndose anulado rigurosamente las cubiertas y recintos interiores inaccesibles para el sensor cenital.
+\end{enumerate}
 
 \section{Observaciones y Modelo del Sensor (Sensor Ideal de Nivel 1)}
 

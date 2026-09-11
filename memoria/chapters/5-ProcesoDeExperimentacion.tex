@@ -43,12 +43,7 @@ En la Tabla~\ref{tab:perfiles_koester} se detallan las ponderaciones porcentuale
 	}}
 \end{table}
 
-\begin{figure}[H]
-	\ffigbox[\FBwidth]
-	{\caption{MAPA DE CALOR PROBABILÍSTICO INICIAL $b(v^0)$ PARA EL PERFIL DEMENCIA}}
-	{\label{fig:escenario_demencia}
-	\includegraphics[width=0.90\textwidth]{imagenes/escenario_inicial_demencia.png}}
-\end{figure}
+Las tres matrices de probabilidad a priori $b(v^0)$ resultantes de aplicar estas ponderaciones y el filtrado por R-Tree han sido analizadas y contrastadas exhaustivamente en la Sección~\ref{sec:mapas_iniciales} (Figura~\ref{fig:comparativa_perfiles}), constituyendo los tres escenarios independientes de búsqueda sobre los que se evalúan los planificadores.
 
 \section{Calibración Bayesiana de Hiperparámetros con Optuna}
 
@@ -126,10 +121,10 @@ Las variables operativas del UAV se mantuvieron constantes en todas las simulaci
         \item \textit{Franqueo de Seguridad sobre la Masa Arbórea:} En el parque de la Casa de Campo, los ejemplares adultos de pino piñonero (\textit{Pinus pinea}) y encina (\textit{Quercus ilex}) alcanzan alturas comprendidas entre los 15 y los 25 metros. Volar a $50\text{ m}$ asegura un margen vertical de seguridad holgado de al menos 25 metros sobre las copas de los árboles y posibles postes o tendidos de servicio, eliminando el riesgo de colisión física.
     \end{enumerate}
     \item \textbf{Condición de Inicio:} El dron despega siempre desde el centro geométrico del parque o Punto de Planificación Inicial (LKP).
-    \item \textbf{Validación Doble (Búsqueda Informada vs. Búsqueda Ciega):} Cada algoritmo se evalúa bajo dos modalidades:
+    \item \textbf{Validación Doble (Víctimas Informadas LPB vs. Víctimas Ciegas):} Cada trayectoria de vuelo generada se contrasta de forma exhaustiva frente a dos conjuntos independientes de $1000$ víctimas generadas en el Módulo~2:
     \begin{itemize}
-        \item \textit{Búsqueda Informada:} El dron planifica guiado por el mapa de creencias bayesiano $b(v^0)$ generado con las restricciones del perfil correspondiente.
-        \item \textit{Búsqueda Ciega (Línea Base):} El dron no dispone del mapa de calor y navega sobre una distribución uniforme no informada.
+        \item \textit{Víctimas Informadas:} Ubicadas en el mapa siguiendo la distribución probabilística empírica del modelo LPB para cada perfil conductual. Permite evaluar la tasa de éxito cuando la persona desaparecida se comporta acorde a la psicología forense de búsqueda y rescate.
+        \item \textit{Víctimas Ciegas (Línea Base de Estrés):} Distribuidas bajo una distribución espacial uniforme por todo el polígono de la Casa de Campo (evitando únicamente lagos y cubiertas no transitables). Esta modalidad actúa como contraste de estrés para verificar la robustez del planificador ante anomalías conductuales o errores en la categorización inicial del perfil.
     \end{itemize}
 \end{itemize}
 

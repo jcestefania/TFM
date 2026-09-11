@@ -255,7 +255,7 @@ Para facilitar la experimentación, inspección visual y demostración en tiempo
 
 \begin{figure}[H]
 	\ffigbox[\textwidth]
-	{\caption{INTERFAZ GRÁFICA DEL CUADERNO INTERACTIVO DE SIMULACIÓN Y CONTROL: PANEL DE CONFIGURACIÓN DE PERFILES LPB (SUPERIOR), SELECTOR DE ALGORITMOS MTS Y PRESUPUESTO DE VUELO (CENTRO), Y VISTA DUAL DE TRAYECTORIA, MAPA RESIDUAL Y CUADRO DE MÉTRICAS SAR (INFERIOR)}}
+	{\caption{INTERFAZ GRÁFICA DEL CUADERNO INTERACTIVO DE SIMULACIÓN Y CONTROL: PANEL DE CONFIGURACIÓN DE PERFILES LPB (SUPERIOR), SELECTOR DE ALGORITMOS MTS/SARENV Y PRESUPUESTO DE VUELO (CENTRO), Y VISTA DUAL DE TRAYECTORIA, MAPA RESIDUAL Y CUADRO DE MÉTRICAS SAR (INFERIOR)}}
 	{\label{fig:demo_interactiva}
 	\includegraphics[width=0.98\textwidth]{imagenes/interfaz_demo_interactiva.png}}
 \end{figure}
@@ -263,7 +263,7 @@ Para facilitar la experimentación, inspección visual y demostración en tiempo
 Esta herramienta proporciona al operador un entorno unificado de control que integra los cinco módulos del framework:
 \begin{enumerate}
     \item \textbf{Configuración de la Víctima (Panel Superior):} Permite cargar perfiles rápidos basados en la clasificación LPB de Koester \cite{koester2008lost} (Autista, Demencia o Senderista) o personalizar libremente mediante deslizadores los pesos asignados a cada capa semántica de OpenStreetMap (\textit{structure}, \textit{road}, \textit{woodland}, \textit{water}, \textit{field}, \textit{brush}), así como consultar los radios estadísticos de dispersión por cuartiles.
-    \item \textbf{Control de Simulación (Panel Central):} Permite seleccionar el planificador inteligente deseado (ACO, ABC, BHA, Voraz, Lawnmower o Espiral), definir el presupuesto máximo de pasos de vuelo de la aeronave y fijar la semilla pseudoaleatoria de reproducibilidad antes de pulsar el botón de ejecución interactiva.
+    \item \textbf{Control de Simulación y Selección Dual de Algoritmos (Panel Central):} Permite al operador alternar en tiempo real entre las dos familias algorítmicas integradas en el framework: por un lado, los planificadores metaheurísticos bioinspirados de optimización discreta de \textbf{MTS} (\textit{Colonia de Hormigas ACO}, \textit{Colonia de Abejas ABC}, \textit{Agujero Negro BHA} y \textit{Voraz Heurístico}), y por otro, los algoritmos y patrones de cobertura continuos nativos de \textbf{SAREnv} (\textit{Espiral Continua / Expanding Spiral}, \textit{Barrido Zigzag / Lawnmower} y \textit{Voraz Continuo / Greedy}). Asimismo, permite graduar mediante deslizadores el presupuesto de pasos de vuelo de la aeronave y fijar la semilla pseudoaleatoria de reproducibilidad antes de pulsar el botón de ejecución interactiva.
     \item \textbf{Visualización y Métricas en Tiempo Real (Panel Inferior):} Presenta de forma sincronizada la trayectoria ejecutada por el UAV sobre el mapa base de calor (izquierda), la evolución dinámica del mapa de creencias residual $b(v^{\text{final}})$ aplicando la huella sensorial circular de $R_d = 50\text{ m}$ mediante el filtro recursivo bayesiano (derecha) y el cuadro de mando estandarizado de métricas SAR (\textit{SAR Evaluation Metrics Dashboard}), reportando el estado de detección, la distancia euclídea mínima a la víctima, la longitud de ruta recorrida, el área geográfica barrida neta y la masa de probabilidad absorbida.
 \end{enumerate}
 

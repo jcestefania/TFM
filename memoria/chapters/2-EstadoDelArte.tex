@@ -17,7 +17,7 @@ Para formalizar este problema, la teoría de búsqueda clásica define varias m�
     Un algoritmo inteligente puede decidir buscar en una zona con menos probabilidad de presencia (baja POA) si el terreno está muy despejado y es fácil ver el suelo (alta POD), garantizando así un mayor éxito global.
 \end{itemize}
 
-Durante la búsqueda, a medida que los drones sobrevuelan zonas sin encontrar a la víctima, el sistema debe actualizar la creencia sobre dónde podría estar. Este proceso de descarte y actualización continua de las probabilidades se modela mediante técnicas bayesianas, como el Filtro Recursivo Bayesiano, ampliamente utilizado en la literatura moderna de robótica SAR \cite{MTS_c1, lanillos-bayesian}.
+Durante la búsqueda, a medida que los drones sobrevuelan zonas sin encontrar a la víctima, el sistema debe actualizar la creencia sobre dónde podría estar. Este proceso de descarte y actualización continua de las probabilidades se modela mediante técnicas bayesianas, como el Filtro Recursivo Bayesiano, ampliamente utilizado en la literatura moderna de robótica SAR y en el marco de búsqueda en tiempo mínimo (\textit{Minimum Time Search} o MTS) \cite{MTS_c1, lanillos-bayesian, carabaza_ingles, tesis_carabaza}.
 
 \section{Planificación de Rutas para UAVs en SAR}
 
@@ -35,7 +35,7 @@ Para mitigar estas ineficiencias, se han propuesto varias adaptaciones: descompo
 
 En contraste con la cobertura exhaustiva, el Informative Path Planning busca maximizar la adquisición de información relevante por unidad de tiempo o distancia recorrida \cite{rossello2022, bai2021}. Esto se logra incorporando un marco probabilístico, como el mapa de Probabilidad de Contención (POC), que representa la probabilidad de que la persona perdida se encuentre en diferentes puntos del área de búsqueda.
 
-Lin y Goodrich \cite{lin2009, lin2010} demostraron un método donde la ruta del UAV se dirige hacia regiones con la mayor probabilidad de contener el objetivo, priorizando las áreas más prometedoras primero. Las metodologías híbridas combinan las fortalezas de CPP e IPP, particionando el área operacional en subregiones de alta probabilidad basadas en un mapa de probabilidad previa, tratando cada subregión como un nodo en un problema del viajante (TSP) para determinar la secuencia óptima de tareas de cobertura \cite{vasquez2018}.
+Lin y Goodrich \cite{lin2009, lin2010} demostraron un método donde la ruta del UAV se dirige hacia regiones con la mayor probabilidad de contener el objetivo, priorizando las áreas más prometedoras primero. Las metodologías híbridas combinan las fortalezas de CPP e IPP, particionando el área operacional en subregiones de alta probabilidad basadas en un mapa de probabilidad previa, tratando cada subregión como un nodo en un problema del viajante (TSP) para determinar la secuencia óptima de tareas de cobertura \cite{vasquez2018}, así como la coordinación adaptativa de formaciones en flotas multi-UAV orientadas a la minimización del tiempo de búsqueda \cite{Multiple_Fixed-Wing_Unmanned_Aerial_Vehicles}.
 
 \subsection{Algoritmos Baseline en SAREnv}
 
@@ -69,12 +69,12 @@ Los métodos metaheurísticos han demostrado ser efectivos para la planificació
 	\item \textbf{Particle Swarm Optimization (PSO):} Variantes como PSO mejorado, FP-GPSO y MCMOPSO-RL se utilizan para optimizar rutas en entornos complejos con obstáculos.
 	\item \textbf{Grey Wolf Optimizer (GWO):} Algoritmo de optimización inspirado en el comportamiento de los lobos grises, utilizado para planificación de rutas 3D \cite{huang2024}.
 	\item \textbf{Dung Beetle Optimization (DBO):} Recientemente aplicado a la planificación de rutas multi-UAV en áreas de desastre, con mejoras como el algoritmo LODBO (Landmark Operator DBO) que mejora la capacidad de búsqueda global.
-	\item \textbf{Ant Colony Optimization (ACO):} Utilizado para planificación de rutas globales 3D, especialmente en entornos marítimos.
+	\item \textbf{Ant Colony Optimization (ACO):} Ampliamente estudiado en la planificación de rutas multi-UAV para búsqueda en tiempo mínimo (MTS), donde variantes adaptadas al dominio continuo como $\text{ACO}_{\mathbb{R}}$ permiten optimizar trayectorias cinemáticas de vuelo sobre mapas de probabilidad bayesianos inciertos \cite{carabaza-ACOr, carabaza_ingles}.
 \end{itemize}
 
 \subsection{Aprendizaje por Refuerzo}
 
-El aprendizaje por refuerzo (RL) y el aprendizaje profundo por refuerzo (DRL) han emergido como enfoques prominentes para la planificación de rutas multi-UAV \cite{hayat2020, yue2025}. El proceso de toma de decisiones en RL involucra factores como agente, entorno, estado, acción, recompensa, política y función de valor.
+El aprendizaje por refuerzo (RL) y el aprendizaje profundo por refuerzo (DRL) han emergido como enfoques prominentes para la planificación de rutas multi-UAV en escenarios de rescate silvestre de tiempo crítico \cite{hayat2020, yue2025, ewers2025deep}. El proceso de toma de decisiones en RL involucra factores como agente, entorno, estado, acción, recompensa, política y función de valor.
 
 Q-learning es una técnica destacada de RL, aunque presenta problemas de sobreestimación que pueden afectar la eficiencia del sistema. Para abordar esto, se han desarrollado variantes como Deep Q-Network (DQN), Double DQN, Dueling Deep Q-Learning y C51 Dueling Deep Q-Network.
 

@@ -20,7 +20,7 @@ donde $\mathcal{G}_{\text{OSM}}$ son las características geográficas descargad
 
 \section{Proceso de Sectorización (Discretización)}
 
-Los algoritmos de planificación de rutas en cuadrículas no pueden procesar un mapa geométrico continuo; requieren una representación discreta. Para ello, el espacio geográfico se sectoriza proyectándolo en una matriz bidimensional (rejilla o \textit{grid} de Numpy).
+Los algoritmos de planificación de rutas en cuadrículas no pueden procesar un mapa geométrico continuo, requieren una representación discreta. Para ello, el espacio geográfico se sectoriza proyectándolo en una matriz bidimensional (rejilla o \textit{grid} de Numpy).
 
 La resolución del mapa discreto se controla a través del parámetro fundamental $meter\_per\_bin$ (denotado como $\delta$), que establece cuántos metros reales mide cada lado de una celda de la cuadrícula. Para este trabajo, se ha seleccionado $\delta = 10$, lo que implica que cada celda o sector representa un área física real de $10 \times 10$ metros ($100~\text{m}^2$).
 
@@ -31,7 +31,7 @@ El framework calcula las dimensiones de la matriz de la siguiente manera. Sean $
 \begin{equation}
     N_y = \left\lfloor \frac{|y_{\max} - y_{\min} + 2b|}{\delta} \right\rfloor
 \end{equation}
-donde $\lfloor \cdot \rfloor$ representa la función piso. El escenario discretizado completo de la Casa de Campo queda modelado por una matriz de $458 \times 481$ celdas, abarcando una superficie total de aproximadamente $12.75~\text{km}^2$. Cada celda de coordenadas discretas $(i, j)$ se asocia unívocamente a una zona física del parque.
+donde $\lfloor \cdot \rfloor$ representa la función suelo (redondeo hacia abajo a la parte entera inferior, equivalente a la operación \texttt{int()} en Python). El escenario discretizado completo de la Casa de Campo queda modelado por una matriz de $458 \times 481$ celdas ($N_y \times N_x$), abarcando una superficie total de aproximadamente $12{,}75~\text{km}^2$. Cada celda de coordenadas discretas $(i, j)$ se asocia unívocamente a una zona física del parque.
 
 \section{Fusión Probabilística Multicapa (SAREnv)}
 

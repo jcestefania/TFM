@@ -18,6 +18,16 @@ Una vez definida la región geométrica, el sistema se conecta a la API de OpenS
 \end{equation}
 donde $\mathcal{G}_{\text{OSM}}$ son las características geográficas descargadas en bruto y $\mathcal{P}_{\text{búsqueda}}$ es el polígono del escenario del usuario. Esto descarta cualquier información fuera del lienzo de simulación.
 
+En la Figura~\ref{fig:contexto_geografico} se expone el contexto geográfico y la delimitación exacta del área de búsqueda en la Casa de Campo ($12{,}75\text{ km}^2$), contrastando el mapa cartográfico ráster de OpenStreetMap con la ortofotografía satelital de alta resolución (Esri World Imagery). La línea perimetral discontinua define el polígono estricto sobre el cual se acotan tanto las descargas de información geoespacial como la discretización del espacio operacional.
+
+\begin{figure}[H]
+	\ffigbox[\textwidth]
+	{\caption{CONTEXTO GEOGRÁFICO Y DELIMITACIÓN DEL ÁREA DE BÚSQUEDA EN LA CASA DE CAMPO ($12{,}75\text{ km}^2$): CARTOGRAFÍA RÁSTER DE OPENSTREETMAP (IZQUIERDA) Y VISTA SATELITAL ESRI WORLD IMAGERY (DERECHA)}}
+	{\label{fig:contexto_geografico}
+	\includegraphics[width=0.49\textwidth]{imagenes/contexto_mapa_raster.png}\hfill
+	\includegraphics[width=0.49\textwidth]{imagenes/contexto_mapa_satelite.png}}
+\end{figure}
+
 \subsection{Desacoplamiento Arquitectónico: Generación del Escenario Maestro vs. Evaluación en Simulación}
 
 Para garantizar la viabilidad operativa y la eficiencia computacional durante campañas masivas de experimentación (como la batería de 900 simulaciones de Montecarlo), la arquitectura de SAREnv desacopla el ciclo de vida del escenario en dos fases estancas:
@@ -146,13 +156,13 @@ Sin embargo, existe una distinción operativa crucial entre \textit{dónde se ub
         \item \textbf{Recursos Aéreos (Drones):} Los UAVs se asignan exclusivamente al rastreo exhaustivo de los corredores exteriores transitables: caminos peatonales ($18\%$), claros de campo ($9\%$) y masas boscosas abiertas ($9\%$), donde la visión aérea es decisiva.
     \end{itemize}
 \end{enumerate}
-Al fijar a cero la probabilidad en agua y edificios, el planificador del dron redistribuye su esfuerzo de búsqueda hacia las zonas donde sus sensores sí tienen capacidad de detección, garantizando una utilización óptima del tiempo de vuelo.
+Al fijar a cero la probabilidad en agua y edificios, el planificador del dron redistribuye su esfuerzo de búsqueda hacia las zonas donde sus sensores sí tienen capacidad de detección, garantizando una utilización óptima del tiempo de vuelo (véase la Figura~\ref{fig:filtro_restricciones}).
 
 \begin{figure}[H]
-	\ffigbox[\FBwidth]
-	{\caption{VISTA SATELITAL Y FILTRO DE RESTRICCIONES FÍSICAS EN LA CASA DE CAMPO}}
+	\ffigbox[\textwidth]
+	{\caption{PROCESO DE FILTRADO DE RESTRICCIONES FÍSICAS EN LA CASA DE CAMPO: MAPA BASE NO FILTRADO (1), MÁSCARA BINARIA R-TREE (2), VISTA AÉREA SATELITAL DE REFERENCIA (3) Y MAPA DE CREENCIAS FINAL FILTRADO (4)}}
 	{\label{fig:filtro_restricciones}
-	\includegraphics[width=0.95\textwidth]{imagenes/filtro_restricciones_satelite_autista.png}}
+	\includegraphics[width=\textwidth]{imagenes/filtro_restricciones_demencia.png}}
 \end{figure}
 
 \section{Observaciones y Modelo del Sensor (Sensor Ideal de Nivel 1)}

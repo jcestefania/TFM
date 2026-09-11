@@ -168,21 +168,51 @@ El International Search \& Rescue Incident Database (ISRID) fue desarrollado por
 
 El libro ``Lost Person Behavior'' \cite{koester2008lost} utiliza clusters de patrones de comportamiento para predecir dónde podría encontrarse una persona perdida. Incluye categorías de sujetos, perfiles conductuales, estadísticas actualizadas, tareas iniciales sugeridas y preguntas de investigación especializadas.
 
-\subsection{Modelos de Desplazamiento}
+\subsection{Modelos de Desplazamiento y Dispersión Espacial}
 
-Los modelos principales de comportamiento de personas perdidas incluyen:
+Para transformar las estadísticas empíricas de incidentes SAR en distribuciones espaciales de probabilidad $P_{prior}(x,y)$, la metodología formulada por Robert Koester \cite{koester2008lost}, respaldada operativamente por manuales de salvamento terrestre \cite{romero2018manual}, define cinco modelos cuantitativos y geométricos de comportamiento:
 
-\begin{itemize}
-	\item \textbf{Modelo de Desplazamiento (Ring Model):} El más común, utiliza anillos de rango. Por ejemplo, para niños de 1-3 años, el 25\% se encuentran dentro de 200m, el 50\% dentro de 300m, el 75\% dentro de 600m, y el 95\% a 4.5km.
-	\item \textbf{Modelo de Dispersión:} Predice qué tan cerca de una línea de dirección de viaje se encontrará una persona perdida. Los pacientes con demencia tienen un ángulo de dispersión bastante ajustado.
-	\item \textbf{Modelo de Elevación:} Predice la probabilidad de que una persona vaya cuesta arriba versus cuesta abajo. Históricamente la gente tendía a bajar, pero con el uso de teléfonos móviles la tendencia ha cambiado a subir por señal.
-	\item \textbf{Modelo de Offset de Pista:} Especialmente valioso para personas vulnerables como niños y pacientes con demencia. El 50\% de personas con demencia no encontradas en caminos están a solo 15m de una característica lineal.
-	\item \textbf{Modelo de Cuenca Hidrográfica:} Predice cómo se comportará una persona en relación con fuentes de agua. El 50\% de personas perdidas se encuentran en la misma cuenca.
-\end{itemize}
+\begin{enumerate}
+	\item \textbf{Modelo de Desplazamiento Radial (\textit{Ring Model}):} 
+	Es el modelo primario de contención probabilística espacial. Modela la distancia euclídea radial $r = \|\mathbf{x} - \mathbf{x}_{IPP}\|$ recorrida por el sujeto desde el Punto de Planificación Inicial (IPP, \textit{Initial Planning Point}) o último punto de contacto conocido (LKP). La distribución empírica de distancias no se comporta como una gaussiana simétrica convencional, sino que presenta una acusada asimetría positiva con colas pesadas, ajustándose rigurosamente a una función de densidad log-normal:
+	\begin{equation}
+	f(r; \mu, \sigma) = \frac{1}{r \sigma \sqrt{2\pi}} \exp \left( -\frac{(\ln r - \mu)^2}{2\sigma^2} \right), \quad r > 0
+	\end{equation}
+	A partir de dicha formulación, el espacio operacional se estratifica en regiones circulares delimitadas por los radios cuartiles de dispersión estadística correspondientes a los percentiles del 25\%, 50\%, 75\% y 95\% de contención acumulada.
+	
+	\item \textbf{Modelo de Desviación respecto a Vías (\textit{Track Offset Model}):} 
+	Cuantifica la probabilidad de que la persona extraviada permanezca a una distancia perpendicular $d_\perp(\mathbf{x}, \mathcal{L})$ respecto a una característica lineal $\mathcal{L}$ (caminos, pistas forestales, senderos o arroyos) extraída de cartografía vectorial. Las estadísticas de la base de datos ISRID evidencian que, por ejemplo, más del 50\% de las personas con demencia no halladas sobre la vía se encuentran a menos de 15 metros de su trazado, convirtiendo las bandas adyacentes a las rutas en sectores de alta probabilidad condicional.
+	
+	\item \textbf{Modelo de Dispersión Angular (\textit{Dispersion Model}):} 
+	Modela la desviación angular del sujeto respecto al vector de dirección de viaje previsto o estimado. Individuos con desorientación severa o deterioro cognitivo tienden a exhibir ángulos de dispersión notablemente acotados debido a patrones de desplazamiento en línea recta sin cambio de rumbo, mientras que sujetos recreativos suelen presentar derivas angulares dispersas al intentar sortear obstáculos naturales.
+	
+	\item \textbf{Modelo de Elevación y Gradiente Topográfico:} 
+	Describe la propensión relativa del desaparecido a ascender o descender en cota respecto a la elevación del IPP. Históricamente, el patrón dominante consistía en descender hacia valles siguiendo la ley de mínima resistencia gravitatoria; no obstante, el análisis contemporáneo de ISRID refleja una marcada inversión de tendencia hacia cotas altas en excursionistas para obtener visibilidad o cobertura de telefonía móvil.
+	
+	\item \textbf{Modelo de Cuenca Hidrográfica (\textit{Watershed Model}):} 
+	Restringe físicamente la dispersión geográfica considerando las divisorias topográficas y cuencas fluviales. Empíricamente, más del 50\% de las víctimas son localizadas dentro de la misma cuenca de drenaje en la que se situaba el IPP, actuando los relieves pronunciados como barreras efectivas de contención.
+\end{enumerate}
+
+\begin{table}[H]
+	\ttabbox[\textwidth]
+	{\caption{PARÁMETROS ESTADÍSTICOS DE DISPERSIÓN RADIAL Y DESPLAZAMIENTO SEGÚN ISRID \cite{koester2008lost}}}
+	{\label{tab:isrid_perfiles_cap2}
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{|l|c|c|c|c|l|}
+		\hline
+		\textbf{Categoría / Perfil} & \textbf{25\% (km)} & \textbf{50\% (km)} & \textbf{75\% (km)} & \textbf{95\% (km)} & \textbf{Comportamiento de Vía (\textit{Track Offset})} \\
+		\hline
+		Senderista / Excursionista (\textit{Hiker}) & 0.6 & 1.8 & 3.2 & 9.9 & Alta retención en sendas ($\le 10$ m del camino) \\
+		Demencia (\textit{Dementia}) & 0.3 & 1.0 & 2.4 & 12.8 & Cruza caminos al azar ($\le 15$ m en margen) \\
+		Desorden del Espectro Autista (\textit{Autism}) & 0.6 & 1.6 & 3.7 & 15.2 & Atracción por cuerpos de agua y estructuras \\
+		\hline
+	\end{tabular}%
+	}}
+\end{table}
 
 \subsection{Generación de Mapas de Probabilidad}
 
-SAREnv \cite{drones9090628} utiliza un modelo probabilístico basado en estadísticas de comportamiento de personas perdidas. El proceso comienza extrprestando características geoespaciales de OpenStreetMap (estructuras, caminos, drenajes, agua, vegetación) y asigna probabilidades según tablas estadísticas de manuales.
+SAREnv \cite{drones9090628} utiliza un modelo probabilístico basado en estas estadísticas de comportamiento de personas perdidas. El proceso comienza extrayendo características geoespaciales de OpenStreetMap (estructuras, caminos, drenajes, agua, vegetación) y asigna probabilidades según tablas estadísticas de manuales.
 
 La distribución log-normal proporciona el mejor ajuste a los datos de distancia (RMSE = 1.76 km), superando a las distribuciones normal (6.83 km) y gamma (2.02 km). Las probabilidades finales se normalizan para producir un mapa de Probabilidad de Área (POA) válido \cite{doherty2014}.
 

@@ -165,6 +165,29 @@ Al fijar a cero la probabilidad en agua y edificios, el planificador del dron re
 	\includegraphics[width=\textwidth]{imagenes/filtro_restricciones_demencia.png}}
 \end{figure}
 
+\subsection{Granularidad Celda a Celda vs. Exclusión Poligonal Global e Interpretación Visual}
+
+Una inspección superficial de la Figura~\ref{fig:filtro_restricciones} podría sugerir a primera vista que el mapa base sin filtrar (Panel~1) y el mapa de creencias final filtrado (Panel~4) presentan un aspecto muy similar. Esta aparente similitud visual a escala macroscópica responde a la naturaleza espacial del parque: más del $90\%$ de los $12{,}75\text{ km}^2$ de la Casa de Campo está compuesto por masas forestales abiertas, senderos y monte bajo, donde no aplican restricciones físicas y el gradiente de calor continuo se preserva intacto.
+
+Sin embargo, al examinar en detalle las zonas señaladas por las flechas directrices del Panel~2, se observan con total nitidez las discontinuidades locales introducidas por el filtro en el Panel~4, donde las celdas restringidas adoptan un valor nulo ($P = 0{,}0$, representadas en blanco puro):
+\begin{itemize}
+    \item \textbf{El Lago de la Casa de Campo (flanco este):} Toda la cuenca hídrica del lago principal queda nítidamente vaciada a blanco ($P = 0{,}0$), eliminando cualquier probabilidad residual sobre una superficie acuática profunda en la que el sensor óptico del UAV carece de efectividad y cuya inspección compete a unidades subacuáticas especializadas.
+    \item \textbf{Pabellones e infraestructuras del Zoo Aquarium (suroeste):} Los tejados y recintos cubiertos de los edificios e instalaciones cerradas del zoológico aparecen troquelados a blanco, descartando el sobregiro inútil de la aeronave sobre estructuras techadas.
+    \item \textbf{Estructuras del Parque de Atracciones (centro-sur):} Las edificaciones, naves de mantenimiento y atracciones cubiertas del complejo de ocio quedan anuladas celda a celda.
+    \item \textbf{Edificaciones periféricas y zonas urbanizadas (borde oeste):} Las construcciones adyacentes a los límites del parque son suprimidas rigurosamente de la distribución.
+\end{itemize}
+
+Desde una perspectiva de diseño cartográfico, podría plantearse la alternativa de recortar y excluir de forma gruesa el polígono perimetral completo del Parque de Atracciones o del Zoo Aquarium como áreas prohibidas o huecos en el mapa de búsqueda. No obstante, dicha aproximación constituiría un severo error táctico en operaciones de búsqueda y rescate en entornos periurbanos (\textit{Wilderness Search and Rescue}):
+\begin{enumerate}
+    \item \textbf{Tránsito Peatonal en Espacios Abiertos Interiores:} Ambos recintos no constituyen bloques monolíticos impenetrables, sino complejos dotados de amplias avenidas peatonales, plazas arboladas, viales de servicio y zonas ajardinadas al aire libre. La cámara cenital del UAV posee línea de visión directa y perfecta visibilidad óptica sobre estos corredores transitorios.
+    \item \textbf{Atracción Psicológica de Determinados Perfiles (LPB):} Según los datos empíricos del manual LPB de Koester \cite{koester2008lost}, ciertos perfiles vulnerables (especialmente niños o personas con autismo) sienten una fuerte atracción hacia elementos lúdicos, estímulos sensoriales, música o estructuras de ocio, deambulando con frecuencia por las calles y explanadas exteriores de dichos parques.
+    \item \textbf{Sondeo Quirúrgico Celda a Celda mediante R-Tree:} La estrategia adoptada mediante indexación espacial R-Tree a resolución métrica ($\delta = 10\text{ m}$) discrimina quirúrgicamente entre el tejado no transitable e impenetrable de un edificio (\texttt{building=True}) y los viales peatonales contiguos por donde transitan los visitantes. Excluir el polígono perimetral completo cegaría al dron en corredores de alta probabilidad donde la persona extraviada puede caminar y ser divisada desde el aire.
+\end{enumerate}
+
+De este modo, el mapa filtrado (Panel~4 de la Figura~\ref{fig:filtro_restricciones}) retiene la probabilidad de búsqueda sobre las vías y paseos accesibles entre las atracciones y recintos, al tiempo que neutraliza estrictamente los tejados ciegos y la lámina de agua del lago, optimizando la asignación del tiempo de vuelo hacia objetivos visualmente alcanzables.
+
+
+
 \section{Observaciones y Modelo del Sensor (Sensor Ideal de Nivel 1)}
 
 La capacidad del UAV para localizar a la víctima en el terreno requiere formalizar la interacción entre la cinemática de vuelo de la aeronave y la física del dispositivo óptico cenital.

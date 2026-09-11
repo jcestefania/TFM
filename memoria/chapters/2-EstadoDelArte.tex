@@ -60,16 +60,22 @@ Los algoritmos heurísticos son simples de ejecutar pero tienen gran sobrecarga 
 
 Ejemplos de algoritmos heurísticos utilizados en planificación multi-UAV incluyen A* (A-star), el algoritmo voraz (Greedy), y el algoritmo de planificación de rutas óptimas (OPP). Los algoritmos heurísticos híbridos como Elastic Band combinado con A* utilizan bandas elásticas para la planificación general de rutas y A* para suavizar la ruta inicial mediante planificación local.
 
-\subsection{Métodos Metaheurísticos}
+\subsection{Métodos Metaheurísticos y Bioinspirados}
 
-Los métodos metaheurísticos han demostrado ser efectivos para la planificación de rutas multi-UAV. Según revisiones de referencia sobre planificación de rutas y control de enjambres \cite{alqudsi2025, guo2025}, los algoritmos más utilizados incluyen:
+Los métodos metaheurísticos inspirados en la naturaleza han demostrado una elevada eficacia en la planificación de trayectorias complejas para UAVs en búsqueda y rescate, al ser capaces de explorar paisajes de búsqueda no lineales y multimodales sin quedar atrapados en óptimos locales \cite{alqudsi2025, guo2025}. Entre las técnicas bioinspiradas y basadas en física más consolidadas destacan:
 
 \begin{itemize}
-	\item \textbf{Algoritmos Genéticos (GA):} Utilizados para reducir rutas de vuelo y optimizar la asignación de tareas, aunque pueden no ser rentables en términos computacionales.
-	\item \textbf{Particle Swarm Optimization (PSO):} Variantes como PSO mejorado, FP-GPSO y MCMOPSO-RL se utilizan para optimizar rutas en entornos complejos con obstáculos.
-	\item \textbf{Grey Wolf Optimizer (GWO):} Algoritmo de optimización inspirado en el comportamiento de los lobos grises, utilizado para planificación de rutas 3D \cite{huang2024}.
-	\item \textbf{Dung Beetle Optimization (DBO):} Recientemente aplicado a la planificación de rutas multi-UAV en áreas de desastre, con mejoras como el algoritmo LODBO (Landmark Operator DBO) que mejora la capacidad de búsqueda global.
-	\item \textbf{Ant Colony Optimization (ACO):} Ampliamente estudiado en la planificación de rutas multi-UAV para búsqueda en tiempo mínimo (MTS), donde variantes adaptadas al dominio continuo como $\text{ACO}_{\mathbb{R}}$ permiten optimizar trayectorias cinemáticas de vuelo sobre mapas de probabilidad bayesianos inciertos \cite{carabaza-ACOr, carabaza_ingles}.
+	\item \textbf{Ant Colony Optimization (ACO):} 
+	Inspirado en la comunicación estigmérgica de las colonias de hormigas mediante rastros de feromona. En problemas de búsqueda en tiempo mínimo (MTS), las hormigas artificiales construyen rutas de forma probabilística combinando la concentración de feromona acumulada con una función heurística de visibilidad guiada por la matriz de probabilidad de la víctima, optimizando trayectorias continuas y discretas \cite{carabaza-ACOr, carabaza_ingles}.
+	
+	\item \textbf{Artificial Bee Colony (ABC):} 
+	Propuesto por Karaboga y Basturk \cite{karaboga2007}, simula el comportamiento de forrajeo colectivo de un enjambre de abejas melíferas. El algoritmo organiza la población en tres roles coordinados: \textit{abejas empleadas}, que explotan y perturban localmente las fuentes de alimento (trayectorias candidatas); \textit{abejas observadoras}, que seleccionan probabilísticamente las mejores fuentes mediante mecanismos de ruleta proporcionales a la acumulación de probabilidad SAR (\textit{fitness}); y \textit{abejas exploradoras}, que abandonan soluciones estancadas tras superar un límite prefijado para muestrear aleatoriamente nuevas regiones del mapa, otorgando una gran resistencia ante mínimos locales.
+	
+	\item \textbf{Black Hole Algorithm (BHA):} 
+	Metaheurística de inspiración física formulada por Hatamlou \cite{hatamlou2012} que emula la dinámica gravitacional de los agujeros negros. La mejor solución de la población se define como el agujero negro central, ejerciendo una atracción gravitatoria sobre el resto de soluciones candidatas (estrellas o trayectorias de vuelo). Aquellas estrellas que cruzan el radio del horizonte de sucesos son absorbidas y reubicadas estocásticamente en el espacio operacional, garantizando un equilibrio eficiente entre convergencia acelerada y exploración espacial en misiones críticas de rescate.
+	
+	\item \textbf{Particle Swarm Optimization (PSO) y Algoritmos Genéticos (GA):} 
+	Paradigmas clásicos de inteligencia de enjambre y computación evolutiva utilizados habitualmente para la generación de waypoints y asignación de áreas en flotas multi-UAV \cite{alqudsi2025, huang2024}.
 \end{itemize}
 
 \subsection{Aprendizaje por Refuerzo}
@@ -226,17 +232,23 @@ OpenStreetMap (OSM) es la fuente principal de datos geoespaciales para aplicacio
 
 Las herramientas basadas en OSM incluyen motores de enrutamiento como GraphHopper (Java), OSRM (Open Source Routing Machine en C++), y Valhalla (por Mapbox, soporta transporte multimodal). Para geocodificación se utiliza Nominatim.
 
-\subsection{Procesamiento de Datos Vectoriales}
+\subsection{Procesamiento y Rasterización de Datos Vectoriales}
 
-Para aplicaciones robóticas, los datos vectoriales basados en características se convierten en mapas de cuadrícula espacialmente explícitos. Esta representación es ventajosa porque proporciona una estructura de datos uniforme y computacionalmente eficiente compatible con los espacios de estado discretizados comúnmente utilizados en algoritmos de planificación de rutas robóticos.
+Para su empleo en algoritmos robóticos de planificación basados en cuadrículas, las entidades vectoriales georreferenciadas (puntos, polilíneas y polígonos) deben transformarse en matrices discretas espacialmente explícitas. Esta representación en rejilla regular (\textit{grid map}) proporciona una estructura computacional uniforme, compatible con los espacios de estados matriciales de los planificadores de búsqueda.
 
-El proceso de conversión comprende dos etapas principales: (1) rasterización independiente de cada característica en cuadrículas binarias separadas, y (2) ponderación y agregación de estas cuadrículas para generar un mapa de probabilidad compuesto final. En ubicaciones donde las características se superponen, el valor de probabilidad más alto toma precedencia.
+En implementaciones preliminares de la literatura, como el diseño original de SAREnv \cite{drones9090628}, la rasterización combinaba las capas espaciales aplicando un operador de máximo ($\max$) celda a celda para evitar saturaciones de probabilidad. No obstante, como señalan los propios autores, dicho operador introduce una distorsión operativa importante: infravalora las regiones ricas en características acumulativas (\textit{feature-rich zones}), al ignorar la convergencia de múltiples capas favorables (por ejemplo, la intersección de un sendero con una edificación de refugio). Para solventar esta limitación, las metodologías avanzadas de modelado multicapa procesan cada clase topológica en matrices binarias independientes $\mathbf{M}_k$, aplicando posteriormente una agregación lineal ponderada por los pesos del perfil conductual y una renormalización global estricta, garantizando la conservación unitaria de la creencia $\sum_{i,j} P(i,j) = 1.0$.
 
-\subsection{Sistemas de Información Geográfica (GIS)}
+\subsection{Sistemas de Información Geográfica (GIS) y Proyecciones en Operaciones SAR}
 
-Los sistemas GIS expanden las capacidades de los drones proporcionando datos espaciales detallados, precisos y sensibles al tiempo. Las aplicaciones incluyen mapeo aéreo y levantamientos topográficos, agricultura de precisión, monitoreo ambiental, respuesta a emergencias y desastres, seguridad y defensa, e inspección industrial.
+La integración de herramientas GIS y librerías geoespaciales abiertas (como \texttt{OSMnx}, \texttt{GeoPandas} y \texttt{Shapely}) resulta indispensable para gestionar la complejidad espacial en misiones SAR:
 
-Tecnologías geoespaciales clave incluyen receptores GNSS/RTK para posicionamiento centimétrico, unidades IMU para detección de orientación, SLAM para mapeo en entornos sin GPS, sensores LiDAR para nubes de puntos 3D, y sistemas de imágenes espectrales (multiespectral, hiperespectral, térmica).
+\begin{itemize}
+	\item \textbf{Transformación de Sistemas de Coordenadas (CRS):} 
+	Los datos globales de posicionamiento GPS y cartografía OSM se expresan en coordenadas angulares geodésicas (WGS84, $\text{EPSG:4326}$). Dado que las ecuaciones cinemáticas de vuelo del UAV y los sensores requieren distancias y velocidades en el sistema métrico euclídeo sin distorsión angular, es imprescindible realizar una proyección conforme a coordenadas métricas planas Universal Transverse Mercator (UTM, como $\text{EPSG:32630}$ para la Península Ibérica).
+	
+	\item \textbf{Indexación Espacial Jerárquica (R-Tree):} 
+	Durante la fase de preparación del escenario, la comprobación exhaustiva de intersecciones punto a polígono celda a celda conlleva una complejidad computacional prohibitiva $\mathcal{O}(N \times M)$ en rejillas de gran escala. El empleo de árboles espaciales R-Tree (\texttt{sindex}) reduce la complejidad a $\mathcal{O}(\log M)$, permitiendo identificar y enmascarar instantáneamente polígonos no transitables (lagos y estructuras cerradas).
+\end{itemize}
 
 \section{Conclusiones del Estado del Arte}
 

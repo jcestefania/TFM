@@ -24,6 +24,9 @@ A pesar de la consistencia metodológica del framework desarrollado, es necesari
 
     \item \textbf{Asunción de Víctimas Estáticas en la Batería Experimental:} 
     Las 900 simulaciones del benchmark consideran que la persona desaparecida permanece en una ubicación fija e inalterable desde el inicio de la misión hasta su hallazgo o el agotamiento de la autonomía de vuelo.
+
+    \item \textbf{Autonomía Energética y Capacidad de Batería de UAVs Comerciales:} 
+    En la formulación experimental se ha considerado un presupuesto de vuelo de $K = 500$ pasos (equivalente a $25\text{ km}$ recorridos a una velocidad de crucero de $10\text{ m/s}$, con una duración teórica de $41{,}6\text{ minutos}$). Sin embargo, en el despliegue práctico con aeronaves comerciales no tripuladas de ala rotatoria (multirrotores tácticos comúnmente empleados en rescate, tales como DJI Matrice 300/350 RTK o Mavic 3 Enterprise), la autonomía real por ciclo de batería oscila estrictamente entre $25$ y $40\text{ minutos}$. Dicho margen se ve adicionalmente mermado por factores ambientales adversos (viento y turbulencias), peso del payload sensorial (cámaras duales electro-ópticas y térmicas) y costes energéticos derivados de maniobras de aceleración angular continua. Ante escenarios extensos como la Casa de Campo de Madrid ($17{,}2\text{ km}^2$), la cobertura completa o sostenida demanda necesariamente la articulación de relevos continuos de baterías en el Puesto de Mando Avanzado (PMA) o el despliegue coordinado de múltiples aeronaves.
 \end{enumerate}
 
 \section{Líneas de Trabajo Futuro}
@@ -41,6 +44,9 @@ Como extensión directa de los resultados y la arquitectura desarrollada, se pla
     \item \textbf{Modelado de Víctimas Dinámicas mediante Cadenas de Markov y Random Walk:} 
     Extender el Filtro Recursivo Bayesiano incorporando la formulación estocástica de Chapman-Kolmogorov \cite{Chapman-Kolmogorov} para propagar matrices de transición dinámicas $P(x, y, t)$ orientadas por la pendiente del terreno, senderos y perfiles psicológicos de dispersión extraídos del Manual de Búsqueda y Salvamento Terrestre \cite{romero2018manual}.
     
+    \item \textbf{Despliegue de Flotas Multi-UAV y Planificación con Relevos de Batería:} 
+    Extender los planificadores metaheurísticos bioinspirados hacia arquitecturas multi-agente descentralizadas que coordinen simultáneamente varias aeronaves sobre particiones espaciales o celdas de máxima incertidumbre, integrando restricciones cinemáticas de desconflicto aéreo y ventanas temporales de aterrizaje programado en estaciones de intercambio rápido de baterías.
+
     \item \textbf{Control de Vuelo Guiado por Campos Potenciales de Repulsión:} 
     Implementar restricciones cinemáticas de no sobrevuelo en la capa de bajo nivel del UAV para impedir físicamente que el dron cruce masas de agua o zonas de exclusión aérea.
 \end{itemize}

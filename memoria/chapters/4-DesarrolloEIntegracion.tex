@@ -131,11 +131,91 @@ Sea el Punto de Planificación Inicial o punto de despegue $LKP = (\text{lon}_{\
 \end{enumerate}
 El vector resultante $(X_{\text{local}}, Y_{\text{local}})$ define unívocamente la posición de despegue fija en la matriz discreta de MTS.
 
+\subsection{Estructura de Intercambio del Escenario (\texttt{escenario.json})}
+
+Para desacoplar el procesamiento cartográfico de la lógica de optimización, el middleware genera un archivo de configuración estandarizado en formato JSON vinculado a la matriz binaria \texttt{.npy}. Este fichero articula los parámetros cinemáticos, sensoriales y dimensionales de la misión:
+\begin{itemize}
+    \item \texttt{size}: Dimensiones matriciales de la rejilla $[N_x, N_y]$ ($458 \times 481$ celdas para la Casa de Campo).
+    \item \texttt{init\_pos}: Vector de despegue $[[X_{\text{local}}, Y_{\text{local}}]]$ derivado del LKP.
+    \item \texttt{posible\_moves}: Conectividad cinemática del UAV, fijada en 8 direcciones contiguas (vecindad de Moore: N, NE, E, SE, S, SW, W, NW).
+    \item \texttt{num\_steps}: Presupuesto temporal de vuelo máximo ($T = 1000$ pasos por misión).
+    \item \texttt{height} y \texttt{dmax}: Parámetros de altitud de crucero y huella sensorial efectiva ($R_d = 50\text{ m}$).
+    \item \texttt{algoritmo\_busqueda}: Planificador seleccionado (\texttt{aco}, \texttt{abc}, \texttt{bha} o baselines de referencia).
+\end{itemize}
+
 \section{Módulo 4: Motor de Simulación y Algoritmos Bioinspirados (MTS)}
 
-El Módulo 4 carga el escenario generado en formato JSON y ejecuta los algoritmos metaheurísticos bioinspirados de planificación de trayectorias (Colonia de Hormigas - ACO, Colonia de Abejas - ABC y Agujeros Negros - BHA), así como los baselines tradicionales de referencia (Búsqueda Voraz, Lawnmower y Expanding Spiral). Este módulo se integra sobre el núcleo de simulación de \textit{MTS-UncertainEnvironment} \cite{Broton_Gutierrez_MTS-UncertainEnvironment}.
+El Módulo 4 constituye el núcleo de enrutamiento deliberativo del sistema, integrando y extendiendo el framework \textit{MTS-UncertainEnvironment} \cite{Broton_Gutierrez_MTS-UncertainEnvironment}. A partir del mapa de creencias inicial $b(v^0)$ y las restricciones físicas calculadas en los módulos precedentes, el planificador genera trayectorias de vuelo optimizadas para interceptar a la víctima en tiempo mínimo.
 
-Durante el vuelo, el dron explora el espacio aplicando el sensor de 50 metros de radio y actualizando paso a paso el mapa de creencias residual $b(v^k)$ mediante el Filtro Recursivo Bayesiano (RBF). Las trayectorias resultantes se exportan en registros de telemetría CSV y ficheros de coordenadas JSON.
+\subsection{Formulación del Problema de Optimización de Trayectorias}
+
+Sea $\mathcal{S} \subset \mathbb{Z}^2$ el espacio discreto de celdas de la rejilla y $\mathcal{M}$ el conjunto de movimientos admisibles de 8 conectividad. Una trayectoria para un UAV en un horizonte de tiempo $T$ se define como una secuencia ordenada de posiciones:
+\begin{equation}
+\pi = \left( p_0, p_1, p_2, \dots, p_T \right), \quad p_t \in \mathcal{S}, \quad p_{t+1} - p_t \in \mathcal{M}
+\end{equation}
+con $p_0 = (X_{\text{local}}, Y_{\text{local}})$. El objetivo del planificador es encontrar la trayectoria $\pi^*$ que maximice la ganancia acumulada de probabilidad de detección sobre el mapa dinámico de creencias $b(v^t)$ actualizado recursivamente mediante el RBF:
+\begin{equation}
+\pi^* = \arg\max_{\pi} \sum_{t=0}^{T} \sum_{(x,y) \in \text{FoV}(p_t)} b(v^t)(x, y)
+\end{equation}
+donde $\text{FoV}(p_t)$ denota el conjunto de celdas contenidas en la huella del sensor circular de radio $R_d = 50\text{ m}$ centrado en la posición $p_t$.
+
+\subsection{Colonia de Hormigas (Ant Colony Optimization - ACO)}
+
+La formulación de ACO en MTS implementa el esquema \textit{Max-Min Ant System} (MMAS) con feromona espacial 2D, adaptando los desarrollos de Carabaza et al. \cite{carabaza-ACOr, carabaza_ingles}:
+\begin{enumerate}
+    \item \textbf{Construcción Probabilística de Rutas:} Cada hormiga artificial construye una trayectoria desde $p_0$. La probabilidad de transición de la celda actual $i$ a la celda vecina $j \in \mathcal{N}(i)$ se rige por:
+    \begin{equation}
+    P_{ij} = \frac{[\tau_{ij}]^\alpha \cdot [\eta_{ij}]^\beta}{\sum_{l \in \mathcal{N}(i)} [\tau_{il}]^\alpha \cdot [\eta_{il}]^\beta}
+    \end{equation}
+    donde $\tau_{ij}$ representa la traza de feromona acumulada en el movimiento $i \to j$, y $\eta_{ij}$ es la deseabilidad heurística local, proporcional a la densidad de creencia $b(v^k)$ observable en el entorno de $j$. Los exponentes $\alpha$ y $\beta$ ponderan la influencia relativa del rastro histórico frente a la ganancia inmediata.
+    \item \textbf{Evaporación y Depósito Acotado de Feromona:} Para evitar la convergencia prematura hacia óptimos locales, la feromona se evapora a una tasa $\rho \in (0,1)$, y solo la mejor hormiga global deposita nueva feromona $\Delta \tau$, acotando estrictamente los valores en el intervalo $[\tau_{\min}, \tau_{\max}]$:
+    \begin{equation}
+    \tau_{ij}(t+1) = \max \left( \tau_{\min}, \min \left( \tau_{\max}, (1-\rho)\tau_{ij}(t) + \Delta \tau_{ij}^{\text{best}} \right) \right)
+    \end{equation}
+\end{enumerate}
+
+\subsection{Colonia de Abejas Artificiales (Artificial Bee Colony - ABC)}
+
+El algoritmo ABC, adaptado a partir del paradigma original de Karaboga y Basturk \cite{karaboga2007}, modela la optimización de rutas mediante una población de fuentes de alimento (cada una representando una política o secuencia de decisiones de rumbo) gestionada por tres grupos de agentes:
+\begin{enumerate}
+    \item \textbf{Abejas Empleadas:} Cada abeja empleada está asociada a una trayectoria candidata $\mathbf{x}_i$. En cada iteración, explora las proximidades de su solución aplicando una perturbación estocástica:
+    \begin{equation}
+    v_{ij} = x_{ij} + \phi_{ij} (x_{ij} - x_{kj}), \quad \phi_{ij} \in [-1, 1]
+    \end{equation}
+    donde $k$ es otra solución seleccionada al azar. Si la nueva trayectoria produce una mayor absorción bayesiana, reemplaza a la anterior; en caso contrario, se incrementa un contador de estancamiento.
+    \item \textbf{Abejas Observadoras:} Evalúan la calidad de todas las fuentes mediante un mecanismo de ruleta probabilística proporcional a su \textit{fitness} $J(\pi_i)$:
+    \begin{equation}
+    p_i = \frac{J(\pi_i)}{\sum_{m=1}^{SN} J(\pi_m)}
+    \end{equation}
+    Las observadoras concentran un mayor esfuerzo de refinamiento en las trayectorias que sobrevuelan zonas de alta densidad de personas extraviadas.
+    \item \textbf{Abejas Exploradoras:} Si el contador de estancamiento de una fuente supera el umbral prefijado (\texttt{limit}), la solución se descarta por haberse agotado su margen de mejora local, y la abeja se transforma en exploradora, generando una nueva trayectoria en regiones inexploradas para mantener la diversidad del enjambre.
+\end{enumerate}
+
+\subsection{Algoritmo de Agujeros Negros (Black Hole Algorithm - BHA)}
+
+Inspirado en la mecánica gravitatoria cósmica formulada por Hatamlou \cite{hatamlou2012}, BHA opera sobre una población de $N_{\text{stars}}$ trayectorias candidatas denominadas estrellas:
+\begin{enumerate}
+    \item \textbf{Identificación del Agujero Negro:} La trayectoria con mayor valor de absorción de probabilidad acumulada es designada como el Agujero Negro central ($\mathbf{X}_{BH}$).
+    \item \textbf{Atracción Gravitacional de Soluciones:} En cada paso del algoritmo, todas las estrellas son atraídas hacia la trayectoria líder modificando sus vectores de decisión:
+    \begin{equation}
+    \mathbf{X}_i(t+1) = \mathbf{X}_i(t) + \mathbf{r} \cdot \left( \mathbf{X}_{BH} - \mathbf{X}_i(t) \right)
+    \end{equation}
+    donde $\mathbf{r}$ es un vector aleatorio con distribución uniforme en $[0, 1]$. Si una estrella supera en \textit{fitness} al agujero negro actual, asume inmediatamente el rol de nuevo agujero negro.
+    \item \textbf{Horizonte de Sucesos y Regeneración Estocástica:} Para evitar el colapso prematuro de la población en un único punto, se define el radio del horizonte de sucesos (análogo al radio de Schwarzschild):
+    \begin{equation}
+    R_{EH} = \frac{J(\mathbf{X}_{BH})}{\sum_{i=1}^{N_{\text{stars}}} J(\mathbf{X}_i)}
+    \end{equation}
+    Cualquier estrella cuya distancia euclídea al agujero negro sea inferior a $R_{EH}$ se considera absorbida, destruida y regenerada aleatoriamente en el espacio de búsqueda.
+\end{enumerate}
+
+\subsection{Planificadores Clásicos de Referencia (Baselines)}
+
+Para contrastar el beneficio de los métodos bioinspirados frente a las estrategias estándar de rescate, el Módulo 4 incorpora tres algoritmos clásicos:
+\begin{itemize}
+    \item \textbf{Búsqueda Voraz (\textit{Greedy}):} En cada celda $p_t$, el UAV evalúa sus 8 vecinos admisibles y avanza hacia aquel con la mayor densidad de creencia $b(v^t)$, sin planificación a largo plazo.
+    \item \textbf{Patrón Boustrophedon (\textit{Lawnmower}):} Cobertura geométrica sistemática en pasadas paralelas de ida y vuelta, cubriendo exhaustivamente el terreno sin guiado probabilístico.
+    \item \textbf{Espiral Expansiva (\textit{Expanding Spiral}):} Trayectoria geométrica de radios crecientes centrada en el LKP, representativa de las búsquedas visuales manuales en rescate tradicional.
+\end{itemize}
 
 \section{Módulo 5: Evaluador Centralizado de Métricas SAR (\texttt{PathEvaluatorTFM})}
 

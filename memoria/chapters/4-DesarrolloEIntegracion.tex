@@ -69,23 +69,23 @@ Como se describió en el Capítulo 3, las capas semánticas (caminos, bosques, e
 El segundo módulo proyecta las geometrías de exclusión física (lagos profundos y edificaciones cerradas) sobre la rejilla espacial utilizando árboles de indexación jerárquica R-Tree (\texttt{sindex}), como se sintetiza en la Figura~\ref{fig:diagrama_modulo2}.
 
 \begin{figure}[H]
-	\ffigbox[\FBwidth]
+	\ffigbox[\textwidth]
 	{\caption{FLUJO DEL MÓDULO 2: FILTRADO ESPACIAL DE RESTRICCIONES DURAS}}
 	{\label{fig:diagrama_modulo2}
 	\begin{tikzpicture}[node distance=1.5cm, auto,
-	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=3.8cm, text centered, rounded corners, minimum height=0.9cm, font=\footnotesize},
+	    block/.style={rectangle, draw=azulUC3M, fill=gray97, text width=2.7cm, text centered, rounded corners, minimum height=1.05cm, font=\footnotesize},
 	    line/.style={draw=azulUC3M, thick, -latex}]
 	    
-	    \node [block] (in) {Matriz Base $\mathbf{POA}_{\text{base}}$};
-	    \node [block, below of=in] (polys) {Polígonos No Transitables (Agua / Edificios)};
-	    \node [block, right of=in, node distance=5.5cm] (mask) {\textbf{Máscara Espacial R-Tree}\\Anulación Estricta: $P(i,j) = 0.0$};
-	    \node [block, below of=mask] (renorm) {Renormalización Global\\$\sum_{i,j} b(v^0)(i,j) = 1.0$};
-	    \node [block, right of=mask, node distance=4.5cm] (out2) {Mapa de Creencias $b(v^0)$};
+	    \node [block] (in) {Matriz Base\\$\mathbf{POA}_{\text{base}}$};
+	    \node [block, below of=in, node distance=2.2cm] (polys) {Polígonos Exclusión\\(Agua y Edificios)};
+	    \node [block, right of=in, xshift=2.2cm, yshift=-1.1cm, text width=2.9cm] (mask) {\textbf{Máscara R-Tree}\\Anulación Estricta:\\$P(i,j) = 0{,}0$};
+	    \node [block, right of=mask, node distance=3.6cm, text width=2.9cm] (renorm) {\textbf{Renormalización}\\Global:\\$\sum_{i,j} b(v^0) = 1{,}0$};
+	    \node [block, right of=renorm, node distance=3.4cm, text width=2.5cm] (out2) {Mapa de Creencias\\$b(v^0)$};
 	    
-	    \path [line] (in) -- (mask);
+	    \path [line] (in) -| (mask);
 	    \path [line] (polys) -| (mask);
 	    \path [line] (mask) -- (renorm);
-	    \path [line] (renorm) -| (out2);
+	    \path [line] (renorm) -- (out2);
 	\end{tikzpicture}}
 \end{figure}
 

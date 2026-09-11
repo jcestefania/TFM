@@ -216,11 +216,19 @@ Para transformar las estadísticas empíricas de incidentes SAR en distribucione
 	}}
 \end{table}
 
-\subsection{Generación de Mapas de Probabilidad}
+\subsection{Generación de Mapas de Probabilidad en la Literatura}
 
-SAREnv \cite{drones9090628} utiliza un modelo probabilístico basado en estas estadísticas de comportamiento de personas perdidas. El proceso comienza extrayendo características geoespaciales de OpenStreetMap (estructuras, caminos, drenajes, agua, vegetación) y asigna probabilidades según tablas estadísticas de manuales.
+La traslación de las estadísticas de comportamiento humano hacia modelos computacionales ejecutables en robótica aérea fue formulada recientemente por Gerez et al. a través del entorno SAREnv \cite{drones9090628}. El paradigma propuesto articula la construcción del mapa de creencias a partir de la descomposición semántica de características geoespaciales vectoriales obtenidas de OpenStreetMap (estructuras edificadas, vías de comunicación, redes de drenaje e hidrología, y coberturas vegetales). 
 
-La distribución log-normal proporciona el mejor ajuste a los datos de distancia (RMSE = 1.76 km), superando a las distribuciones normal (6.83 km) y gamma (2.02 km). Las probabilidades finales se normalizan para producir un mapa de Probabilidad de Área (POA) válido \cite{doherty2014}.
+A cada entidad geográfica se le asocian probabilidades empíricas condicionadas por el perfil psicológico y demográfico del sujeto mediante dos factores complementarios:
+\begin{enumerate}
+	\item \textbf{Atracción tipológica:} Determinada por la frecuencia histórica de hallazgo asociada al tipo de terreno o infraestructura según los catálogos LPB e ISRID \cite{koester2008lost, romero2018manual}.
+	\item \textbf{Decaimiento radial:} Modelado a partir del LKP mediante distribuciones continuas de distancia. Los estudios empíricos demuestran que la distribución log-normal proporciona el mejor ajuste a los datos de dispersión ($\text{RMSE} = 1{,}76\text{ km}$), superando significativamente a las funciones gaussiana normal ($\text{RMSE} = 6{,}83\text{ km}$) y gamma ($\text{RMSE} = 2{,}02\text{ km}$).
+\end{enumerate}
+
+La integración de ambos factores genera una puntuación combinada que, tras ser agregada y normalizada sobre el espacio de búsqueda, produce un mapa de Probabilidad de Área ($POA$) estadísticamente consistente que satisface $\sum POA = 1{,}0$ \cite{doherty2014}. 
+
+La formulación matemática rigurosa de este proceso, así como su adaptación metodológica mediante agregación lineal ponderada multicapa, discretización espacial en celdas métricas de $10\text{ m}$ y filtrado jerárquico de no transitabilidad sobre el escenario real de la Casa de Campo de Madrid, se desarrollan en profundidad en el Capítulo \ref{cap:modelado}.
 
 \section{Mapas Vectorizados y Datos Geoespaciales}
 

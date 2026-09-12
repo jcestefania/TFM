@@ -122,7 +122,7 @@ El perfil de Demencia impone una prueba de estrés caracterizada por una alta de
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_demencia_voraz.png}}
 \end{figure}
 
-En la Figura~\ref{fig:evolucion_demencia_voraz}, el algoritmo Voraz Heurístico persigue en cada iteración la celda vecina con mayor densidad residual inmediata. Aunque consigue alcanzar a la persona extraviada en el paso $t=370$ a una distancia de $22.4\text{ metros}$ (Semilla~3), el panel en $t=500$ evidencia una limitación clásica de los métodos miope: el dron queda orbitando de manera redundante sobre parches residuales dispersos en lugar de ejecutar una expansión sistemática hacia nuevas zonas boscosas.
+En la Figura~\ref{fig:evolucion_demencia_voraz}, el algoritmo Voraz Heurístico persigue en cada iteración la celda vecina con mayor densidad residual inmediata. Aunque consigue alcanzar a la persona extraviada en el paso $t=370$ a una distancia de $22.4\text{ metros}$ (Semilla~3), el panel final $b(v^{370})$ evidencia una limitación clásica de los métodos miopes: el dron queda orbitando de manera cerrada y redundante sobre parches residuales dispersos en lugar de ejecutar una expansión sistemática y suave hacia nuevas zonas boscosas.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -149,7 +149,7 @@ La Colonia de Abejas (ABC), representada en la Figura~\ref{fig:evolucion_demenci
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_demencia_bha.png}}
 \end{figure}
 
-Finalmente, la Figura~\ref{fig:evolucion_demencia_bha} ilustra la dinámica del Algoritmo del Agujero Negro (BHA) sobre la Semilla~14. El BHA muestra la convergencia más veloz de la comparativa: la solución que actúa como agujero negro ejerce una poderosa atracción gravitatoria hacia el centro de masa de la probabilidad, localizando a la víctima en el paso $t=243$ a $20.2\text{ metros}$. Al quedar neutralizado el núcleo central, las estrellas que traspasan el radio de Schwarzschild son regeneradas estocásticamente en la periferia, produciendo la fase expansiva observada en $t=500$.
+Finalmente, la Figura~\ref{fig:evolucion_demencia_bha} ilustra la dinámica del Algoritmo del Agujero Negro (BHA) sobre la Semilla~14. El BHA muestra la convergencia más veloz de la comparativa: la solución que actúa como agujero negro ejerce una poderosa atracción gravitatoria hacia el centro de masa de la probabilidad, localizando a la víctima en el paso $t=243$ a $20.2\text{ metros}$, tal como refleja el panel final de intercepción $b(v^{243})$.
 
 \subsection{Dinámica Espaciotemporal en el Perfil Autista}
 
@@ -202,7 +202,7 @@ El perfil de Senderista presenta una marcada morfología filiforme o lineal, dic
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_senderista_voraz.png}}
 \end{figure}
 
-La Figura~\ref{fig:evolucion_senderista_voraz} revela la causa exacta por la que el planificador Voraz Heurístico alcanza su mejor tasa de acierto media ($13.01\%$) en el perfil de senderista. Al constituir los caminos una guía unidimensional continua de probabilidad, el avance por gradiente local actúa como un seguidor de líneas de alta velocidad, localizando a la persona en el paso $t=341$ a $20.3\text{ metros}$ (Semilla~14). Sin embargo, el mapa en $t=500$ demuestra que Voraz genera un surco estrictamente monolineal: si el sendero concluye o la víctima se halla tras una discontinuidad, el método queda bloqueado en el extremo del camino.
+La Figura~\ref{fig:evolucion_senderista_voraz} revela la causa exacta por la que el planificador Voraz Heurístico alcanza su mejor tasa de acierto media ($13.01\%$) en el perfil de senderista. Al constituir los caminos una guía unidimensional continua de probabilidad, el avance por gradiente local actúa como un seguidor de líneas de alta velocidad, localizando a la persona en el paso $t=341$ a $20.3\text{ metros}$ (Semilla~14). Sin embargo, la trayectoria en el panel final $b(v^{341})$ demuestra que Voraz genera un surco estrictamente monolineal: el avance miope se encadena exclusivamente al sendero con mayor densidad local sin explorar bifurcaciones adyacentes; si el camino concluyera o existiera una discontinuidad en la red viaria, el método quedaría bloqueado en el extremo de la traza al carecer de diversificación global.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -220,7 +220,7 @@ La Colonia de Hormigas (ACO) en la Figura~\ref{fig:evolucion_senderista_aco} sol
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_senderista_abc.png}}
 \end{figure}
 
-De igual modo, la Colonia de Abejas (ABC) en la Figura~\ref{fig:evolucion_senderista_abc} demuestra su versatilidad sobre la misma Semilla~39: las abejas observadoras asignan recursos para explorar senderos concurrentes, barriendo de forma progresiva la traza principal y alcanzando la detección en el paso $t=445$ a $22.4\text{ metros}$. El panel final en $t=500$ refleja un vaciado limpio y continuo de probabilidad a lo largo de los principales corredores recreativos de la Casa de Campo.
+De igual modo, la Colonia de Abejas (ABC) en la Figura~\ref{fig:evolucion_senderista_abc} demuestra su versatilidad sobre la misma Semilla~39: las abejas observadoras asignan recursos para explorar senderos concurrentes, barriendo de forma progresiva la traza principal y alcanzando la detección en el paso $t=445$ a $22.4\text{ metros}$. El panel final $b(v^{445})$ refleja un vaciado limpio y continuo de probabilidad a lo largo de los principales corredores recreativos de la Casa de Campo.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]

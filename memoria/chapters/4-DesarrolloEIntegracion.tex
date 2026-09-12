@@ -182,7 +182,7 @@ El algoritmo ABC, adaptado a partir del paradigma original de Karaboga y Basturk
     \begin{equation}
     v_{ij} = x_{ij} + \phi_{ij} (x_{ij} - x_{kj}), \quad \phi_{ij} \in [-1, 1]
     \end{equation}
-    donde $k$ es otra solución seleccionada al azar. Si la nueva trayectoria produce una mayor absorción bayesiana, reemplaza a la anterior; en caso contrario, se incrementa un contador de estancamiento.
+    donde $k$ es otra solución seleccionada al azar. Si la nueva trayectoria produce una mayor absorción bayesiana, reemplaza a la anterior, en caso contrario, se incrementa un contador de estancamiento.
     \item \textbf{Abejas Observadoras:} Evalúan la calidad de todas las fuentes mediante un mecanismo de ruleta probabilística proporcional a su \textit{fitness} $J(\pi_i)$:
     \begin{equation}
     p_i = \frac{J(\pi_i)}{\sum_{m=1}^{SN} J(\pi_m)}

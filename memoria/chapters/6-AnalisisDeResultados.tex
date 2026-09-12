@@ -109,7 +109,9 @@ A partir de estos diagramas se observan claramente las diferencias de comportami
 
 Más allá de los agregados estadísticos consolidados en las tablas anteriores, resulta indispensable comprender la física del rastreo aéreo y la interacción dinámica entre el Filtro Recursivo Bayesiano y las distintas heurísticas de optimización. A continuación, se examina de manera exhaustiva la evolución cronológica del mapa de creencias residual $b(v^k)$ para los tres perfiles conductuales (Demencia, Autista y Senderista) bajo los cuatro algoritmos adaptativos evaluados (Voraz Heurístico, ACO, ABC y BHA), totalizando las doce configuraciones clave del estudio.
 
-En cada panel se desglosan cuatro hitos temporales significativos ($t = 0, 100, 300, 500$ pasos de avance físico), visualizando el punto de despegue LKP (marcador azul), la ubicación exacta de la víctima asignada estocásticamente según la matriz a priori (cruz roja), la trayectoria descrita por la aeronave (traza azul), la posición instantánea del dron (triángulo naranja) y la huella de probabilidad consumida por el sensor de 50 metros.
+En cada figura se desglosan cuatro hitos temporales significativos desde el despegue ($t=0$) hasta el instante de la intercepción de la víctima ($t_{\text{det}}$), visualizando el punto de despegue LKP (marcador azul), la ubicación real de la persona extraviada generada estocásticamente por Monte Carlo (cruz roja), la trayectoria descrita por la aeronave (traza azul), la posición instantánea del dron (triángulo naranja) y la huella de probabilidad consumida por el sensor cenital de $50\text{ metros}$ de radio.
+
+Es fundamental distinguir con claridad entre dos magnitudes espaciales en este análisis: por un lado, la \textbf{distancia de dispersión de la víctima respecto al punto de despegue (LKP)}, que en el modelo empírico de Koester sitúa a la persona a cientos de metros o varios kilómetros de la base operativa; y por otro, la \textbf{distancia de aproximación sensor-víctima} ($d_{\text{aprox}} \le R_d = 50\text{ m}$), que cuantifica el margen de proximidad física con el que la cámara cenital del UAV sobrevoló la posición de la víctima en el paso temporal de detección para confirmar el avistamiento.
 
 \subsection{Dinámica Espaciotemporal en el Perfil de Demencia}
 
@@ -122,7 +124,7 @@ El perfil de Demencia impone una prueba de estrés caracterizada por una alta de
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_demencia_voraz.png}}
 \end{figure}
 
-En la Figura~\ref{fig:evolucion_demencia_voraz}, el algoritmo Voraz Heurístico persigue en cada iteración la celda vecina con mayor densidad residual inmediata. Aunque consigue alcanzar a la persona extraviada en el paso $t=370$ a una distancia de $22.4\text{ metros}$ (Semilla~3), el panel final $b(v^{370})$ evidencia una limitación clásica de los métodos miopes: el dron queda orbitando de manera cerrada y redundante sobre parches residuales dispersos en lugar de ejecutar una expansión sistemática y suave hacia nuevas zonas boscosas.
+En la Figura~\ref{fig:evolucion_demencia_voraz}, el algoritmo Voraz Heurístico persigue en cada iteración la celda vecina con mayor densidad residual inmediata. Aunque consigue alcanzar a la persona extraviada en el paso $t=370$, aproximándose la cámara a una distancia sensor-víctima de $22.4\text{ metros}$ (Semilla~3), el panel final $b(v^{370})$ evidencia una limitación clásica de los métodos miopes: el dron queda orbitando de manera cerrada y redundante sobre parches residuales dispersos en lugar de ejecutar una expansión sistemática y suave hacia nuevas zonas boscosas.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -131,7 +133,7 @@ En la Figura~\ref{fig:evolucion_demencia_voraz}, el algoritmo Voraz Heurístico 
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_demencia_aco.png}}
 \end{figure}
 
-Por su parte, la Colonia de Hormigas (ACO) en la Figura~\ref{fig:evolucion_demencia_aco} equilibra la concentración de feromonas con una tasa de evaporación controlada. Para la misma Semilla~3, el enjambre de hormigas identifica rápidamente el gradiente del arbolado denso, consolidando una trayectoria directa que culmina en una detección muy temprana en el paso $t=105$ a una distancia de tan solo $20.0\text{ metros}$.
+Por su parte, la Colonia de Hormigas (ACO) en la Figura~\ref{fig:evolucion_demencia_aco} equilibra la concentración de feromonas con una tasa de evaporación controlada. Para la misma Semilla~3, el enjambre de hormigas identifica rápidamente el gradiente del arbolado denso, consolidando una trayectoria directa que culmina en una detección muy temprana en el paso $t=105$, al sobrevolar a la persona extraviada con una proximidad sensor-víctima de tan solo $20.0\text{ metros}$.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -140,7 +142,7 @@ Por su parte, la Colonia de Hormigas (ACO) en la Figura~\ref{fig:evolucion_demen
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_demencia_abc.png}}
 \end{figure}
 
-La Colonia de Abejas (ABC), representada en la Figura~\ref{fig:evolucion_demencia_abc} sobre la Semilla~14, divide su colonia entre abejas obreras (explotación) y exploradoras (diversificación). Conforme el sensor de $50\text{ m}$ agota el núcleo inicial, el mecanismo de abandono (\textit{limit}) inhibe el revisado de zonas ya inspeccionadas, forzando la apertura de la búsqueda hasta interceptar a la víctima en el paso $t=389$ a $28.3\text{ metros}$.
+La Colonia de Abejas (ABC), representada en la Figura~\ref{fig:evolucion_demencia_abc} sobre la Semilla~14, divide su colonia entre abejas obreras (explotación) y exploradoras (diversificación). Conforme el sensor de $50\text{ m}$ agota el núcleo inicial, el mecanismo de abandono (\textit{limit}) inhibe el revisado de zonas ya inspeccionadas, forzando la apertura de la búsqueda hasta interceptar a la víctima en el paso $t=389$, con una distancia de aproximación de la cámara de $28.3\text{ metros}$.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -149,7 +151,7 @@ La Colonia de Abejas (ABC), representada en la Figura~\ref{fig:evolucion_demenci
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_demencia_bha.png}}
 \end{figure}
 
-Finalmente, la Figura~\ref{fig:evolucion_demencia_bha} ilustra la dinámica del Algoritmo del Agujero Negro (BHA) sobre la Semilla~14. El BHA muestra la convergencia más veloz de la comparativa: la solución que actúa como agujero negro ejerce una poderosa atracción gravitatoria hacia el centro de masa de la probabilidad, localizando a la víctima en el paso $t=243$ a $20.2\text{ metros}$, tal como refleja el panel final de intercepción $b(v^{243})$.
+Finalmente, la Figura~\ref{fig:evolucion_demencia_bha} ilustra la dinámica del Algoritmo del Agujero Negro (BHA) sobre la Semilla~14. El BHA muestra la convergencia más veloz de la comparativa: la solución que actúa como agujero negro ejerce una poderosa atracción gravitatoria hacia el centro de masa de la probabilidad, localizando a la víctima en el paso $t=243$ con una pasada a $20.2\text{ metros}$ de distancia sensor-víctima, tal como refleja el panel final de intercepción $b(v^{243})$.
 
 \subsection{Dinámica Espaciotemporal en el Perfil Autista}
 
@@ -162,7 +164,7 @@ El perfil de personas en el espectro autista se caracteriza por una topología f
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_autista_voraz.png}}
 \end{figure}
 
-En la Figura~\ref{fig:evolucion_autista_voraz}, el planificador Voraz Heurístico navega sobre la Semilla~0 logrando el contacto visual en el paso $t=190$ ($28.3\text{ metros}$). Sin embargo, se aprecia cómo la presencia de bordes con probabilidad nula fuerza cambios bruscos de rumbo en el dron, el cual contornea las zonas vedadas sin anticipación espacial.
+En la Figura~\ref{fig:evolucion_autista_voraz}, el planificador Voraz Heurístico navega sobre la Semilla~0 logrando el contacto visual en el paso $t=190$ al aproximarse la cámara cenital a una distancia de $28.3\text{ metros}$ del objetivo. Sin embargo, se aprecia cómo la presencia de bordes con probabilidad nula fuerza cambios bruscos de rumbo en el dron, el cual contornea las zonas vedadas sin anticipación espacial.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -171,7 +173,7 @@ En la Figura~\ref{fig:evolucion_autista_voraz}, el planificador Voraz Heurístic
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_autista_aco.png}}
 \end{figure}
 
-En contraposición, el algoritmo ACO en la Figura~\ref{fig:evolucion_autista_aco} utiliza la dispersión estocástica de feromonas para sortear las barreras geográficas. Las rutas intermedias bordean suavemente el lago sin penetrar en él, guiando al dron hacia la víctima en el paso $t=327$ ($28.3\text{ metros}$) y manteniendo una distribución uniforme de probabilidad residual en los sectores no transitados.
+En contraposición, el algoritmo ACO en la Figura~\ref{fig:evolucion_autista_aco} utiliza la dispersión estocástica de feromonas para sortear las barreras geográficas. Las rutas intermedias bordean suavemente el lago sin penetrar en él, guiando al dron hacia la víctima en el paso $t=327$ con un margen de proximidad sensor-víctima de $28.3\text{ metros}$ y manteniendo una distribución uniforme de probabilidad residual en los sectores no transitados.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -180,7 +182,7 @@ En contraposición, el algoritmo ACO en la Figura~\ref{fig:evolucion_autista_aco
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_autista_abc.png}}
 \end{figure}
 
-La respuesta de la Colonia de Abejas (ABC) para la Semilla~44 se presenta en la Figura~\ref{fig:evolucion_autista_abc}. El enjambre reconoce de forma natural la desconexión espacial de los clústeres periféricos. La aeronave sortea con holgura las masas de agua y ejecuta pasadas paralelas coordinadas sobre el cuadrante objetivo, interceptando a la víctima en el paso $t=315$ a una distancia mínima de $20.5\text{ metros}$.
+La respuesta de la Colonia de Abejas (ABC) para la Semilla~44 se presenta en la Figura~\ref{fig:evolucion_autista_abc}. El enjambre reconoce de forma natural la desconexión espacial de los clústeres periféricos. La aeronave sortea con holgura las masas de agua y ejecuta pasadas paralelas coordinadas sobre el cuadrante objetivo, interceptando a la víctima en el paso $t=315$ a una distancia de aproximación de la cámara de $20.5\text{ metros}$ (holgadamente dentro del radio de detección).
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -189,7 +191,7 @@ La respuesta de la Colonia de Abejas (ABC) para la Semilla~44 se presenta en la 
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_autista_bha.png}}
 \end{figure}
 
-En la Figura~\ref{fig:evolucion_autista_bha}, el algoritmo BHA protagoniza una detección relámpago sobre la Semilla~0: al localizarse el centroide gravitatorio en el clúster ocupado por la persona extraviada, la trayectoria del dron se orienta de manera directa e implacable, alcanzando la detección en apenas $t=37$ pasos a $28.3\text{ metros}$ de distancia. Esta capacidad de convergencia expedita resulta de vital valor operativo cuando la víctima se ubica en el núcleo probabilístico predominante.
+En la Figura~\ref{fig:evolucion_autista_bha}, el algoritmo BHA protagoniza una detección relámpago sobre la Semilla~0: al localizarse el centroide gravitatorio en el clúster ocupado por la persona extraviada, la trayectoria del dron se orienta de manera directa e implacable, alcanzando la detección en apenas $t=37$ pasos con una pasada a $28.3\text{ metros}$ de la persona. Esta capacidad de convergencia expedita resulta de vital valor operativo cuando la víctima se ubica en el núcleo probabilístico predominante.
 
 \subsection{Dinámica Espaciotemporal en el Perfil de Senderista}
 
@@ -202,7 +204,7 @@ El perfil de Senderista presenta una marcada morfología filiforme o lineal, dic
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_senderista_voraz.png}}
 \end{figure}
 
-La Figura~\ref{fig:evolucion_senderista_voraz} revela la causa exacta por la que el planificador Voraz Heurístico alcanza su mejor tasa de acierto media ($13.01\%$) en el perfil de senderista. Al constituir los caminos una guía unidimensional continua de probabilidad, el avance por gradiente local actúa como un seguidor de líneas de alta velocidad, localizando a la persona en el paso $t=341$ a $20.3\text{ metros}$ (Semilla~14). Sin embargo, la trayectoria en el panel final $b(v^{341})$ demuestra que Voraz genera un surco estrictamente monolineal: el avance miope se encadena exclusivamente al sendero con mayor densidad local sin explorar bifurcaciones adyacentes; si el camino concluyera o existiera una discontinuidad en la red viaria, el método quedaría bloqueado en el extremo de la traza al carecer de diversificación global.
+La Figura~\ref{fig:evolucion_senderista_voraz} revela la causa exacta por la que el planificador Voraz Heurístico alcanza su mejor tasa de acierto media ($13.01\%$) en el perfil de senderista. Al constituir los caminos una guía unidimensional continua de probabilidad, el avance por gradiente local actúa como un seguidor de líneas de alta velocidad, localizando a la persona en el paso $t=341$ al aproximarse el sensor a $20.3\text{ metros}$ de la víctima (Semilla~14). Sin embargo, la trayectoria en el panel final $b(v^{341})$ demuestra que Voraz genera un surco estrictamente monolineal: el avance miope se encadena exclusivamente al sendero con mayor densidad local sin explorar bifurcaciones adyacentes; si el camino concluyera o existiera una discontinuidad en la red viaria, el método quedaría bloqueado en el extremo de la traza al carecer de diversificación global.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -211,7 +213,7 @@ La Figura~\ref{fig:evolucion_senderista_voraz} revela la causa exacta por la que
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_senderista_aco.png}}
 \end{figure}
 
-La Colonia de Hormigas (ACO) en la Figura~\ref{fig:evolucion_senderista_aco} solventa el problema de bifurcación de la red. Para la Semilla~39, las hormigas inspeccionan varias ramas secundarias de la red viaria antes de concentrar el flujo de feromonas en el trazado que conduce a la víctima, completando la intercepción con éxito en el paso $t=471$ a $20.0\text{ metros}$.
+La Colonia de Hormigas (ACO) en la Figura~\ref{fig:evolucion_senderista_aco} solventa el problema de bifurcación de la red. Para la Semilla~39, las hormigas inspeccionan varias ramas secundarias de la red viaria antes de concentrar el flujo de feromonas en el trazado que conduce a la víctima, completando la intercepción con éxito en el paso $t=471$ con una aproximación sensor-víctima de $20.0\text{ metros}$.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -220,7 +222,7 @@ La Colonia de Hormigas (ACO) en la Figura~\ref{fig:evolucion_senderista_aco} sol
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_senderista_abc.png}}
 \end{figure}
 
-De igual modo, la Colonia de Abejas (ABC) en la Figura~\ref{fig:evolucion_senderista_abc} demuestra su versatilidad sobre la misma Semilla~39: las abejas observadoras asignan recursos para explorar senderos concurrentes, barriendo de forma progresiva la traza principal y alcanzando la detección en el paso $t=445$ a $22.4\text{ metros}$. El panel final $b(v^{445})$ refleja un vaciado limpio y continuo de probabilidad a lo largo de los principales corredores recreativos de la Casa de Campo.
+De igual modo, la Colonia de Abejas (ABC) en la Figura~\ref{fig:evolucion_senderista_abc} demuestra su versatilidad sobre la misma Semilla~39: las abejas observadoras asignan recursos para explorar senderos concurrentes, barriendo de forma progresiva la traza principal y alcanzando la detección en el paso $t=445$ a $22.4\text{ metros}$ de proximidad de la cámara. El panel final $b(v^{445})$ refleja un vaciado limpio y continuo de probabilidad a lo largo de los principales corredores recreativos de la Casa de Campo.
 
 \begin{figure}[H]
 	\ffigbox[\FBwidth]
@@ -229,7 +231,7 @@ De igual modo, la Colonia de Abejas (ABC) en la Figura~\ref{fig:evolucion_sender
 	\includegraphics[width=0.95\textwidth]{imagenes/evolucion_temporal_senderista_bha.png}}
 \end{figure}
 
-Por último, la Figura~\ref{fig:evolucion_senderista_bha} confirma la eficiencia de búsqueda rápida del Algoritmo del Agujero Negro (BHA) en la red de caminos (Semilla~14): el dron experimenta una aceleración cinemática directa sobre el eje viario, logrando la intercepción en tan solo $t=31$ pasos a una distancia de $22.4\text{ metros}$. En misiones de tiempo crítico, esta rapidez de aproximación en los primeros minutos de vuelo proporciona el mayor índice de supervivencia potencial para la persona accidentada.
+Por último, la Figura~\ref{fig:evolucion_senderista_bha} confirma la eficiencia de búsqueda rápida del Algoritmo del Agujero Negro (BHA) en la red de caminos (Semilla~14): el dron experimenta una aceleración cinemática directa sobre el eje viario, logrando la intercepción en tan solo $t=31$ pasos de vuelo, aproximándose el dron a $22.4\text{ metros}$ de la víctima (distancia de contacto visual holgadamente inferior al radio de cobertura del sensor $R_d = 50\text{ m}$). En misiones de tiempo crítico, esta rapidez de aproximación en los primeros minutos de vuelo proporciona el mayor índice de supervivencia potencial para la persona accidentada.
 
 \section{Comparativa Global: Bioinspirados vs. Baselines Clásicos}
 

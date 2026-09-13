@@ -3,9 +3,8 @@
 En este capítulo se presenta una revisión exhaustiva de los conceptos teóricos y tecnológicos que fundamentan este trabajo. La búsqueda y rescate (SAR, por sus siglas en inglés) mediante vehículos aéreos no tripulados (UAVs) ha evolucionado desde la simple ejecución de patrones de vuelo fijos hacia sistemas inteligentes guiados por la probabilidad y la inteligencia artificial.
 
 \section{Teoría de Búsqueda Bayesiana}
-\label{sec:teoria_busqueda_bayesiana}
 
-La base matemática para la planificación de misiones de búsqueda tiene sus raíces teóricas en los trabajos desarrollados durante la Segunda Guerra Mundial, documentados por autores seminales como Koopman \cite{koopman1980}. El problema fundamental no consiste únicamente en mover un dron por el espacio, sino en decidir cómo moverlo para maximizar las posibilidades de encontrar el objetivo antes de que se agote el tiempo o la batería.
+La base matemática para la planificación de misiones de búsqueda tiene sus raíces teóricas en los trabajos desarrollados durante la Segunda Guerra Mundial, documentados posteriormente por autores como Koopman (1946) \cite{koopman}. El problema fundamental no consiste únicamente en mover un dron por el espacio, sino en decidir cómo moverlo para maximizar las posibilidades de encontrar el objetivo antes de que se agote el tiempo o la batería.
 
 Para formalizar este problema, la teoría de búsqueda clásica define varias métricas clave que los algoritmos intentan optimizar:
 \begin{itemize}
@@ -15,7 +14,7 @@ Para formalizar este problema, la teoría de búsqueda clásica define varias m�
     \begin{equation}
         POS = POA \times POD
     \end{equation}
-    Cabe señalar que en la doctrina de búsqueda y salvamento (como el manual IAMSAR), la Probabilidad de Área ($POA$) se denomina indistintamente Probabilidad de Contención ($POC$), siendo formulaciones conceptual y matemáticamente equivalentes ($POS = POA \times POD \equiv POC \times POD$). Un algoritmo inteligente puede decidir buscar en una zona con menos probabilidad de presencia (baja POA/POC) si el terreno está muy despejado y es fácil ver el suelo (alta POD), garantizando así un mayor éxito global.
+    Un algoritmo inteligente puede decidir buscar en una zona con menos probabilidad de presencia (baja POA) si el terreno está muy despejado y es fácil ver el suelo (alta POD), garantizando así un mayor éxito global.
 \end{itemize}
 
 Durante la búsqueda, a medida que los drones sobrevuelan zonas sin encontrar a la víctima, el sistema debe actualizar la creencia sobre dónde podría estar. Este proceso de descarte y actualización continua de las probabilidades se modela mediante técnicas bayesianas, como el Filtro Recursivo Bayesiano, ampliamente utilizado en la literatura moderna de robótica SAR y en el marco de búsqueda en tiempo mínimo (\textit{Minimum Time Search} o MTS) \cite{MTS_c1, lanillos-bayesian, carabaza_ingles, tesis_carabaza}.
@@ -157,7 +156,7 @@ Los conteos brutos de personas encontradas han sido ampliamente utilizados en en
 
 \subsection{Probabilidad de Éxito (POS)}
 
-Según el manual IAMSAR, la Probabilidad de Éxito (POS) es el producto de la Probabilidad de Contención (POC, conceptualmente equivalente a la POA definida en la Sección~\ref{sec:teoria_busqueda_bayesiana}) y la Probabilidad de Detección (POD):
+Según el manual IAMSAR, la Probabilidad de Éxito (POS) es el producto de la Probabilidad de Contención (POC) y la Probabilidad de Detección (POD):
 
 \begin{equation}
 POS = POC \times POD
@@ -202,7 +201,7 @@ Para transformar las estadísticas empíricas de incidentes SAR en distribucione
 
 \begin{table}[H]
 	\ttabbox[\textwidth]
-	{\caption{PARÁMETROS ESTADÍSTICOS DE DISPERSIÓN RADIAL Y DESPLAZAMIENTO SEGÚN ISRID \protect\cite{koester2008lost}}}
+	{\caption{PARÁMETROS ESTADÍSTICOS DE DISPERSIÓN RADIAL Y DESPLAZAMIENTO SEGÚN ISRID \cite{koester2008lost}}}
 	{\label{tab:isrid_perfiles_cap2}
 	\resizebox{\textwidth}{!}{%
 	\begin{tabular}{|l|c|c|c|c|l|}

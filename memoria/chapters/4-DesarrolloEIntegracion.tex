@@ -135,7 +135,7 @@ El vector resultante $(X_{\text{local}}, Y_{\text{local}})$ define unívocamente
 
 Para desacoplar el procesamiento cartográfico de la lógica de optimización, el middleware genera un archivo de configuración estandarizado en formato JSON vinculado a la matriz binaria \texttt{.npy}. Este fichero articula los parámetros cinemáticos, sensoriales y dimensionales de la misión:
 \begin{itemize}
-    \item \texttt{size}: Dimensiones matriciales de la rejilla $[N_y, N_x] = [458, 481]$ celdas para la Casa de Campo.
+    \item \texttt{size}: Dimensiones matriciales de la rejilla $[N_x, N_y]$ ($458 \times 481$ celdas para la Casa de Campo).
     \item \texttt{init\_pos}: Vector de despegue $[[X_{\text{local}}, Y_{\text{local}}]]$ derivado del LKP.
     \item \texttt{posible\_moves}: Conectividad cinemática del UAV, fijada en 8 direcciones contiguas (vecindad de Moore: N, NE, E, SE, S, SW, W, NW).
     \item \texttt{num\_steps}: Presupuesto temporal de vuelo máximo ($T = 1000$ pasos por misión).
@@ -240,12 +240,12 @@ El Módulo 5 centraliza la evaluación cuantitativa independiente de todas las t
 	\end{tikzpicture}}
 \end{figure}
 
-Las métricas evaluadas son:
+Las cinco métricas evaluadas son:
 \begin{enumerate}
-    \item \textbf{Tasa de Éxito de Misión ($SR_{\text{misión}}$, \%):} Porcentaje de misiones independientes en las que el dron intercepta la víctima virtual a una distancia $d \le 50\text{ m}$. Asimismo, el evaluador calcula la tasa de cobertura sobre el censo de víctimas virtuales ($SR_{\text{pob}}$).
-    \item \textbf{Pasos hasta el Hallazgo (\textit{Steps to Goal}):} Número de instantes temporales transcurridos hasta la detección de la víctima.
-    \item \textbf{Puntuación de Verosimilitud Acumulada ($S_{\text{like}}$, \%):} Suma acumulada de la creencia a priori $b(v^0)$ en las celdas sobrevoladas por el sensor ($\sum_{(i,j) \in \mathcal{V}} b(v^0)(i,j)$), métrica analítica de absorción de probabilidad que coincide con la tasa esperada de rescate poblacional ($S_{\text{like}} \approx SR_{\text{pob}}$).
-    \item \textbf{Área Geográfica Barrida (\textit{Covered Area}, $\text{km}^2$):} Superficie neta cubierta por la huella del sensor sin duplicar solapamientos ($A_{\text{cov}}$).
+    \item \textbf{Tasa de Éxito (\textit{Success Rate}, \%):} Porcentaje de misiones en las que el dron intercepta la víctima virtual a una distancia $d \le 50\text{ m}$.
+    \item \textbf{Pasos hasta el Hallazgo (\textit{Steps to Goal}):} Número de instantes temporales transcurridos hasta la detección.
+    \item \textbf{Probabilidad Acumulada Absorbida (\textit{Reduced Belief}, \%):} Fracción de la masa de probabilidad total del mapa eliminada tras el paso del sensor.
+    \item \textbf{Área Geográfica Barrida (\textit{Covered Area}, $\text{km}^2$):} Superficie neta cubierta por la huella del sensor sin duplicar solapamientos.
     \item \textbf{Distancia de Vuelo (\textit{Total Flight Length}, km):} Longitud métrica total de la trayectoria recorrida.
 \end{enumerate}
 

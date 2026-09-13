@@ -19,7 +19,7 @@ El modelo LPB clasifica a las personas extraviadas en categorías psicológicas 
 
 \subsection{Ponderación de Capas Topológicas y Radios Cuartiles}
 
-En la Tabla~\ref{tab:perfiles_koester} se detallan las ponderaciones estadísticas $\alpha_k$ asignadas a cada una de las capas cartográficas geoespaciales de OpenStreetMap conforme a la taxonomía empírica de Robert Koester (\textit{Lost Person Behavior}) \cite{koester2008lost}, así como los cuatro radios cuartiles de dispersión estadística $[25\%, 50\%, 75\%, 95\%]$ para clima templado y orografía llana. En el perfil Senderista, la búsqueda se orienta predominantemente hacia elementos de guiado lineal: tanto las sendas y pistas forestales (\texttt{road}, $13\%$) como las tapias perimetrales y vallas divisorias (\texttt{linear}, $25\%$), elementos que en la doctrina LPB actúan como guías tácticas de navegación para el sujeto extraviado (\textit{handrailing}), sumando conjuntamente un $38\%$ de concentración sobre corredores lineales.
+En la Tabla~\ref{tab:perfiles_koester} se detallan las ponderaciones porcentuales normalizadas asignadas a cada una de las seis coberturas del suelo en OpenStreetMap, así como los cuatro radios cuartiles de dispersión estadística $[25\%, 50\%, 75\%, 95\%]$ para clima templado y terreno llano.
 
 \begin{table}[H]
 	\ttabbox[\textwidth]
@@ -28,25 +28,20 @@ En la Tabla~\ref{tab:perfiles_koester} se detallan las ponderaciones estadístic
 	\resizebox{\textwidth}{!}{%
 	\begin{tabular}{|l|c|c|c|}
 		\hline
-		\textbf{Característica / Capa OSM} & \textbf{Perfil Autista} & \textbf{Perfil Demencia} & \textbf{Perfil Senderista} \\
+		\textbf{Característica / Capa} & \textbf{Perfil Autista} & \textbf{Perfil Demencia} & \textbf{Perfil Senderista} \\
 		\hline
-		Estructuras y Edificios (\textit{structure})        & 45\% & 20\% & 13\% \\
-		Red Viaria, Pistas y Senderos (\textit{road})       & 18\% & 18\% & 13\% \\
-		Barreras y Tapias Lineales (\textit{linear})        &  0\% &  9\% & 25\% \\
-		Bosques y Arbolado (\textit{woodland})              &  9\% & 17\% &  7\% \\
-		Campo Abierto y Claros (\textit{field})             &  9\% & 14\% & 14\% \\
-		Drenajes y Vaguadas (\textit{drainage})             &  0\% &  9\% & 12\% \\
-		Masas de Agua (\textit{water})                      &  9\% &  7\% &  8\% \\
-		Matorral y Vegetación Baja (\textit{brush/scrub})   &  9\% &  6\% &  5\% \\
-		Afloramientos Rocosos (\textit{rock})               &  0\% &  0\% &  4\% \\
+		Estructuras (\textit{Building}) & 45\% & 20\% & 13\% \\
+		Carreteras y Caminos (\textit{Road}) & 18\% & 18\% & 25\% \\
+		Bosques (\textit{Woodland}) & 9\% & 17\% & 7\% \\
+		Campo abierto (\textit{Field}) & 9\% & 14\% & 14\% \\
+		Masas de agua (\textit{Water}) & 9\% & 7\% & 8\% \\
+		Matorral denso (\textit{Brush}) & 9\% & 6\% & 3\% \\
 		\hline
 		\textbf{Radios Cuartiles $[25\%, 50\%, 75\%, 95\%]$} & $[0.6, 1.6, 3.7, 15.2]$ km & $[0.3, 1.0, 2.4, 12.8]$ km & $[0.6, 1.8, 3.2, 9.9]$ km \\
 		\hline
 	\end{tabular}%
 	}}
 \end{table}
-\vspace{-0.3cm}
-\noindent{\footnotesize \textit{Nota:} Las ponderaciones reproducen las frecuencias estadísticas empíricas de la base de datos ISRID documentadas por Robert Koester \cite{koester2008lost}, cuyas sumas crudas ($99\%$, $100\%$ y $101\%$) presentan leves desviaciones por redondeo al entero más próximo; dado que la matriz espacial resultante se normaliza globalmente ($\sum b(v^0) = 1.0$, Ec.~\ref{eq:poa_norm}), cualquier factor de escala global queda cancelado analíticamente, garantizando la rigurosa invariancia del mapa de creencias final.}
 
 Las tres matrices de probabilidad a priori $b(v^0)$ resultantes de aplicar estas ponderaciones y el filtrado por R-Tree han sido analizadas y contrastadas exhaustivamente en la Sección~\ref{sec:mapas_iniciales} (Figura~\ref{fig:comparativa_perfiles}), constituyendo los tres escenarios independientes de búsqueda sobre los que se evalúan los planificadores.
 
@@ -126,7 +121,7 @@ Las variables operativas del UAV se mantuvieron constantes en todas las simulaci
         \item \textit{Franqueo de Seguridad sobre la Masa Arbórea:} En el parque de la Casa de Campo, los ejemplares adultos de pino piñonero (\textit{Pinus pinea}) y encina (\textit{Quercus ilex}) alcanzan alturas comprendidas entre los 15 y los 25 metros. Volar a $50\text{ m}$ asegura un margen vertical de seguridad holgado de al menos 25 metros sobre las copas de los árboles y posibles postes o tendidos de servicio, eliminando el riesgo de colisión física.
     \end{enumerate}
     \item \textbf{Condición de Inicio:} El dron despega siempre desde el centro geométrico del parque o Punto de Planificación Inicial (LKP).
-    \item \textbf{Validación Doble (Víctimas Informadas LPB vs. Víctimas Ciegas):} Cada trayectoria de vuelo generada se contrasta de forma exhaustiva frente a dos conjuntos independientes de $1000$ víctimas virtuales generadas en el Módulo~5 (motor estocástico de Montecarlo):
+    \item \textbf{Validación Doble (Víctimas Informadas LPB vs. Víctimas Ciegas):} Cada trayectoria de vuelo generada se contrasta de forma exhaustiva frente a dos conjuntos independientes de $1000$ víctimas generadas en el Módulo~2:
     \begin{itemize}
         \item \textit{Víctimas Informadas:} Ubicadas en el mapa siguiendo la distribución probabilística empírica del modelo LPB para cada perfil conductual. Permite evaluar la tasa de éxito cuando la persona desaparecida se comporta acorde a la psicología forense de búsqueda y rescate.
         \item \textit{Víctimas Ciegas (Línea Base de Estrés):} Distribuidas bajo una distribución espacial uniforme por todo el polígono de la Casa de Campo (evitando únicamente lagos y cubiertas no transitables). Esta modalidad actúa como contraste de estrés para verificar la robustez del planificador ante anomalías conductuales o errores en la categorización inicial del perfil.
@@ -165,38 +160,32 @@ goal = np.array([x_goal, y_goal], dtype=float)
 
 \section{Formulación Matemática de las Métricas SAR Unificadas (\texttt{PathEvaluatorTFM})}
 
-Todas las trayectorias resultantes se evalúan cuantitativamente a través de las métricas estandarizadas del módulo \texttt{PathEvaluatorTFM}:
+Todas las trayectorias resultantes se evalúan cuantitativamente a través de las cinco métricas estandarizadas del módulo \texttt{PathEvaluatorTFM}:
 
 \begin{enumerate}
-    \item \textbf{Tasa de Cobertura Poblacional (\textit{Population Success Rate}, $SR_{\text{pob}}$):} Porcentaje del censo de $N_{\text{censo}} = 1000$ víctimas virtuales (informadas o ciegas) interceptadas por la trayectoria del UAV $\mathcal{T} = \{p_0, p_1, \dots, p_K\}$ dentro del radio de detección sensor $R_d = 50\text{ m}$:
+    \item \textbf{Tasa de Éxito (\textit{Success Rate}, $SR$):} Porcentaje de misiones en las que la trayectoria del UAV $\mathcal{T} = \{p_0, p_1, \dots, p_K\}$ intercepta la posición de la víctima $v_{\text{real}}$ dentro del radio de detección de 50 metros:
     \begin{equation}
-        SR_{\text{pob}} = \frac{1}{N_{\text{censo}}} \sum_{m=1}^{N_{\text{censo}}} \mathbb{I}\left( \min_{t} \|p_t - v_m\|_2 \le R_d \right) \times 100
+        SR = \frac{1}{N} \sum_{k=1}^{N} \mathbb{I}\left( \min_{t} \|p_t^{(k)} - v_{\text{real}}^{(k)}\|_2 \le 50\text{ m} \right) \times 100
     \end{equation}
-    Esta métrica evalúa la amplitud exploratoria global de la ruta frente a la distribución espacial del perfil y se reporta en las Tablas~\ref{tab:resultados_demencia}, \ref{tab:resultados_autista} y \ref{tab:resultados_senderista} como media $\pm$ desviación típica sobre las 50 misiones.
+    donde $\mathbb{I}(\cdot)$ es la función indicatriz y $N=50$ es el número de semillas de Montecarlo.
 
-    \item \textbf{Tasa de Éxito de Misión (\textit{Mission Success Rate}, $SR_{\text{misión}}$):} Porcentaje de misiones independientes en las que el dron interceptó exitosamente a la víctima objetivo concreta asignada a cada semilla de Montecarlo antes de expirar el presupuesto de vuelo:
+    \item \textbf{Pasos hasta el Hallazgo (\textit{Steps to Goal}, $S_{\text{goal}}$):} En las misiones exitosas, representa el número de pasos transcurridos hasta el primer instante de detección $t_{\text{det}}$:
     \begin{equation}
-        SR_{\text{misión}} = \frac{1}{N} \sum_{k=1}^{N} \mathbb{I}\left( \min_{t} \|p_t^{(k)} - v_{\text{real}}^{(k)}\|_2 \le R_d \right) \times 100
-    \end{equation}
-    donde $N=50$ representa el número de semillas estocásticas por perfil, reportada en la Tabla~\ref{tab:golden_hour}.
-
-    \item \textbf{Verosimilitud Acumulada (\textit{Likelihood Score}, $S_{\text{like}}$):} Suma analítica de la probabilidad de presencia a priori contenida en el conjunto de celdas geográficas únicas $\mathcal{V}_{\text{vis}}$ sobrevoladas por la huella del sensor a lo largo de la misión:
-    \begin{equation}
-        S_{\text{like}} = \sum_{(i,j) \in \mathcal{V}_{\text{vis}}} b(v^0)(i, j)
-    \end{equation}
-    Nótese que $S_{\text{like}}$ constituye la integral analítica de la masa de probabilidad a priori barrida por la trayectoria, mientras que $SR_{\text{pob}}$ representa su estimación empírica por Montecarlo sobre el censo de 1.000 víctimas. La estrecha concordancia observada entre ambas métricas ($\le 1$ punto porcentual de desviación en todos los perfiles) valida formalmente la consistencia matemática y estocástica del generador del benchmark.
-
-    \item \textbf{Pasos hasta el Hallazgo (\textit{Steps to Goal}, $S_{\text{goal}}$):} En las misiones exitosas ($SR_{\text{misión}} = 1$), cuantifica el paso temporal exacto $t_{\text{det}}$ en el que se produjo el primer contacto visual con la víctima:
-    \begin{equation}
-        S_{\text{goal}} = \min \left\{ t \in [0, K] \mid \|p_t - v_{\text{real}}\|_2 \le R_d \right\}
+        S_{\text{goal}} = \min \left\{ t \in [0, K] \mid \|p_t - v_{\text{real}}\|_2 \le 50\text{ m} \right\}
     \end{equation}
 
-    \item \textbf{Área Geográfica Barrida (\textit{Covered Area}, $A_{\text{cov}}$):} Superficie en kilómetros cuadrados cubierta por la unión geométrica de las huellas circulares del sensor a lo largo del vuelo:
+    \item \textbf{Probabilidad Acumulada Reducida (\textit{Reduced Belief}, $P_{\text{red}}$):} Fracción de la masa de probabilidad original $b(v^0)$ que ha sido eliminada por las observaciones del dron al finalizar la misión:
+    \begin{equation}
+        P_{\text{red}} = 1.0 - \frac{\sum_{i=1}^{N_y} \sum_{j=1}^{N_x} b(v^{\text{Final}})(i,j)}{\sum_{i=1}^{N_y} \sum_{j=1}^{N_x} b(v^0)(i,j)}
+    \end{equation}
+
+    \item \textbf{Área Geográfica Barrida (\textit{Covered Area}, $A_{\text{cov}}$):} Superficie total en kilómetros cuadrados cubierta por la unión geométrica de las huellas circulares del sensor a lo largo de la trayectoria:
     \begin{equation}
         A_{\text{cov}} = \frac{\text{Área}\left( \bigcup_{t=0}^{K} \mathcal{B}(p_t, R_d) \right)}{10^6} \text{ km}^2
     \end{equation}
+    donde $\mathcal{B}(p_t, R_d)$ representa el círculo de radio $R_d = 50\text{ m}$ centrado en $p_t$.
 
-    \item \textbf{Distancia Total de Vuelo (\textit{Total Flight Length}, $D_{\text{total}}$):} Longitud métrica euclídea acumulada recorrida por el vehículo aéreo en kilómetros:
+    \item \textbf{Distancia Total de Vuelo (\textit{Total Flight Length}, $D_{\text{total}}$):} Longitud métrica euclídea acumulada recorrida por el vehículo aéreo:
     \begin{equation}
         D_{\text{total}} = \frac{1}{1000} \sum_{t=0}^{K-1} \|p_{t+1} - p_t\|_2 \text{ km}
     \end{equation}
